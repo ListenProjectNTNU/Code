@@ -60,6 +60,7 @@ public class NPCDialogue : MonoBehaviour
     }
     public void NextLine()
     {
+        Debug.Log("NextLine() 被呼叫");
         contButton.SetActive(false);
         if(index < dialogue.Length - 1)
         {
