@@ -14390,8 +14390,8 @@ MonoBehaviour:
   dialogueText: {fileID: 246495899}
   dialogue:
   - "\u65E9\u5B89"
-  - "\u5348\u5B89"
   - "\u665A\u5B89"
+  - "\u5348\u5B89"
   contButton: {fileID: 1552965258}
   wordSpeed: 0.06
   playerIsClose: 0
