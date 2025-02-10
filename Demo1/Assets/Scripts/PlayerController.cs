@@ -16,14 +16,17 @@ public class PlayerController : MonoBehaviour
     public Text cherryText;
 
     //FSM
-    private enum State{idle,running,jumping,falling,hurt};
+    private enum State{idle,running,jumping,falling,hurt,dead};
     private State state = State.idle;
     //Inspector variable
     public LayerMask ground;
     public float speed = 5f;
     public float jumpForce = 15f;
     public float hurtForce = 10f;
-    
+    public healthbar healthBar;
+    private float trapDamageCooldown = 1f; // 地刺傷害間隔 1 秒
+    private float lastTrapDamageTime = 0f; // 上次受到地刺傷害的時間
+
     private void Start() {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -52,6 +55,32 @@ public class PlayerController : MonoBehaviour
             //Debug.Log(cherries);
             cherryText.text = cherries.ToString();
         }
+        else if (collision.tag == "enemyhitbox") // 檢測是否碰到敵人的 Hitbox
+        {
+            EnemyBehavior enemy = collision.GetComponentInParent<EnemyBehavior>(); // 獲取敵人的主要行為腳本
+
+            if (state == State.falling)
+            {
+                // 玩家從上方踩到敵人
+                jump();
+            }
+            else  // 敵人處於攻擊狀態
+            {
+                // 玩家被敵人攻擊
+                state = State.hurt;
+
+                if (collision.transform.position.x > transform.position.x)
+                {
+                    // 敵人在右側，玩家向左受傷
+                    rb.velocity = new Vector2(-hurtForce, rb.velocity.y);
+                }
+                else
+                {
+                    // 敵人在左側，玩家向右受傷
+                    rb.velocity = new Vector2(hurtForce, rb.velocity.y);
+                }
+            }             
+        }
     }
 
     //Enemy
@@ -61,7 +90,7 @@ public class PlayerController : MonoBehaviour
         {
             if(state ==State.falling)
             {
-                Destroy(other.gameObject);
+                // Destroy(other.gameObject);
                 jump();
             }
             else
@@ -78,11 +107,77 @@ public class PlayerController : MonoBehaviour
                     //Enemy is to player's left therefore player shoud be demaged and move right.
                     rb.velocity = new Vector2(hurtForce, rb.velocity.y);
                 }
+                
+                if (healthBar != null)
+                {
+                    healthBar.SetHealth(healthBar.currenthp - 20f); // 減少血量
+                }
+                else
+                {
+                    Debug.LogError("HealthBar reference is missing in PlayerController.");
+                }
+
+                // 確保血量不小於 0
+                if (healthBar != null && healthBar.currenthp <= 0)
+                {
+                    healthBar.SetHealth(0f); // 保持血量為 0，不會變成負數\
+                    state = State.dead;
+                    anim.SetInteger("state", (int)State.dead);
+                    Debug.Log("Player is dead!");
+                    // 可以在這裡加入玩家死亡處理邏輯
+                    
+                    rb.velocity = Vector2.zero; // 停止玩家移動
+                    this.enabled = false;
+                }
             }
             
-        }  
+        }
     }
+    private void OnTriggerStay2D(Collider2D collision)
+{
+    if (collision.tag == "trap" && Time.time > lastTrapDamageTime + trapDamageCooldown)
+    {
+        lastTrapDamageTime = Time.time; // 更新上次受傷時間
+        TakeTrapDamage();
+    }
+}
 
+// 受地刺傷害的方法
+    private void TakeTrapDamage()
+    {
+        state = State.hurt;
+
+        // 讓玩家受到擊退
+        if (transform.position.x > 0)
+        {
+            rb.velocity = new Vector2(-hurtForce, rb.velocity.y);
+        }
+        else
+        {
+            rb.velocity = new Vector2(hurtForce, rb.velocity.y);
+        }
+
+        // 扣血
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(healthBar.currenthp - 2f);
+        }
+        else
+        {
+            Debug.LogError("HealthBar reference is missing in PlayerController.");
+        }
+
+        // 檢查血量是否歸零
+        if (healthBar != null && healthBar.currenthp <= 0)
+        {
+            healthBar.SetHealth(0f);
+            state = State.dead;
+            anim.SetInteger("state", (int)State.dead);
+            Debug.Log("Player is dead!");
+            rb.velocity = Vector2.zero;
+            this.enabled = false;
+        }
+    }
 
     private void Movement()
     {
