@@ -43,6 +43,7 @@ public class EnemyFrog : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
+        
         //play hurt animation
         anim.SetTrigger("Hurt");
 

@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Collectable
   - Enemy
+  - enemyhitbox
+  - playerhitbox
+  - trap
   layers:
   - Default
   - TransparentFX
