@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class NPCDialogue : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class NPCDialogue : MonoBehaviour
     public GameObject contButton;
     public float wordSpeed;
     public bool playerIsClose;
+    public UnityEvent onDialogueEnd;
+    
 
     // Update is called once per frame
     void Update()
@@ -68,6 +71,7 @@ public class NPCDialogue : MonoBehaviour
         else
         {
             resetText();
+            onDialogueEnd?.Invoke(); // 觸發對話結束事件
         }
     }
 
