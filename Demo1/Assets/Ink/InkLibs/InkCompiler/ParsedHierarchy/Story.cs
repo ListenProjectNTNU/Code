@@ -39,6 +39,10 @@ namespace Ink.Parsed
             // the ExportRuntime method is called.
 		}
 
+        public Story(string text)
+        {
+        }
+
         // Before this function is called, we have IncludedFile objects interspersed
         // in our content wherever an include statement was.
         // So that the include statement can be added in a sensible place (e.g. the
@@ -50,6 +54,7 @@ namespace Ink.Parsed
         // knots/stiches and any other content. Insert the normal content wherever
         // the include statement was, and append the knots/stitches to the very
         // end of the main story.
+
         protected override void PreProcessTopLevelObjects(List<Parsed.Object> topLevelContent)
         {
             var flowsFromOtherFiles = new List<FlowBase> ();
