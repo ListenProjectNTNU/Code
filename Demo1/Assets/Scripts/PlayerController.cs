@@ -50,10 +50,17 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.CompareTag("Collectable")) 
         {
-            cherries += 1;
-            Destroy(collision.gameObject);
-            //Debug.Log(cherries);
-            cherryText.text = cherries.ToString();
+            LootItem lootItem = collision.GetComponent<LootItem>();
+            if (lootItem != null)
+            {
+                PlayerInventory.Instance.AddItem(lootItem.lootData.lootName);
+                //Debug.Log("PC撿到物品：" + lootItem.lootData.lootName);
+                Destroy(collision.gameObject); // 撿起後刪除物品
+            }
+            else
+            {
+                Debug.LogWarning("LootItem 腳本沒有附加在 Collectable 上！");
+            }
         }
         else if (collision.tag == "enemyhitbox") // 檢測是否碰到敵人的 Hitbox
         {

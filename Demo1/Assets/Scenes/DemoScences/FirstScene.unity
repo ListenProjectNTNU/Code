@@ -14226,6 +14226,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1253663558}
     - target: {fileID: 6058715792962781089, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: displayNameText
+      value: 
+      objectReference: {fileID: 1921411728}
+    - target: {fileID: 6058715792962781089, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: portraitAnimator
+      value: 
+      objectReference: {fileID: 1921411729}
+    - target: {fileID: 6058715792962781089, guid: ec6087b620debe04093b594023afd197, type: 3}
       propertyPath: choices.Array.data[0]
       value: 
       objectReference: {fileID: 185924082}
@@ -14703,6 +14711,22 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ccebf93433070784bb4a00b28ef73685, type: 3}
+--- !u!114 &1921411728 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1756038664383375804, guid: ccebf93433070784bb4a00b28ef73685, type: 3}
+  m_PrefabInstance: {fileID: 1921411727}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!95 &1921411729 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 4147749474481063595, guid: ccebf93433070784bb4a00b28ef73685, type: 3}
+  m_PrefabInstance: {fileID: 1921411727}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2108117160
 PrefabInstance:
   m_ObjectHideFlags: 0
