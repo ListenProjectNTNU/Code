@@ -10,9 +10,13 @@ using UnityEngine.Events;
 public class DialogueManager : MonoBehaviour
 {
     private PlayerController playerController;
+
     [Header("Dialogue UI")]
     public GameObject dialoguePanel;
     public TextMeshProUGUI dialogueText;
+    public TextMeshProUGUI displayNameText;
+    [SerializeField] private Animator portraitAnimator;
+
     [Header("Choices UI")]
     public GameObject[] choices;
     private TextMeshProUGUI[] choicesText;
@@ -23,6 +27,9 @@ public class DialogueManager : MonoBehaviour
 
     public UnityEvent onDialogueEnd;
 
+    private const string SPEAKER_TAG = "speaker";
+    private const string PORTRAIT_TAG = "portrait";
+private const string LAYOUT_TAG = "layout";
     private void Awake()
     {
         if(instance != null)
@@ -72,7 +79,7 @@ public class DialogueManager : MonoBehaviour
 
     public void EnterDialogueMode(TextAsset inkJSON)
     {
-        Debug.Log("EnterDialogueMode");
+        //Debug.Log("EnterDialogueMode");
         if (playerController != null)
         {
             playerController.enabled = false;  // 進入對話時停用玩家移動
@@ -102,11 +109,55 @@ public class DialogueManager : MonoBehaviour
             dialogueText.text = currentStory.Continue();
             // display the choices
             DisplayChoices();
+            //handle tags
+            HandleTags(currentStory.currentTags);
         }
         else
         {
             ExitDialogueMode();
             onDialogueEnd?.Invoke(); // 觸發對話結束事件
+        }
+    }
+
+    private void HandleTags(List<string> currentTags)
+    {
+        //loop for each tag 
+        foreach(string tag in currentTags)
+        {
+            //parse the tag
+            string[] splitTag = tag.Split(":");
+            //check parsing is correct
+            if(splitTag.Length !=2)
+            {
+                Debug.LogError("Tag could not be appropriately parsed: " + tag);
+            }
+
+            string tagKey = splitTag[0].Trim();
+            string tagValue = splitTag[1].Trim();
+
+            // Debug 檢查是否解析正確
+            Debug.Log($"Tag detected - Key:{tagKey}, Value:{tagValue}");
+
+             // handle the tag
+            switch (tagKey) 
+            {
+                case SPEAKER_TAG:
+                    displayNameText.text = tagValue;
+                    break;
+                case PORTRAIT_TAG:
+                    Debug.Log("portrait = "+ tagValue);
+                    portraitAnimator.Play(tagValue);
+                    break;
+                case LAYOUT_TAG:
+                    //layoutAnimator.Play(tagValue);
+                    break;
+                //case AUDIO_TAG: 
+                    //SetCurrentAudioInfo(tagValue);
+                    //break;
+                default:
+                    Debug.LogWarning("Tag came in but is not currently being handled: " + tag);
+                    break;
+            }
         }
     }
 
