@@ -5,6 +5,7 @@ using Ink.Runtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -19,6 +20,9 @@ public class DialogueManager : MonoBehaviour
     private Story currentStory;
     public bool dialogueIsPlaying { get; private set;}
     private static DialogueManager instance;
+
+    public UnityEvent onDialogueEnd;
+
     private void Awake()
     {
         if(instance != null)
@@ -102,6 +106,7 @@ public class DialogueManager : MonoBehaviour
         else
         {
             ExitDialogueMode();
+            onDialogueEnd?.Invoke(); // 觸發對話結束事件
         }
     }
 
