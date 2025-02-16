@@ -14795,6 +14795,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 777749337478202044, guid: 983cbfddb03bbb3419005b156f9f4574, type: 3}
+      propertyPath: m_SortingOrder
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6748596313305583503, guid: 983cbfddb03bbb3419005b156f9f4574, type: 3}
       propertyPath: m_Name
       value: NPC_PM_Other
