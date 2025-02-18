@@ -123,11 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &330546919 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8210320342672839757, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
-  m_PrefabInstance: {fileID: 1672318239}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &450398624 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6058715792962781089, guid: ec6087b620debe04093b594023afd197, type: 3}
@@ -368,7 +363,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2331651468020798637, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.137255
+      value: -0.93
       objectReference: {fileID: 0}
     - target: {fileID: 2331651468020798637, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
       propertyPath: m_LocalPosition.z
@@ -409,28 +404,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2918784421876243179, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 995221296}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
 --- !u!4 &824339890 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2553590595040252757, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
   m_PrefabInstance: {fileID: 1672318239}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &824339898
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 330546919}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23411b8eed7953344977cdd203af4639, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &888725086
 GameObject:
   m_ObjectHideFlags: 0
@@ -3249,27 +3229,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6271089988770836920, guid: ccebf93433070784bb4a00b28ef73685, type: 3}
   m_PrefabInstance: {fileID: 723836187}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &995221295 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2918784421876243179, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
-  m_PrefabInstance: {fileID: 746551960}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &995221296
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 995221295}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 436b6744cd21f90409d8804fa242f51d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  droppedItemPrefab: {fileID: 6897369363764271678, guid: 8c3a97b6e0ffa974da1f30b6ffbb3abd, type: 3}
-  lootList:
-  - {fileID: 11400000, guid: be566db420a28244585558a6cf79613b, type: 2}
-  - {fileID: 11400000, guid: 731e1905e7558cd46b0168cf607e76be, type: 2}
 --- !u!1 &1201693463
 GameObject:
   m_ObjectHideFlags: 0
@@ -14619,17 +14578,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 8210320342672839757, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8210320342672839757, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 824339898}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
 --- !u!1 &1753512599 stripped
 GameObject:
@@ -14945,6 +14897,10 @@ PrefabInstance:
     - target: {fileID: 2090304802380399114, guid: 3a3f9ac3aa5c5de4bab8768391ac7ee1, type: 3}
       propertyPath: m_Name
       value: LevelLoader
+      objectReference: {fileID: 0}
+    - target: {fileID: 2931672820656105797, guid: 3a3f9ac3aa5c5de4bab8768391ac7ee1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4397298383811543057, guid: 3a3f9ac3aa5c5de4bab8768391ac7ee1, type: 3}
       propertyPath: m_LocalPosition.x

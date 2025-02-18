@@ -4,8 +4,8 @@ using UnityEngine.SceneManagement;
 public class DoorTrigger : MonoBehaviour
 {
     public string targetSceneName; // 設定要切換的場景名稱
-    public Animator transition;//換場動畫
-    public float transitionTime = 1f;
+    //public Animator transition;//換場動畫
+    //public float transitionTime = 1f;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -14,7 +14,7 @@ public class DoorTrigger : MonoBehaviour
             if (AllEnemiesDefeated()) // 檢查敵人是否全部消失
             {
                 //play animation
-                transition.SetTrigger("Start");
+                //transition.SetTrigger("Start");
 
                 //wait
                 //yield return new WaitForSeconds(transitionTime);
