@@ -61,7 +61,7 @@ public class DialogueManager : MonoBehaviour
             index++;
         }
 
-        
+
 
     }
 
@@ -91,6 +91,16 @@ public class DialogueManager : MonoBehaviour
         currentStory = new Story(inkJSON.text);
         dialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
+
+        //更新變數
+        InkVariableUpdater inkUpdater = FindObjectOfType<InkVariableUpdater>();
+        if (inkUpdater != null)
+        {
+            //Debug.Log("進入對話時更新暫存變數");
+            inkUpdater.SetCurrentStory(currentStory);
+            inkUpdater.ApplyTempVariables();
+        }
+
 
         continueStory();
 
@@ -139,7 +149,7 @@ public class DialogueManager : MonoBehaviour
             string tagValue = splitTag[1].Trim();
 
             // Debug 檢查是否解析正確
-            Debug.Log($"Tag detected - Key:{tagKey}, Value:{tagValue}");
+            //Debug.Log($"Tag detected - Key:{tagKey}, Value:{tagValue}");
 
             // handle the tag
             switch (tagKey)
@@ -148,7 +158,7 @@ public class DialogueManager : MonoBehaviour
                     displayNameText.text = tagValue;
                     break;
                 case PORTRAIT_TAG:
-                    Debug.Log("portrait = " + tagValue);
+                    //Debug.Log("portrait = " + tagValue);
                     portraitAnimator.Play(tagValue);
                     break;
                 case LAYOUT_TAG:

@@ -26,6 +26,7 @@ public class PlayerInventory : MonoBehaviour
     private void Start()
     {
         inkUpdater = FindObjectOfType<InkVariableUpdater>();
+        Debug.Log($"🔍 inkUpdater 是否為 null？{inkUpdater == null}");
     }
 
     public void AddItem(string itemName)
@@ -36,6 +37,7 @@ public class PlayerInventory : MonoBehaviour
         // 更新對應的 Ink 變數
         if (inkUpdater != null)
         {
+            Debug.Log($"更新對應的 Ink 變數：has_{itemName}");
             inkUpdater.UpdateVariable($"has_{itemName}", true);
         }
     }
