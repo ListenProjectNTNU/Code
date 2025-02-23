@@ -1,13 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    //Start() var
     private Rigidbody2D rb;
     private Animator anim;
     private Collider2D coll;
@@ -15,159 +13,93 @@ public class PlayerController : MonoBehaviour
     public int cherries = 0;
     public Text cherryText;
 
-    //FSM
-    private enum State{idle,running,jumping,falling,hurt,dead};
+    private enum State { idle, running, jumping, falling, hurt, dead };
     private State state = State.idle;
-    //Inspector variable
+
     public LayerMask ground;
     public float speed = 5f;
     public float jumpForce = 15f;
     public float hurtForce = 10f;
     public healthbar healthBar;
-    private float trapDamageCooldown = 1f; // 地刺傷害間隔 1 秒
-    private float lastTrapDamageTime = 0f; // 上次受到地刺傷害的時間
 
-    private void Start() {
+    private float trapDamageCooldown = 1f;
+    private float lastTrapDamageTime = 0f;
+
+    private void Start()
+    {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
     }
-  
-    // Update is called once per frame
+
     void Update()
     {
-        if(state != State.hurt)
+        if (state != State.hurt)
         {
             Movement();
         }
         AnimationState();
-        anim.SetInteger("state", (int)state);//sets animation based on Enumerator state
-        //Debug.Log((int)state);
+        anim.SetInteger("state", (int)state);
     }
 
-    //Cherries
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Collectable")) 
+        if (collision.CompareTag("Collectable"))
         {
-            cherries += 1;
-            Destroy(collision.gameObject);
-            //Debug.Log(cherries);
-            cherryText.text = cherries.ToString();
-        }
-        else if (collision.tag == "enemyhitbox") // 檢測是否碰到敵人的 Hitbox
-        {
-            EnemyBehavior enemy = collision.GetComponentInParent<EnemyBehavior>(); // 獲取敵人的主要行為腳本
-
-            if (state == State.falling)
+            LootItem lootItem = collision.GetComponent<LootItem>();
+            if (lootItem != null)
             {
-                // 玩家從上方踩到敵人
-                jump();
+                PlayerInventory.Instance.AddItem(lootItem.lootData.lootName);
+                Destroy(collision.gameObject);
             }
-            else  // 敵人處於攻擊狀態
-            {
-                // 玩家被敵人攻擊
-                state = State.hurt;
-
-                if (collision.transform.position.x > transform.position.x)
-                {
-                    // 敵人在右側，玩家向左受傷
-                    rb.velocity = new Vector2(-hurtForce, rb.velocity.y);
-                }
-                else
-                {
-                    // 敵人在左側，玩家向右受傷
-                    rb.velocity = new Vector2(hurtForce, rb.velocity.y);
-                }
-            }             
         }
     }
 
-    //Enemy
-    private void OnCollisionEnter2D(Collision2D other) 
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        if(other.gameObject.tag == "Enemy")  
+        if (collision.tag == "trap" && Time.time > lastTrapDamageTime + trapDamageCooldown)
         {
-            if(state ==State.falling)
+            lastTrapDamageTime = Time.time;
+            TakeDamage(2);
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            if (state == State.falling)
             {
-                // Destroy(other.gameObject);
                 jump();
             }
             else
             {
                 state = State.hurt;
-                Debug.Log(state);
-                if(other.gameObject.transform.position.x > transform.position.x)
+                if (other.gameObject.transform.position.x > transform.position.x)
                 {
-                    //Enemy is to player's right therefore player shoud be demaged and move left.
                     rb.velocity = new Vector2(-hurtForce, rb.velocity.y);
                 }
                 else
                 {
-                    //Enemy is to player's left therefore player shoud be demaged and move right.
                     rb.velocity = new Vector2(hurtForce, rb.velocity.y);
                 }
-                
-                if (healthBar != null)
-                {
-                    healthBar.SetHealth(healthBar.currenthp - 20f); // 減少血量
-                }
-                else
-                {
-                    Debug.LogError("HealthBar reference is missing in PlayerController.");
-                }
-
-                // 確保血量不小於 0
-                if (healthBar != null && healthBar.currenthp <= 0)
-                {
-                    healthBar.SetHealth(0f); // 保持血量為 0，不會變成負數\
-                    state = State.dead;
-                    anim.SetInteger("state", (int)State.dead);
-                    Debug.Log("Player is dead!");
-                    // 可以在這裡加入玩家死亡處理邏輯
-                    
-                    rb.velocity = Vector2.zero; // 停止玩家移動
-                    this.enabled = false;
-                }
+                TakeDamage(100);
             }
-            
         }
     }
-    private void OnTriggerStay2D(Collider2D collision)
-{
-    if (collision.tag == "trap" && Time.time > lastTrapDamageTime + trapDamageCooldown)
-    {
-        lastTrapDamageTime = Time.time; // 更新上次受傷時間
-        TakeTrapDamage();
-    }
-}
 
-// 受地刺傷害的方法
-    private void TakeTrapDamage()
+    public void TakeDamage(int damage)
     {
         state = State.hurt;
-
-        // 讓玩家受到擊退
-        if (transform.position.x > 0)
-        {
-            rb.velocity = new Vector2(-hurtForce, rb.velocity.y);
-        }
-        else
-        {
-            rb.velocity = new Vector2(hurtForce, rb.velocity.y);
-        }
-
-        // 扣血
         if (healthBar != null)
         {
-            healthBar.SetHealth(healthBar.currenthp - 2f);
+            healthBar.SetHealth(healthBar.currenthp - damage);
         }
         else
         {
             Debug.LogError("HealthBar reference is missing in PlayerController.");
         }
 
-        // 檢查血量是否歸零
         if (healthBar != null && healthBar.currenthp <= 0)
         {
             healthBar.SetHealth(0f);
@@ -185,13 +117,11 @@ public class PlayerController : MonoBehaviour
 
         if (hDirection < 0)
         {
-            //moving left
             rb.velocity = new Vector2(-speed, rb.velocity.y);
             transform.localScale = new Vector2(-1, 1);
         }
         else if (hDirection > 0)
         {
-            //moveing right
             rb.velocity = new Vector2(speed, rb.velocity.y);
             transform.localScale = new Vector2(1, 1);
         }
@@ -200,13 +130,12 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector2(0, rb.velocity.y);
         }
 
-        //jump
         if (Input.GetButtonDown("Jump") && coll.IsTouchingLayers(ground))
         {
             jump();
         }
     }
-    
+
     private void jump()
     {
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
@@ -215,38 +144,34 @@ public class PlayerController : MonoBehaviour
 
     private void AnimationState()
     {
-        if(state == State.jumping)
+        if (state == State.jumping)
         {
-           //state = State.idle;
-            if(rb.velocity.y < .1f)
+            if (rb.velocity.y < .1f)
             {
                 state = State.falling;
             }
         }
-        else if(state == State.falling)
+        else if (state == State.falling)
         {
-            if(coll.IsTouchingLayers(ground))
+            if (coll.IsTouchingLayers(ground))
             {
                 state = State.idle;
             }
         }
-        //Math.Abs means absloute value
-        else if(state == State.hurt)
+        else if (state == State.hurt)
         {
-            if(Math.Abs(rb.velocity.x) < .1f)
+            if (Math.Abs(rb.velocity.x) < .1f)
             {
                 state = State.idle;
             }
         }
-        else if(Math.Abs(rb.velocity.x) > 4.5f)
+        else if (Math.Abs(rb.velocity.x) > 4.5f)
         {
-            //is running
             state = State.running;
         }
         else
         {
             state = State.idle;
         }
-        //Debug.Log(state);
     }
 }

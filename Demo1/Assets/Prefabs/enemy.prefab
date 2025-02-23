@@ -241,6 +241,7 @@ GameObject:
   - component: {fileID: 6401325289433311747}
   - component: {fileID: 4391496779238050349}
   - component: {fileID: 6837795680981624476}
+  - component: {fileID: 2293140914306977931}
   m_Layer: 7
   m_Name: enemy
   m_TagString: Enemy
@@ -429,6 +430,22 @@ MonoBehaviour:
   dropAmount: 1
   health: 100
   healthBar: {fileID: 2161786921408713922}
+--- !u!114 &2293140914306977931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918784421876243179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 436b6744cd21f90409d8804fa242f51d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  droppedItemPrefab: {fileID: 6897369363764271678, guid: 8c3a97b6e0ffa974da1f30b6ffbb3abd, type: 3}
+  lootList:
+  - {fileID: 11400000, guid: be566db420a28244585558a6cf79613b, type: 2}
+  - {fileID: 11400000, guid: 731e1905e7558cd46b0168cf607e76be, type: 2}
 --- !u!1 &3362104566922464249
 GameObject:
   m_ObjectHideFlags: 0

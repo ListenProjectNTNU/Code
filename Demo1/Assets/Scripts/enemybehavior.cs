@@ -109,9 +109,12 @@ public class EnemyBehavior : MonoBehaviour
         GetComponent<Collider2D>().enabled = false;
         this.enabled = false;
 
+        //呼叫掉落物
+        GetComponent<LootBag>().InstantiateLoot(transform.position);
+
         // 延遲後刪除敵人
         Destroy(gameObject, 1f);
-        SpawnDropItems();
+        //SpawnDropItems();
     }
 
     // 重置為待機狀態
@@ -161,7 +164,7 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    private void SpawnDropItems()
+    /* private void SpawnDropItems()
     {
         for (int i = 0; i < dropAmount; i++)
         {
@@ -178,5 +181,5 @@ public class EnemyBehavior : MonoBehaviour
                 Quaternion.identity
             );
         }
-    }
+    } */
 }
