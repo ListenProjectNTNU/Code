@@ -12,28 +12,36 @@ public class BossWeapon : MonoBehaviour
 	public LayerMask attackMask;
 
 	public void Attack()
-    {
-        Vector3 pos = transform.position;
-        pos += transform.right * attackOffset.x;
-        pos += transform.up * attackOffset.y;
+	{
+		Vector3 pos = transform.position;
+		pos += transform.right * attackOffset.x;
+		pos += transform.up * attackOffset.y;
 
-        // 使用 OverlapCircle 检测是否有碰撞
-        Collider2D colInfo = Physics2D.OverlapCircle(pos, attackRange, attackMask);
-        if (colInfo != null)
-        {
-            // 检查是否包含 PlayerController 组件
-            PlayerController player = colInfo.GetComponent<PlayerController>();
-            if (player != null)
-            {
-                player.TakeDamage(100);
-                Debug.Log("成功對 Player 造成傷害！");
-            }
-            else
-            {
-                Debug.LogWarning("碰到的物体没有 PlayerController 组件：" + colInfo.name);
-            }
-        }
-    }
+		Collider2D colInfo = Physics2D.OverlapCircle(pos, attackRange, attackMask);
+		if (colInfo != null)
+		{
+			// 嘗試從 Player 取得 PlayerController
+			PlayerController player = colInfo.GetComponent<PlayerController>();
+			if (player != null)
+			{
+				// 使用 PlayerController 中的 Health Bar
+				if (player.healthBar != null)
+				{
+					//player.healthBar.SetHealth(player.healthBar.currenthp - 100);
+					PlayerUtils.TakeDamage(player.healthBar, 20f);
+					Debug.Log("成功對 Player 造成傷害！");
+				}
+				else
+				{
+					Debug.LogWarning("Player 的 Health Bar 為空！");
+				}
+			}
+			else
+			{
+				Debug.LogWarning("碰到的物体没有 PlayerController 组件：" + colInfo.name);
+			}
+		}
+	}
 
 	public void EnragedAttack()
 	{
@@ -44,7 +52,17 @@ public class BossWeapon : MonoBehaviour
 		Collider2D colInfo = Physics2D.OverlapCircle(pos, attackRange, attackMask);
 		if (colInfo != null)
 		{
-			colInfo.GetComponent<PlayerController>().TakeDamage(100);
+			// 取得 Player 的 healthbar
+			healthbar playerHealth = colInfo.GetComponent<healthbar>();
+			if (playerHealth != null)
+			{
+				PlayerUtils.TakeDamage(playerHealth, 100); // ✅ 正確使用 PlayerUtils
+				Debug.Log("成功對 Player 造成傷害！");
+			}
+			else
+			{
+				Debug.LogWarning("找到 Player，但沒有 healthbar：" + colInfo.name);
+			}
 		}
 	}
 
