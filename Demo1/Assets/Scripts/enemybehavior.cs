@@ -8,6 +8,10 @@ public class EnemyBehavior : MonoBehaviour
     private float attackTimer;
     private bool isAttacking = false;
     public float attackInterval = 2f; // 每 2 秒攻擊一次
+    public float chaseRange = 10f;
+    public float moveSpeed = 2f;  // 追蹤速度
+    private Transform player;
+    private Vector3 startPosition; // 記錄初始位置
     public GameObject hitbox; // 攻擊區域
     public GameObject dropItemPrefab;
     public Transform dropPosition;   // 掉落物生成位置，可選（默認為敵人位置）
@@ -20,6 +24,9 @@ public class EnemyBehavior : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         attackTimer = attackInterval; // 初始化計時器
+        startPosition = transform.position; // 記錄敵人初始位置
+        player = GameObject.FindGameObjectWithTag("Player")?.transform; // 找到玩家
+        Debug.Log(player);  
         if (hitbox != null)
         {
             hitbox.SetActive(false); // 開始時隱藏 hitbox
@@ -29,6 +36,11 @@ public class EnemyBehavior : MonoBehaviour
     void Update()
     {
         if (isDead) return; // 死亡後停止所有行為
+        float distanceToPlayer = player ? Vector2.Distance(transform.position, player.position) : Mathf.Infinity;
+        if (distanceToPlayer <= chaseRange)
+        {
+            ChasePlayer();
+        }
 
         attackTimer -= Time.deltaTime; // 減少計時器
         if (attackTimer <= 0)
@@ -38,6 +50,32 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
+    // ➤ 追蹤玩家
+    private void ChasePlayer()
+    {
+        if (player == null) return;
+
+        Vector2 targetPosition = new Vector2(player.position.x, transform.position.y);
+        transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+
+        SetState(4); // 設置為移動狀態
+    }
+
+    // ➤ 停止移動
+    // private void StopMoving()
+    // {
+    //     SetState(0); // 設置為待機狀態
+    // }
+
+    // // ➤ 玩家離開範圍時，敵人返回原位
+    // private void ReturnToStart()
+    // {
+    //     transform.position = Vector2.MoveTowards(transform.position, startPosition, moveSpeed * Time.deltaTime);
+    //     if (Vector2.Distance(transform.position, startPosition) < 0.1f)
+    //     {
+    //         SetState(0); // 設置為待機狀態
+    //     }
+    // }
     // 攻擊邏輯
     void Attack()
     {
