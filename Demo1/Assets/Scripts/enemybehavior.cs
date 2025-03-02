@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyBehavior : MonoBehaviour
@@ -8,8 +9,13 @@ public class EnemyBehavior : MonoBehaviour
     private float attackTimer;
     private bool isAttacking = false;
     public float attackInterval = 2f; // 每 2 秒攻擊一次
+    public bool isFlipped = true;
+
     public float chaseRange = 10f;
     public float moveSpeed = 2f;  // 追蹤速度
+    private float originalSpeed; // 存儲原本的移動速度
+    [SerializeField] private float leftCap;
+    [SerializeField] private float rightCap;    
     private Transform player;
     private Vector3 startPosition; // 記錄初始位置
     public GameObject hitbox; // 攻擊區域
@@ -31,6 +37,7 @@ public class EnemyBehavior : MonoBehaviour
         {
             hitbox.SetActive(false); // 開始時隱藏 hitbox
         }
+        originalSpeed = moveSpeed; // 在 Start() 中存儲原本的速度
     }
 
     void Update()
@@ -50,7 +57,33 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    // ➤ 追蹤玩家
+    public void LookAtPlayer()
+{
+    Vector3 flipped = transform.localScale;
+
+    if (transform.position.x > player.position.x && !isFlipped)
+    {
+        flipped.x *= -1f;  
+        transform.localScale = flipped;
+        isFlipped = true;
+        if (animator != null)
+        {
+            animator.SetBool("IsFlipped", true);
+        }
+    }
+    else if (transform.position.x < player.position.x && isFlipped)
+    {
+        flipped.x *= -1f;  
+        transform.localScale = flipped;
+        isFlipped = false;
+        if (animator != null)
+        {
+            animator.SetBool("IsFlipped", false);
+        }
+    }
+}
+
+    // 追蹤玩家
     private void ChasePlayer()
     {
         if (player == null) return;
@@ -59,6 +92,33 @@ public class EnemyBehavior : MonoBehaviour
         transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
 
         SetState(4); // 設置為移動狀態
+        //有bug
+        // if(transform.position.x <= leftCap)
+        //     {
+        //         moveSpeed = 0f;
+        //         SetState(0);
+        //     }
+        // else if (player.position.x > leftCap)
+        //     {
+        //         moveSpeed = originalSpeed; // 恢復原本速度
+        //         SetState(4); // 設定為移動狀態
+        //     }
+        // if(transform.position.x >= rightCap)
+        //     {
+        //         moveSpeed = 0f;
+        //         SetState(0);
+        //     }
+        // else if (player.position.x < rightCap)
+        //     {
+        //         moveSpeed = originalSpeed; // 恢復原本速度
+        //         SetState(4); // 設定為移動狀態
+        //     }
+        //     Debug.Log(moveSpeed);
+        // if (moveSpeed > 0)
+        //     {
+        //         transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+        //         SetState(4); // 設定為移動狀態
+        //     }
     }
 
     // ➤ 停止移動
