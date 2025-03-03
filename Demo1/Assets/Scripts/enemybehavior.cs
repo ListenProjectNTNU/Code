@@ -55,6 +55,7 @@ public class EnemyBehavior : MonoBehaviour
             Attack(); // 執行攻擊
             attackTimer = attackInterval; // 重置計時器
         }
+        LookAtPlayer();
     }
 
     public void LookAtPlayer()
@@ -93,32 +94,32 @@ public class EnemyBehavior : MonoBehaviour
 
         SetState(4); // 設置為移動狀態
         //有bug
-        // if(transform.position.x <= leftCap)
-        //     {
-        //         moveSpeed = 0f;
-        //         SetState(0);
-        //     }
-        // else if (player.position.x > leftCap)
-        //     {
-        //         moveSpeed = originalSpeed; // 恢復原本速度
-        //         SetState(4); // 設定為移動狀態
-        //     }
-        // if(transform.position.x >= rightCap)
-        //     {
-        //         moveSpeed = 0f;
-        //         SetState(0);
-        //     }
-        // else if (player.position.x < rightCap)
-        //     {
-        //         moveSpeed = originalSpeed; // 恢復原本速度
-        //         SetState(4); // 設定為移動狀態
-        //     }
-        //     Debug.Log(moveSpeed);
-        // if (moveSpeed > 0)
-        //     {
-        //         transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-        //         SetState(4); // 設定為移動狀態
-        //     }
+        if(transform.position.x <= leftCap)
+            {
+                moveSpeed = 0f;
+                SetState(0);
+            }
+        else if (player.position.x > leftCap)
+            {
+                moveSpeed = originalSpeed; // 恢復原本速度
+                SetState(4); // 設定為移動狀態
+            }
+        if(transform.position.x >= rightCap)
+            {
+                moveSpeed = 0f;
+                SetState(0);
+            }
+        else if (player.position.x < rightCap)
+            {
+                moveSpeed = originalSpeed; // 恢復原本速度
+                SetState(4); // 設定為移動狀態
+            }
+            Debug.Log(moveSpeed);
+        if (moveSpeed > 0)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+                SetState(4); // 設定為移動狀態
+            }
     }
 
     // ➤ 停止移動
