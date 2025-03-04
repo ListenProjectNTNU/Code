@@ -250,6 +250,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8253020527943935033, guid: 3a3f9ac3aa5c5de4bab8768391ac7ee1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -21447,6 +21451,22 @@ PrefabInstance:
       propertyPath: jumpForce
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 1999101714820936565, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -240
+      objectReference: {fileID: 0}
+    - target: {fileID: 1999101714820936565, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -177
+      objectReference: {fileID: 0}
+    - target: {fileID: 2187606667627633999, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -240
+      objectReference: {fileID: 0}
+    - target: {fileID: 2187606667627633999, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -177
+      objectReference: {fileID: 0}
     - target: {fileID: 2553590595040252757, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.1201777
@@ -21491,6 +21511,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: healthbar
       objectReference: {fileID: 0}
+    - target: {fileID: 8022755471619213724, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8210320342672839757, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
       propertyPath: m_Name
       value: Player
@@ -21502,6 +21526,14 @@ PrefabInstance:
     - target: {fileID: 8210320342672839757, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
       propertyPath: m_TagString
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 8585217680861347250, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -240
+      objectReference: {fileID: 0}
+    - target: {fileID: 8585217680861347250, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -177
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
