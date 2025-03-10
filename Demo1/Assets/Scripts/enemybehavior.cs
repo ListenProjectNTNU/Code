@@ -13,9 +13,15 @@ public class EnemyBehavior : MonoBehaviour
 
     public float chaseRange = 10f;
     public float moveSpeed = 2f;  // 追蹤速度
-    private float originalSpeed; // 存儲原本的移動速度
+    
+    //邊界設置
     [SerializeField] private float leftCap;
-    [SerializeField] private float rightCap;    
+    [SerializeField] private float rightCap;
+    public Vector3 centerPoint;
+    public float respawnDelay = 1f;  // 重生延遲時間
+    private bool isRespawning = false; // 確保不會重複重生
+    
+
     private Transform player;
     private Vector3 startPosition; // 記錄初始位置
     public GameObject hitbox; // 攻擊區域
@@ -37,7 +43,7 @@ public class EnemyBehavior : MonoBehaviour
         {
             hitbox.SetActive(false); // 開始時隱藏 hitbox
         }
-        originalSpeed = moveSpeed; // 在 Start() 中存儲原本的速度
+        centerPoint = new Vector3((leftCap + rightCap) / 2, transform.position.y, transform.position.z); //平台中央
     }
 
     void Update()
@@ -56,10 +62,33 @@ public class EnemyBehavior : MonoBehaviour
             attackTimer = attackInterval; // 重置計時器
         }
         LookAtPlayer();
+        CheckBoundaries();
+    }
+
+    void CheckBoundaries()
+    {
+        if (!isRespawning && (transform.position.x <= leftCap || transform.position.x >= rightCap))
+        {
+            StartCoroutine(Respawn());
+        }
+    }
+
+    IEnumerator Respawn()
+    {
+        isRespawning = true; // 防止重複執行
+        yield return new WaitForSeconds(respawnDelay); // 等待重生時間
+
+        // 讓敵人回到中央點
+        transform.position = centerPoint;
+
+        // 可以加上重生動畫或特效
+        Debug.Log("敵人重生");
+
+        isRespawning = false; // 允許再次檢查邊界
     }
 
     public void LookAtPlayer()
-{
+    {
     Vector3 flipped = transform.localScale;
 
     if (transform.position.x > player.position.x && !isFlipped)
@@ -94,32 +123,32 @@ public class EnemyBehavior : MonoBehaviour
 
         SetState(4); // 設置為移動狀態
         //有bug
-        if(transform.position.x <= leftCap)
-            {
-                moveSpeed = 0f;
-                SetState(0);
-            }
-        else if (player.position.x > leftCap)
-            {
-                moveSpeed = originalSpeed; // 恢復原本速度
-                SetState(4); // 設定為移動狀態
-            }
-        if(transform.position.x >= rightCap)
-            {
-                moveSpeed = 0f;
-                SetState(0);
-            }
-        else if (player.position.x < rightCap)
-            {
-                moveSpeed = originalSpeed; // 恢復原本速度
-                SetState(4); // 設定為移動狀態
-            }
-            Debug.Log(moveSpeed);
-        if (moveSpeed > 0)
-            {
-                transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-                SetState(4); // 設定為移動狀態
-            }
+        // if(transform.position.x <= leftCap)
+        //     {
+        //         moveSpeed = 0f;
+        //         SetState(0);
+        //     }
+        // else if (player.position.x > leftCap)
+        //     {
+        //         moveSpeed = originalSpeed; // 恢復原本速度
+        //         SetState(4); // 設定為移動狀態
+        //     }
+        // if(transform.position.x >= rightCap)
+        //     {
+        //         moveSpeed = 0f;
+        //         SetState(0);
+        //     }
+        // else if (player.position.x < rightCap)
+        //     {
+        //         moveSpeed = originalSpeed; // 恢復原本速度
+        //         SetState(4); // 設定為移動狀態
+        //     }
+        //     Debug.Log(moveSpeed);
+        // if (moveSpeed > 0)
+        //     {
+        //         transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+        //         SetState(4); // 設定為移動狀態
+        //     }
     }
 
     // ➤ 停止移動
