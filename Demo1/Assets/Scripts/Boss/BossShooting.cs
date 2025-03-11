@@ -1,8 +1,8 @@
-/*using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyShooting : MonoBehaviour
+public class BossShooting : MonoBehaviour
 {
     private GameObject player;
     private Rigidbody2D rb;
@@ -41,4 +41,3 @@ public class EnemyShooting : MonoBehaviour
         }
     }
 }
-*/
