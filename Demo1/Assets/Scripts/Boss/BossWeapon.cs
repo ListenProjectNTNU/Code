@@ -28,7 +28,7 @@ public class BossWeapon : MonoBehaviour
 				if (player.healthBar != null)
 				{
 					//player.healthBar.SetHealth(player.healthBar.currenthp - 100);
-					PlayerUtils.TakeDamage(player.healthBar, 20f);
+					PlayerUtils.TakeDamage(player.healthBar, attackDamage);
 					Debug.Log("成功對 Player 造成傷害！");
 				}
 				else
@@ -56,7 +56,7 @@ public class BossWeapon : MonoBehaviour
 			healthbar playerHealth = colInfo.GetComponent<healthbar>();
 			if (playerHealth != null)
 			{
-				PlayerUtils.TakeDamage(playerHealth, 100); // ✅ 正確使用 PlayerUtils
+				PlayerUtils.TakeDamage(playerHealth, 100);
 				Debug.Log("成功對 Player 造成傷害！");
 			}
 			else

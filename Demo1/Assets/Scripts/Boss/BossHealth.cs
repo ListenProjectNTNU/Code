@@ -6,6 +6,7 @@ public class BossHealth : MonoBehaviour
 {
 
 	public int health = 500;
+	//public healthbar healthBar;
 
 	public GameObject deathEffect;
 
