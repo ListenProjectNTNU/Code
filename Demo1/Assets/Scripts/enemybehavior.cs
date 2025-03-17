@@ -13,13 +13,14 @@ public class EnemyBehavior : MonoBehaviour
 
     public float chaseRange = 10f;
     public float moveSpeed = 2f;  // 追蹤速度
+    public float patrolSpeed = 1.5f; // 巡邏時速度
     
     //邊界設置
     [SerializeField] private float leftCap;
     [SerializeField] private float rightCap;
-    public Vector3 centerPoint;
-    public float respawnDelay = 1f;  // 重生延遲時間
-    private bool isRespawning = false; // 確保不會重複重生
+    private bool isChasing = false;
+    private Vector3 patrolTarget; // 巡邏目標
+     public float detectRange = 3f; // 追蹤範圍
     
 
     private Transform player;
@@ -43,16 +44,35 @@ public class EnemyBehavior : MonoBehaviour
         {
             hitbox.SetActive(false); // 開始時隱藏 hitbox
         }
-        centerPoint = new Vector3((leftCap + rightCap) / 2, transform.position.y, transform.position.z); //平台中央
+        patrolTarget = new Vector3(rightCap, transform.position.y, transform.position.z); // 初始巡邏目標
     }
 
     void Update()
     {
         if (isDead) return; // 死亡後停止所有行為
-        float distanceToPlayer = player ? Vector2.Distance(transform.position, player.position) : Mathf.Infinity;
-        if (distanceToPlayer <= chaseRange)
+         float playerDistance = Vector2.Distance(transform.position, player.position);
+
+        // 確認玩家是否在 leftCap 和 rightCap 之間
+        bool isPlayerInBounds = (player.position.x >= leftCap && player.position.x <= rightCap);
+
+        // 玩家必須在範圍內，且距離小於 detectRange，敵人才開始追蹤
+        if (isPlayerInBounds && playerDistance <= detectRange)
         {
+            isChasing = true;
+        }
+        else
+        {
+            isChasing = false;
+        }
+
+        if (isChasing)
+        {
+            LookAtPlayer();
             ChasePlayer();
+        }
+        else
+        {
+            Patrol();
         }
 
         attackTimer -= Time.deltaTime; // 減少計時器
@@ -61,30 +81,6 @@ public class EnemyBehavior : MonoBehaviour
             Attack(); // 執行攻擊
             attackTimer = attackInterval; // 重置計時器
         }
-        LookAtPlayer();
-        CheckBoundaries();
-    }
-
-    void CheckBoundaries()
-    {
-        if (!isRespawning && (transform.position.x <= leftCap || transform.position.x >= rightCap))
-        {
-            StartCoroutine(Respawn());
-        }
-    }
-
-    IEnumerator Respawn()
-    {
-        isRespawning = true; // 防止重複執行
-        yield return new WaitForSeconds(respawnDelay); // 等待重生時間
-
-        // 讓敵人回到中央點
-        transform.position = centerPoint;
-
-        // 可以加上重生動畫或特效
-        Debug.Log("敵人重生");
-
-        isRespawning = false; // 允許再次檢查邊界
     }
 
     public void LookAtPlayer()
@@ -122,50 +118,31 @@ public class EnemyBehavior : MonoBehaviour
         transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
 
         SetState(4); // 設置為移動狀態
-        //有bug
-        // if(transform.position.x <= leftCap)
-        //     {
-        //         moveSpeed = 0f;
-        //         SetState(0);
-        //     }
-        // else if (player.position.x > leftCap)
-        //     {
-        //         moveSpeed = originalSpeed; // 恢復原本速度
-        //         SetState(4); // 設定為移動狀態
-        //     }
-        // if(transform.position.x >= rightCap)
-        //     {
-        //         moveSpeed = 0f;
-        //         SetState(0);
-        //     }
-        // else if (player.position.x < rightCap)
-        //     {
-        //         moveSpeed = originalSpeed; // 恢復原本速度
-        //         SetState(4); // 設定為移動狀態
-        //     }
-        //     Debug.Log(moveSpeed);
-        // if (moveSpeed > 0)
-        //     {
-        //         transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-        //         SetState(4); // 設定為移動狀態
-        //     }
+    }
+    private void Patrol()
+    {
+        transform.position = Vector2.MoveTowards(transform.position, patrolTarget, patrolSpeed * Time.deltaTime);
+
+        // 到達邊界時改變方向
+        if (Vector2.Distance(transform.position, patrolTarget) < 0.1f)
+        {
+            if (patrolTarget.x == leftCap)
+            {
+                patrolTarget = new Vector3(rightCap, transform.position.y, transform.position.z);
+            }
+            else
+            {
+                patrolTarget = new Vector3(leftCap, transform.position.y, transform.position.z);
+            }
+            Flip();
+        }
     }
 
-    // ➤ 停止移動
-    // private void StopMoving()
-    // {
-    //     SetState(0); // 設置為待機狀態
-    // }
+    private void Flip()
+    {
+        transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+    }
 
-    // // ➤ 玩家離開範圍時，敵人返回原位
-    // private void ReturnToStart()
-    // {
-    //     transform.position = Vector2.MoveTowards(transform.position, startPosition, moveSpeed * Time.deltaTime);
-    //     if (Vector2.Distance(transform.position, startPosition) < 0.1f)
-    //     {
-    //         SetState(0); // 設置為待機狀態
-    //     }
-    // }
     // 攻擊邏輯
     void Attack()
     {
