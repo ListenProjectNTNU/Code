@@ -22,8 +22,8 @@ public class healthbar : MonoBehaviour
     public void SetHealth(float health)
     {
         currenthp = Mathf.Clamp(health, 0f, maxHP); // 確保血量不小於 0
-        // Debug.Log($"SetHealth called: {currenthp}");
-        // Debug.Log($"SetHealth called: {hpImg.fillAmount}");
+        //Debug.Log($"SetHealth called: {currenthp}");
+        //Debug.Log($"SetHealth called: {hpImg.fillAmount}");
         updatehealthbar();
     }
     private void updatehealthbar()
