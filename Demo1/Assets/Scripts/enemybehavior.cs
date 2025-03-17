@@ -1,59 +1,43 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyBehavior : MonoBehaviour
 {
-    private Animator animator;
+    public Animator animator;
     private float attackTimer;
     private bool isAttacking = false;
     public float attackInterval = 2f; // 每 2 秒攻擊一次
-    public bool isFlipped = true;
-
-    public float chaseRange = 10f;
-    public float moveSpeed = 2f;  // 追蹤速度
-    
-    //邊界設置
-    [SerializeField] private float leftCap;
-    [SerializeField] private float rightCap;
-    public Vector3 centerPoint;
-    public float respawnDelay = 1f;  // 重生延遲時間
-    private bool isRespawning = false; // 確保不會重複重生
-    
-
-    private Transform player;
-    private Vector3 startPosition; // 記錄初始位置
     public GameObject hitbox; // 攻擊區域
-    public GameObject dropItemPrefab;
-    public Transform dropPosition;   // 掉落物生成位置，可選（默認為敵人位置）
-    public int dropAmount = 1; // 掉落物的數量，可調整
-
     public float health = 100f; // 敵人血量
-    private bool isDead = false; // 是否已死亡
+    public bool isDead = false; // 是否已死亡
     public healthbar healthBar;
+    public int deathState = 3;
+    public float chaseRange = 10f;
+    public float moveSpeed = 2f;
+    private float originalSpeed;
+    public Transform player; // 追蹤玩家
+    public float leftCap, rightCap;
+    private bool isFlipped = false;
+
     void Start()
     {
         animator = GetComponent<Animator>();
-        attackTimer = attackInterval; // 初始化計時器
-        startPosition = transform.position; // 記錄敵人初始位置
-        player = GameObject.FindGameObjectWithTag("Player")?.transform; // 找到玩家
-        Debug.Log(player);  
+
+        // ✅ 讓敵人的攻擊計時器有點隨機性，避免同步攻擊
+        attackTimer = attackInterval + Random.Range(0f, 1f);
+
         if (hitbox != null)
         {
             hitbox.SetActive(false); // 開始時隱藏 hitbox
         }
-        centerPoint = new Vector3((leftCap + rightCap) / 2, transform.position.y, transform.position.z); //平台中央
+
+        originalSpeed = moveSpeed;
     }
 
     void Update()
     {
         if (isDead) return; // 死亡後停止所有行為
-        float distanceToPlayer = player ? Vector2.Distance(transform.position, player.position) : Mathf.Infinity;
-        if (distanceToPlayer <= chaseRange)
-        {
-            ChasePlayer();
-        }
 
         attackTimer -= Time.deltaTime; // 減少計時器
         if (attackTimer <= 0)
@@ -61,112 +45,12 @@ public class EnemyBehavior : MonoBehaviour
             Attack(); // 執行攻擊
             attackTimer = attackInterval; // 重置計時器
         }
+
         LookAtPlayer();
-        CheckBoundaries();
+        ChasePlayer();
     }
 
-    void CheckBoundaries()
-    {
-        if (!isRespawning && (transform.position.x <= leftCap || transform.position.x >= rightCap))
-        {
-            StartCoroutine(Respawn());
-        }
-    }
-
-    IEnumerator Respawn()
-    {
-        isRespawning = true; // 防止重複執行
-        yield return new WaitForSeconds(respawnDelay); // 等待重生時間
-
-        // 讓敵人回到中央點
-        transform.position = centerPoint;
-
-        // 可以加上重生動畫或特效
-        Debug.Log("敵人重生");
-
-        isRespawning = false; // 允許再次檢查邊界
-    }
-
-    public void LookAtPlayer()
-    {
-    Vector3 flipped = transform.localScale;
-
-    if (transform.position.x > player.position.x && !isFlipped)
-    {
-        flipped.x *= -1f;  
-        transform.localScale = flipped;
-        isFlipped = true;
-        if (animator != null)
-        {
-            animator.SetBool("IsFlipped", true);
-        }
-    }
-    else if (transform.position.x < player.position.x && isFlipped)
-    {
-        flipped.x *= -1f;  
-        transform.localScale = flipped;
-        isFlipped = false;
-        if (animator != null)
-        {
-            animator.SetBool("IsFlipped", false);
-        }
-    }
-}
-
-    // 追蹤玩家
-    private void ChasePlayer()
-    {
-        if (player == null) return;
-
-        Vector2 targetPosition = new Vector2(player.position.x, transform.position.y);
-        transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-
-        SetState(4); // 設置為移動狀態
-        //有bug
-        // if(transform.position.x <= leftCap)
-        //     {
-        //         moveSpeed = 0f;
-        //         SetState(0);
-        //     }
-        // else if (player.position.x > leftCap)
-        //     {
-        //         moveSpeed = originalSpeed; // 恢復原本速度
-        //         SetState(4); // 設定為移動狀態
-        //     }
-        // if(transform.position.x >= rightCap)
-        //     {
-        //         moveSpeed = 0f;
-        //         SetState(0);
-        //     }
-        // else if (player.position.x < rightCap)
-        //     {
-        //         moveSpeed = originalSpeed; // 恢復原本速度
-        //         SetState(4); // 設定為移動狀態
-        //     }
-        //     Debug.Log(moveSpeed);
-        // if (moveSpeed > 0)
-        //     {
-        //         transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-        //         SetState(4); // 設定為移動狀態
-        //     }
-    }
-
-    // ➤ 停止移動
-    // private void StopMoving()
-    // {
-    //     SetState(0); // 設置為待機狀態
-    // }
-
-    // // ➤ 玩家離開範圍時，敵人返回原位
-    // private void ReturnToStart()
-    // {
-    //     transform.position = Vector2.MoveTowards(transform.position, startPosition, moveSpeed * Time.deltaTime);
-    //     if (Vector2.Distance(transform.position, startPosition) < 0.1f)
-    //     {
-    //         SetState(0); // 設置為待機狀態
-    //     }
-    // }
-    // 攻擊邏輯
+    // ✅ 攻擊邏輯
     void Attack()
     {
         if (isDead) return; // 如果已死亡，不執行攻擊
@@ -183,7 +67,7 @@ public class EnemyBehavior : MonoBehaviour
         Invoke("ResetAttack", 0.1f);
     }
 
-    // 重置攻擊狀態
+    // ✅ 重置攻擊狀態
     void ResetAttack()
     {
         isAttacking = false;
@@ -196,56 +80,49 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    // 敵人受傷處理
-    public void TakeDamage(int damage)
+    public void DestroySelf()
     {
-        if (isDead) return; // 如果已死亡，不执行受伤处理
+        // ✅ 確保死亡時產生掉落物品
+        LootBag lootBag = GetComponent<LootBag>();
+        if (lootBag != null)
+        {
+            lootBag.InstantiateLoot(transform.position);
+        }
 
-        if(healthBar != null)
+        // ✅ 刪除敵人
+        Destroy(gameObject);
+    }
+
+    // ✅ 敵人受傷處理
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (isDead) return;
+
+        if (collision.CompareTag("playerhitbox"))
         {
-            healthBar.SetHealth(healthBar.currenthp - damage);
-        }
-        health -= damage; // 减少血量
-        if (health <= 0)
-        {
-            Die(); // 如果血量小于等于 0，进入死亡状态
-        }
-        else
-        {
-            Hurt(); // 否则进入受伤状态
+            // 減少血量
+            health = Mathf.Max(health - 30, 0);
+            PlayerUtils.TakeDamage(healthBar, 30f);
+
+            animator.SetInteger("state", 2);
+            Debug.Log($"{gameObject.name} is hurt!");
+            Invoke("ResetToIdle", 0.5f);
+
+            // ✅ 如果血量歸零，執行死亡
+            if (health <= 0)
+            {
+                Die();
+            }
         }
     }
 
-    // 受傷處理
-    private void Hurt()
-    {
-        animator.SetInteger("state", 2);// 設置為受傷狀態
-        Debug.Log($"{gameObject.name} is hurt!");
-
-        // 在受傷後短暫恢復到待機狀態
-        Invoke("ResetToIdle", 0.5f);
-    }
-
-    // 死亡處理
+    // ✅ 讓 `Die()` 負責處理死亡
     private void Die()
     {
-        isDead = true;
-        SetState(3); // 設置為死亡狀態
-        Debug.Log($"{gameObject.name} is dead!");
-
-        // 禁用敵人碰撞和行為
-        GetComponent<Collider2D>().enabled = false;
-        this.enabled = false;
-
-        //呼叫掉落物
-        GetComponent<LootBag>().InstantiateLoot(transform.position);
-
-        // 延遲後刪除敵人
-        Destroy(gameObject, 1f);
-        //SpawnDropItems();
+        PlayerUtils.Die(this, deathState); // 呼叫共用的死亡函數
     }
 
-    // 重置為待機狀態
+    // ✅ 重置為待機狀態，但死亡時不應該重置
     private void ResetToIdle()
     {
         if (!isDead)
@@ -254,8 +131,8 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    // 設置動畫狀態
-    private void SetState(int state)
+    // ✅ 設置動畫狀態
+    public void SetState(int state)
     {
         if (animator != null)
         {
@@ -276,6 +153,7 @@ public class EnemyBehavior : MonoBehaviour
     {
         return animator != null ? animator.GetInteger("state") : -1;
     }
+
     public void EnableHitbox()
     {
         if (hitbox != null)
@@ -292,22 +170,57 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    /* private void SpawnDropItems()
+    // ✅ 讓敵人面對玩家
+    private void LookAtPlayer()
     {
-        for (int i = 0; i < dropAmount; i++)
-        {
-            Vector3 randomOffset = new Vector3(
-                Random.Range(-0.5f, 0.5f),
-                Random.Range(-0.5f, 0.5f),
-                0
-            );
+        if (player == null) return;
 
-            // 生成掉落物
-            Instantiate(
-                dropItemPrefab, 
-                (dropPosition != null ? dropPosition.position : transform.position) + randomOffset, 
-                Quaternion.identity
-            );
+        Vector3 flipped = transform.localScale;
+
+        if (transform.position.x > player.position.x && !isFlipped)
+        {
+            flipped.x *= -1f;
+            transform.localScale = flipped;
+            isFlipped = true;
+            if (animator != null)
+            {
+                animator.SetBool("IsFlipped", true);
+            }
         }
-    } */
+        else if (transform.position.x < player.position.x && isFlipped)
+        {
+            flipped.x *= -1f;
+            transform.localScale = flipped;
+            isFlipped = false;
+            if (animator != null)
+            {
+                animator.SetBool("IsFlipped", false);
+            }
+        }
+    }
+
+    // ✅ 追蹤玩家
+    private void ChasePlayer()
+    {
+        if (player == null) return;
+
+        Vector2 targetPosition = new Vector2(player.position.x, transform.position.y);
+
+        if (transform.position.x <= leftCap || transform.position.x >= rightCap)
+        {
+            moveSpeed = 0f;
+            SetState(0);
+        }
+        else
+        {
+            moveSpeed = originalSpeed;
+            SetState(4); // 設定為移動狀態
+        }
+
+        if (moveSpeed > 0)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+            SetState(4); // 設定為移動狀態
+        }
+    }
 }

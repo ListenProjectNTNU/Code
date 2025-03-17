@@ -96,7 +96,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -500, y: -200}
+  m_AnchoredPosition: {x: -300, y: -170}
   m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7066990183422963049
@@ -202,7 +202,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -500, y: -200}
+  m_AnchoredPosition: {x: -300, y: -170}
   m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3167052636492183189
@@ -308,7 +308,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -500, y: -200}
+  m_AnchoredPosition: {x: -300, y: -170}
   m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6565823994052156228
@@ -461,7 +461,7 @@ GameObject:
   - component: {fileID: 10306727073399785}
   - component: {fileID: 3364195366605762102}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: healthbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -586,7 +586,7 @@ GameObject:
   - component: {fileID: 4716097349326002765}
   - component: {fileID: 8052022431761410172}
   - component: {fileID: 6766249078937226466}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -769,12 +769,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cherries: 0
-  cherryText: {fileID: 0}
   ground:
     serializedVersion: 2
     m_Bits: 64
   speed: 5
-  jumpForce: 7
+  jumpForce: 10
   hurtForce: 3
   healthBar: {fileID: 3364195366605762102}
 --- !u!114 &4716097349326002765
