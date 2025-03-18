@@ -33,7 +33,6 @@ public static class PlayerUtils
         if (healthBar != null)
         {
             healthBar.SetHealth(ClampValue(healthBar.currenthp - damage, 0, healthBar.maxHP));
-            //healthBar.SetHealth(health);
         }
         else
         {
@@ -45,21 +44,5 @@ public static class PlayerUtils
     public static bool CheckDeath(healthbar healthBar)
     {
         return healthBar != null && healthBar.currenthp <= 0;
-    }
-    
-    //小怪死亡
-    public static void Die(EnemyBehavior enemy, int deathState)
-    {
-        if (enemy.isDead) return;
-
-        enemy.isDead = true;
-        enemy.SetState(deathState);
-        Debug.Log($"{enemy.gameObject.name} is dead with state {deathState}!");
-
-        enemy.GetComponent<Collider2D>().enabled = false;
-        enemy.enabled = false;
-
-        // ✅ 讓 `EnemyBehavior` 自己處理掉落物品
-        enemy.Invoke("DestroySelf", 1.5f);
     }
 }

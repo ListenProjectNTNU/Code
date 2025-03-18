@@ -7,7 +7,7 @@ public class BossFireball : MonoBehaviour
     private GameObject player;
     public GameObject bullet;
     public Transform bulletPos;
-    private float timer;
+     private float timer;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,17 +23,15 @@ public class BossFireball : MonoBehaviour
         {
             timer += Time.deltaTime;
 
-            if (timer > 1f)
+            if(timer > 1f)
             {
-                timer = 0;
-                shoot();
+            timer = 0;
+            shoot();
             }
         }
         void shoot()
         {
-            Instantiate(bullet, bulletPos.position, Quaternion.identity);
-
-            Debug.Log("我射ㄌ");
+        Instantiate(bullet, bulletPos.position, Quaternion.identity);
         }
     }
 }

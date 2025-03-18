@@ -43,14 +43,6 @@ public class PlayerController : MonoBehaviour
         AnimationState();
         anim.SetInteger("state", (int)state);//sets animation based on Enumerator state
         //Debug.Log((int)state);
-        if (PlayerUtils.CheckDeath(healthBar))
-        {
-            state = State.dead;
-            anim.SetInteger("state", (int)State.dead);
-            Debug.Log("Player is dead!");
-            rb.velocity = Vector2.zero;
-            this.enabled = false;
-        }
     }
 
     //Cherries
@@ -69,15 +61,46 @@ public class PlayerController : MonoBehaviour
             if (state == State.falling)
             {
                 // 玩家從上方踩到敵人
-                //jump();
+                jump();
             }
             else  // 敵人處於攻擊狀態
             {
                 // 玩家被敵人攻擊
                 state = State.hurt;
                 PlayerUtils.ApplyKnockback(rb, hurtForce, collision.transform, transform);
-                PlayerUtils.TakeDamage(healthBar, 10f); // 假設每次攻擊扣 10 點血
             }             
+        }
+    }
+
+    //Enemy
+    private void OnCollisionEnter2D(Collision2D other) 
+    {
+        if(other.gameObject.tag == "Enemy")  
+        {
+            if(state ==State.falling)
+            {
+                // Destroy(other.gameObject);
+                jump();
+            }
+            else
+            {
+                state = State.hurt;
+                Debug.Log(state);
+                PlayerUtils.ApplyKnockback(rb, hurtForce, other.transform, transform);
+                
+                PlayerUtils.TakeDamage(healthBar, 20f);
+
+                // 確保血量不小於 0
+                if (PlayerUtils.CheckDeath(healthBar))
+                {
+                    state = State.dead;
+                    anim.SetInteger("state", (int)State.dead);
+                    Debug.Log("Player is dead!");
+                    rb.velocity = Vector2.zero;
+                    this.enabled = false;
+                }
+            }
+            
         }
     }
     private void OnTriggerStay2D(Collider2D collision)
