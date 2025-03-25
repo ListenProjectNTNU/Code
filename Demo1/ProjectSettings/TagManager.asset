@@ -4,11 +4,14 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Collectable
   - Enemy
   - enemyhitbox
   - playerhitbox
   - trap
+  - Collectable_attack
+  - Collectable_defence
+  - Collectable_speed
+  - Collectable
   layers:
   - Default
   - TransparentFX
