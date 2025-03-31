@@ -30,17 +30,16 @@ public class PlayerController : MonoBehaviour
     public int attackDamage = 20;
     public int defence = 15;
 
-    public int curdefence => defence + defenceseg * 100;
-    public int curattack => attackDamage + attackseg * 100;
-    public int curspeed => speed + speedseg * 2;
+    public int curdefence => defence + defenceseg * 10;
+    public int curattack => attackDamage + attackseg * 10;
+    public int curspeed => speed + speedseg * 20;
 
     public healthbar healthBar;
-    private float trapDamageCooldown = 1f; // 地刺傷害間隔 1 秒
-    private float lastTrapDamageTime = 0f; // 上次受到地刺傷害的時間
     public GameObject deathMenu;
 
-    private void Start() 
-    {
+    public int attack_damage = 20;
+
+    private void Start() {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
@@ -93,57 +92,13 @@ public class PlayerController : MonoBehaviour
             PlayerUtils.DestroyObject(collision.gameObject);
             //cherryText.text = cherries.ToString();
         }
-        else if (collision.tag == "enemyhitbox") // 檢測是否碰到敵人的 Hitbox
+        else if (collision.tag == "enemyhitbox" || collision.tag == "trap")  // 檢測是否碰到敵人的 Hitbox
         {
             state = State.hurt;
             PlayerUtils.ApplyKnockback(rb, hurtForce, collision.transform, transform);  
         }
     }
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (collision.tag == "trap" && Time.time > lastTrapDamageTime + trapDamageCooldown)
-        {
-            lastTrapDamageTime = Time.time; // 更新上次受傷時間
-            TakeTrapDamage();
-        }
-    }
 
-// 受地刺傷害的方法
-    private void TakeTrapDamage()
-    {
-        state = State.hurt;
-
-        // 讓玩家受到擊退
-        if (transform.position.x > 0)
-        {
-            rb.velocity = new Vector2(-hurtForce, rb.velocity.y);
-        }
-        else
-        {
-            rb.velocity = new Vector2(hurtForce, rb.velocity.y);
-        }
-
-        // 扣血
-        if (healthBar != null)
-        {
-            healthBar.SetHealth(healthBar.currenthp - 50f);
-        }
-        else
-        {
-            Debug.LogError("HealthBar reference is missing in PlayerController.");
-        }
-
-        // 檢查血量是否歸零
-        if (healthBar != null && healthBar.currenthp <= 0)
-        {
-            healthBar.SetHealth(0f);
-            state = State.dead;
-            anim.SetInteger("state", (int)State.dead);
-            Debug.Log("Player is dead!");
-            rb.velocity = Vector2.zero;
-            this.enabled = false;
-        }
-    }
     //重生
     public void RevivePlayer()
     {
