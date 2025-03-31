@@ -30,7 +30,7 @@ public class BossHealth : MonoBehaviour
     {
         if (collision.CompareTag("playerhitbox"))
         {
-            PlayerController playerController = player.GetComponent<PlayerController>();
+            PlayerController playerController = collision.GetComponentInParent<PlayerController>();
             // 減少血量
             health = Mathf.Max(health - playerController.curattack , 0);
             PlayerUtils.TakeDamage(healthBar, playerController.curattack);
