@@ -22113,6 +22113,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 100240384}
     m_Modifications:
+    - target: {fileID: 2293140914306977931, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
+      propertyPath: lootList.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2293140914306977931, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
+      propertyPath: lootList.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: 05586a8453876214fb4fa2c9fd8ad621, type: 2}
+    - target: {fileID: 2293140914306977931, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
+      propertyPath: lootList.Array.data[3]
+      value: 
+      objectReference: {fileID: 11400000, guid: 862ac52a2f835b340a938f2babd2d6d9, type: 2}
+    - target: {fileID: 2293140914306977931, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
+      propertyPath: lootList.Array.data[4]
+      value: 
+      objectReference: {fileID: 11400000, guid: 36b7f025ace52e44eaf6424d6af0868e, type: 2}
     - target: {fileID: 2331651468020798637, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
       propertyPath: m_LocalPosition.x
       value: -22.788742
@@ -22708,6 +22724,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6058715792962781089, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8496905158961647622, guid: ec6087b620debe04093b594023afd197, type: 3}
       propertyPath: m_Name
       value: Manager

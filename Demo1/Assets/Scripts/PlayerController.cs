@@ -75,7 +75,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Collectable_attack")) 
+        /* if (collision.CompareTag("Collectable_attack")) 
         {
             attackseg += 1;
             PlayerUtils.DestroyObject(collision.gameObject);
@@ -92,6 +92,18 @@ public class PlayerController : MonoBehaviour
             speedseg += 1;
             PlayerUtils.DestroyObject(collision.gameObject);
             //cherryText.text = cherries.ToString();
+        } */
+        if (collision.CompareTag("Collectable"))
+        {
+            LootItem lootItem = collision.GetComponent<LootItem>();
+            if (lootItem != null)
+            {
+                PlayerInventory.Instance.AddItem(lootItem.lootData.lootName);
+
+                // ✅ 呼叫 ApplyLootEffects，確保影響數值
+                PlayerInventory.Instance.ApplyLootEffects(lootItem.lootData);
+                Destroy(collision.gameObject);
+            }
         }
         else if (collision.tag == "enemyhitbox") // 檢測是否碰到敵人的 Hitbox
         {

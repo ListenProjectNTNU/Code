@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 050760fb705ac124cbce9240e6f48cff, type: 3}
-  m_Name: B
+  m_Name: 4
   m_EditorClassIdentifier: 
-  lootSprite: {fileID: 21300000, guid: bd59bf2e866ed4529ae645637eb9c11d, type: 3}
-  lootName: B
+  lootSprite: {fileID: 21300000, guid: e4ba3356d04fb2641bbfc080a2af918a, type: 3}
+  lootName: 4
   dropChance: 0
-  effectType: 0
-  effectValue: 0
+  effectType: 2
+  effectValue: 1
