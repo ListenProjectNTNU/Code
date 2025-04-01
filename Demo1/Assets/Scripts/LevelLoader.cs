@@ -7,12 +7,13 @@ public class LevelLoader : MonoBehaviour
 {
     public Animator transition;
     public float transitionTime = 1f;
+    public string targetSceneName;
 
     // Update is called once per frame
 
     public void LoadNextLevel()
     {
-        StartCoroutine(LoadLevel(SceneManager.GetActiveScene().buildIndex + 1));    
+        SceneManager.LoadScene(targetSceneName);    
     }
 
     IEnumerator LoadLevel(int levelIndex)
