@@ -71,15 +71,15 @@ public class PlayerInventory : MonoBehaviour
         {
             case LootEffectType.Attack:
                 playerController.attackseg++;
-                Debug.Log($"⚔️ 攻擊力提升！當前攻擊段數：{playerController.attackseg}");
+                Debug.Log($"⚔️ 攻擊力提升！當前攻擊段數：{playerController.curattack}");
                 break;
             case LootEffectType.Defense:
                 playerController.defenceseg++;
-                Debug.Log($"🛡️ 防禦力提升！當前防禦段數：{playerController.defenceseg}");
+                Debug.Log($"🛡️ 防禦力提升！當前防禦段數：{playerController.curdefence}");
                 break;
             case LootEffectType.Speed:
                 playerController.speedseg++;
-                Debug.Log($"⚡ 速度提升！當前速度段數：{playerController.speedseg}");
+                Debug.Log($"⚡ 速度提升！當前速度段數：{playerController.curspeed}");
                 break;
             default:
                 Debug.LogWarning($"⚠️ 未知的 Loot 類型：{lootData.effectType}");
