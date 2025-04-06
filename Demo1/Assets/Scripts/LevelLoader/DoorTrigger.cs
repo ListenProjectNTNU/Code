@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 public class DoorTrigger : MonoBehaviour
 {
-    public string targetSceneName; // 設定要切換的場景名稱
-    //public Animator transition;//換場動畫
-    //public float transitionTime = 1f;
+    //此腳本只負責偵測是否開啟傳送門
+    public UnityEvent onEnemiesEnd;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -13,13 +14,7 @@ public class DoorTrigger : MonoBehaviour
         {
             if (AllEnemiesDefeated()) // 檢查敵人是否全部消失
             {
-                //play animation
-                //transition.SetTrigger("Start");
-
-                //wait
-                //yield return new WaitForSeconds(transitionTime);
-                
-                SceneManager.LoadScene(targetSceneName); // 切換場景
+                onEnemiesEnd?.Invoke();
             }
             else
             {
