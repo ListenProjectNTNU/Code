@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private Animator anim;
     private Collider2D coll;
-
+    public LayerMask wallLayer;
     public int attackseg = 0;
     public int defenceseg = 0;
     public int speedseg = 0;
@@ -150,15 +150,26 @@ public class PlayerController : MonoBehaviour
     {
         float hDirection = Input.GetAxis("Horizontal");
 
-        if (hDirection < 0)
+        // 判斷是否碰牆
+        bool touchingWallLeft = Physics2D.Raycast(transform.position, Vector2.left, 0.6f, wallLayer);
+        bool touchingWallRight = Physics2D.Raycast(transform.position, Vector2.right, 0.6f, wallLayer);
+
+        // 判斷是否在嘗試往牆上移動
+        bool movingIntoLeftWall = hDirection < 0 && touchingWallLeft;
+        bool movingIntoRightWall = hDirection > 0 && touchingWallRight;
+
+        if (movingIntoLeftWall || movingIntoRightWall)
         {
-            //moving left
+            // 如果正在推牆，停止水平速度
+            rb.velocity = new Vector2(0, rb.velocity.y);
+        }
+        else if (hDirection < 0)
+        {
             rb.velocity = new Vector2(-curspeed, rb.velocity.y);
             transform.localScale = new Vector2(-1, 1);
         }
         else if (hDirection > 0)
         {
-            //moveing right
             rb.velocity = new Vector2(curspeed, rb.velocity.y);
             transform.localScale = new Vector2(1, 1);
         }
@@ -167,7 +178,7 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector2(0, rb.velocity.y);
         }
 
-        //jump
+        // jump
         if (Input.GetButtonDown("Jump") && coll.IsTouchingLayers(ground))
         {
             jump();
