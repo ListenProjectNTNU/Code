@@ -14279,6 +14279,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 6058715792962781089, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6058715792962781089, guid: ec6087b620debe04093b594023afd197, type: 3}
       propertyPath: dialogueText
       value: 
       objectReference: {fileID: 191276309}
@@ -14761,6 +14765,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 572995902044743379, guid: ccebf93433070784bb4a00b28ef73685, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3383108305679475057, guid: ccebf93433070784bb4a00b28ef73685, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6046546661200234091, guid: ccebf93433070784bb4a00b28ef73685, type: 3}

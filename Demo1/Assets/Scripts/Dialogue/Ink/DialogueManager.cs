@@ -83,7 +83,7 @@ public class DialogueManager : MonoBehaviour
     public void EnterDialogueMode(TextAsset inkJSON)
     {
 
-        //Debug.Log("EnterDialogueMode");
+        Debug.Log("EnterDialogueMode");
         if (playerController != null)
         {
             playerController.enabled = false;  // 進入對話時停用玩家移動

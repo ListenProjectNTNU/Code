@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7122190953397357499}
   - component: {fileID: 4782728039617725909}
   - component: {fileID: 4066041342388023915}
-  - component: {fileID: 6969858734063014392}
+  - component: {fileID: 684712999851689412}
   m_Layer: 0
   m_Name: Teleport
   m_TagString: Untagged
@@ -131,7 +131,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &6969858734063014392
+--- !u!114 &684712999851689412
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -140,9 +140,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 8294157205757559997}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 114241eba8c54b14cbc8e6b760e4c9ad, type: 3}
+  m_Script: {fileID: 11500000, guid: acf4de96604c5ca4f9cc3c260d5e3ae9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetSceneName: ThirdScene
-  transition: {fileID: 0}
-  transitionTime: 1
+  onEnemiesEnd:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: LevelLoader, Assembly-CSharp
+        m_MethodName: LoadNextLevel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
