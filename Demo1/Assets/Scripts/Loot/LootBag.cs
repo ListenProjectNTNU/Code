@@ -31,14 +31,18 @@ public class LootBag : MonoBehaviour
     //執行掉落
     public void InstantiateLoot(Vector3 spawnPosition)
     {
+        //Debug.Log("drop");
         Loot droppedItem = GetDroppedItem();
         if(droppedItem != null)
         {
-            GameObject lootGameObject = Instantiate(droppedItemPrefab, spawnPosition, Quaternion.identity);
+            //加上隨機偏移，讓掉落物稍微分散
+            Vector3 offset = new Vector3(Random.Range(-0.5f, 0.5f), 0.5f, 0f);
+            Vector3 spawnPosWithOffset = spawnPosition + offset;
+
+            GameObject lootGameObject = Instantiate(droppedItemPrefab, spawnPosWithOffset, Quaternion.identity);
             lootGameObject.GetComponent<SpriteRenderer>().sprite = droppedItem.lootSprite;
 
-            lootGameObject.AddComponent<LootItem>().lootData = droppedItem;//讓掉落物品附加 LootItem 腳本
-
+            lootGameObject.AddComponent<LootItem>().lootData = droppedItem;
             //如果要加掉落動畫可以在這裡加
         }
     }
