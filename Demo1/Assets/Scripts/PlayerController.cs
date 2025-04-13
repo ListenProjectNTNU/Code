@@ -76,14 +76,10 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.CompareTag("Collectable"))
         {
-            
             LootItem lootItem = collision.GetComponent<LootItem>();
             if (lootItem != null)
             {
-                PlayerInventory.Instance.AddItem(lootItem.lootData.lootName);
-
-                // ✅ 呼叫 ApplyLootEffects，確保影響數值
-                //PlayerInventory.Instance.ApplyLootEffects(lootItem.lootData);
+                PlayerInventory.Instance.AddItem(lootItem.lootData);
                 Destroy(collision.gameObject);
             }
         }

@@ -32,7 +32,7 @@ public class PlayerInventory : MonoBehaviour
         Debug.Log($"🔍 playerController 是否為 null？{playerController == null}");
     }
 
-    /* public void AddItem(Loot lootData)
+    public void AddItem(Loot lootData)
     {
         if (lootData == null)
         {
@@ -56,7 +56,7 @@ public class PlayerInventory : MonoBehaviour
         
         // 應用物品效果
         ApplyLootEffects(lootData);
-    } */
+    } 
 
     public void ApplyLootEffects(Loot lootData)
     {
@@ -92,7 +92,7 @@ public class PlayerInventory : MonoBehaviour
         return collectedItems.Contains(itemName);
     }
 
-    public void AddItem(string itemName)
+    /* public void AddItem(string itemName)
     {
         if (!string.IsNullOrEmpty(itemName))
         {
@@ -103,5 +103,5 @@ public class PlayerInventory : MonoBehaviour
         {
             Debug.LogError("❌ 嘗試添加的物品名稱為空！");
         }
-    }
+    } */
 }
