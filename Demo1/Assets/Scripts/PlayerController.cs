@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    //Start() var
+    
     private Rigidbody2D rb;
     private Animator anim;
     private Collider2D coll;
@@ -36,8 +36,6 @@ public class PlayerController : MonoBehaviour
 
     public healthbar healthBar;
     public GameObject deathMenu;
-
-    public int attack_damage = 20;
 
     private void Start() {
         rb = GetComponent<Rigidbody2D>();
@@ -74,12 +72,33 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        /* if (collision.CompareTag("Collectable_attack")) 
+        {
+            attackseg += 1;
+            PlayerUtils.DestroyObject(collision.gameObject);
+            //cherryText.text = cherries.ToString();
+        }
+        else if (collision.CompareTag("Collectable_defence")) 
+        {
+            defenceseg += 1;
+            PlayerUtils.DestroyObject(collision.gameObject);
+            //cherryText.text = cherries.ToString();
+        }
+        else if (collision.CompareTag("Collectable_speed")) 
+        {
+            speedseg += 1;
+            PlayerUtils.DestroyObject(collision.gameObject);
+            //cherryText.text = cherries.ToString();
+        } */
         if (collision.CompareTag("Collectable"))
         {
             LootItem lootItem = collision.GetComponent<LootItem>();
             if (lootItem != null)
             {
-                PlayerInventory.Instance.AddItem(lootItem.lootData);
+                //PlayerInventory.Instance.AddItem(lootItem.lootData.lootName);
+
+                // ✅ 呼叫 ApplyLootEffects，確保影響數值
+                PlayerInventory.Instance.ApplyLootEffects(lootItem.lootData);
                 Destroy(collision.gameObject);
             }
         }

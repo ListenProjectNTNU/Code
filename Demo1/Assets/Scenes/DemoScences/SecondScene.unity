@@ -21571,11 +21571,11 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 36b7f025ace52e44eaf6424d6af0868e, type: 2}
     - target: {fileID: 2331651468020798637, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -22.788742
+      value: -22.77
       objectReference: {fileID: 0}
     - target: {fileID: 2331651468020798637, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.989261
+      value: -2.2
       objectReference: {fileID: 0}
     - target: {fileID: 2331651468020798637, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
       propertyPath: m_LocalPosition.z
@@ -21613,18 +21613,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: enemy
       objectReference: {fileID: 0}
-    - target: {fileID: 6837795680981624476, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
+    - target: {fileID: 7483003339669340689, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
       propertyPath: player
       value: 
       objectReference: {fileID: 824339890}
-    - target: {fileID: 6837795680981624476, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
-      propertyPath: leftCap
-      value: -43.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6837795680981624476, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
-      propertyPath: rightCap
-      value: -6.7
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -21798,6 +21790,10 @@ PrefabInstance:
       propertyPath: deathMenu
       value: 
       objectReference: {fileID: 855187370}
+    - target: {fileID: 808179007961779678, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
+      propertyPath: hurtForce
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 808179007961779678, guid: 720e067fee56ec8499ff30b12a59ad6d, type: 3}
       propertyPath: wallLayer.m_Bits
       value: 64
