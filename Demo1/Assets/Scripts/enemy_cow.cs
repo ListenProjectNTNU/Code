@@ -100,6 +100,8 @@ public class enemy_cow : MonoBehaviour
         coll.enabled = false;
 
         anim.SetInteger("state", 3);  // 設定動畫狀態
+        GetComponent<LootBag>().InstantiateLoot(transform.position);
+        Destroy(gameObject, 1f);
         //StartCoroutine(WaitAndDisappear(1.0f)); // 等待死亡動畫完成
     }
 
@@ -203,11 +205,11 @@ public class enemy_cow : MonoBehaviour
             state = State.idle;
         }
     }
-    private void Disappear()
+    /* private void Disappear()
     {
         //GetComponent<SpriteRenderer>().enabled = false;
-        Destroy(gameObject);
-    }
+        
+    } */
 }
 
 
