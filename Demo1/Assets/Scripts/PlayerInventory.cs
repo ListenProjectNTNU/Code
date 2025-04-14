@@ -7,7 +7,10 @@ using System;
 public class PlayerInventory : MonoBehaviour
 {
     public static PlayerInventory Instance { get; private set; }
-    private List<string> collectedItems = new List<string>();
+
+    [SerializeField]private List<string> collectedItems = new List<string>();
+    public IReadOnlyList<string> CollectedItems => collectedItems;
+    
     private InkVariableUpdater inkUpdater;
     private PlayerController playerController;
 
@@ -91,17 +94,4 @@ public class PlayerInventory : MonoBehaviour
     {
         return collectedItems.Contains(itemName);
     }
-
-    /* public void AddItem(string itemName)
-    {
-        if (!string.IsNullOrEmpty(itemName))
-        {
-            collectedItems.Add(itemName);
-            Debug.Log($"撿起物品：{itemName}");
-        }
-        else
-        {
-            Debug.LogError("❌ 嘗試添加的物品名稱為空！");
-        }
-    } */
 }

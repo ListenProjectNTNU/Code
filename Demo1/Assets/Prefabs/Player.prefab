@@ -553,7 +553,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: -1
+  m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: -1609922355
   m_SortingOrder: 0
@@ -814,6 +814,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0f115577d4b1fa44a3e12c1d0f92a45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 64
   attackseg: 0
   defenceseg: 0
   speedseg: 0
@@ -823,8 +826,8 @@ MonoBehaviour:
   jumpForce: 10
   hurtForce: 3
   speed: 5
-  attackDamage: 30
-  defence: 15
+  attackDamage: 100
+  defence: 10
   healthBar: {fileID: 3364195366605762102}
   deathMenu: {fileID: 0}
   attack_damage: 20
@@ -871,7 +874,7 @@ MonoBehaviour:
   enemyLayers:
     serializedVersion: 2
     m_Bits: 128
-  attackDamage: 30
+  attackDamage: 100
   attackDuration: 0.2
 --- !u!114 &6766249078937226466
 MonoBehaviour:
@@ -885,3 +888,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23411b8eed7953344977cdd203af4639, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  collectedItems: []
