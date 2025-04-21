@@ -42,14 +42,14 @@ public class PlayerInventory : MonoBehaviour
             Debug.LogError("❌ LootData 為 null，無法添加物品！");
             return;
         }
-        
+        Debug.Log("AddItem()被執行");
         collectedItems.Add(lootData.lootName);
         Debug.Log($"✅ 獲得物品：{lootData.lootName}");
 
         // 更新對應的 Ink 變數
         if (inkUpdater != null)
         {
-            Debug.Log($"📝 更新 Ink 變數：has_{lootData.lootName}");
+            Debug.Log($"📝 PI更新 Ink 變數：has_{lootData.lootName}");
             inkUpdater.UpdateVariable($"has_{lootData.lootName}", true);
         }
         else

@@ -60,9 +60,6 @@ public class DialogueManager : MonoBehaviour
             choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
             index++;
         }
-
-
-
     }
 
     private void Update()
@@ -82,13 +79,12 @@ public class DialogueManager : MonoBehaviour
 
     public void EnterDialogueMode(TextAsset inkJSON)
     {
-
         Debug.Log("EnterDialogueMode");
         if (playerController != null)
         {
             playerController.enabled = false;  // 進入對話時停用玩家移動
         }
-        currentStory = new Story(inkJSON.text);
+        currentStory = new Story(inkJSON.text);// 🔁 1. 創建 story
         dialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
 
@@ -97,13 +93,12 @@ public class DialogueManager : MonoBehaviour
         if (inkUpdater != null)
         {
             //Debug.Log("進入對話時更新暫存變數");
-            inkUpdater.SetCurrentStory(currentStory);
-            inkUpdater.ApplyTempVariables();
+            inkUpdater.SetCurrentStory(currentStory);// ✅ 2. 設定 story
+            inkUpdater.ApplyTempVariables();// ✅ 3. 把之前暫存的寫入
+            inkUpdater.ApplyInventoryVariables(new List<string>(PlayerInventory.Instance.CollectedItems));
+            Debug.Log("✅ Ink 變數更新完成");
         }
-
-
         continueStory();
-
     }
     private void ExitDialogueMode()
     {
@@ -115,20 +110,26 @@ public class DialogueManager : MonoBehaviour
 
     private void continueStory()
     {
+        // 若此時有選項，就不要繼續跑下一句，而是停下來等玩家選擇
+        if (currentStory.currentChoices.Count > 0)
+        {
+            DisplayChoices(); // 顯示選項
+            Debug.Log("DisplayChoices()");
+            return;
+        }
 
         if (currentStory.canContinue)
         {
-            // set text for the current dialogue line
+            // 若沒選項、且還能繼續，就跑下一句對話
             dialogueText.text = currentStory.Continue();
-            // display the choices
-            DisplayChoices();
-            //handle tags
             HandleTags(currentStory.currentTags);
+            DisplayChoices(); // 注意：這裡還是可能有選項，例如新的一句後面有選項
         }
         else
         {
+            // 若無法繼續，也沒選項，則結束對話
             ExitDialogueMode();
-            onDialogueEnd?.Invoke(); // 觸發對話結束事件
+            onDialogueEnd?.Invoke();
         }
     }
 

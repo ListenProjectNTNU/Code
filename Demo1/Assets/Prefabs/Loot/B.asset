@@ -15,5 +15,5 @@ MonoBehaviour:
   lootSprite: {fileID: 21300000, guid: bd59bf2e866ed4529ae645637eb9c11d, type: 3}
   lootName: B
   dropChance: 100
-  effectType: 0
+  effectType: 2
   effectValue: 0

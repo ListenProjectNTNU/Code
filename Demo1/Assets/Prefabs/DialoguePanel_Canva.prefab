@@ -224,7 +224,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8003342513633482790
 Transform:
   m_ObjectHideFlags: 0
@@ -1120,7 +1120,7 @@ GameObject:
   - component: {fileID: 8737016324119931083}
   - component: {fileID: 6138667693877420931}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: DialoguePanel_Canva
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

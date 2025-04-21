@@ -17,7 +17,7 @@ public class InkVariableUpdater : MonoBehaviour
         }
         else
         {
-            Debug.LogError("無法找到 DialogueManager！");
+            //Debug.LogError("無法找到 DialogueManager！");
         }
     }
 
@@ -41,14 +41,14 @@ public class InkVariableUpdater : MonoBehaviour
         //Debug.Log($"ApplyTempVariables() 被呼叫！目前暫存區大小：{tempVariables.Count}");
         if (currentStory == null)
         {
-            Debug.LogWarning("❌ ApplyTempVariables() 執行時，currentStory 仍為 null！");
+            //Debug.LogWarning("❌ ApplyTempVariables() 執行時，currentStory 仍為 null！");
             return;
         }
 
         foreach (var entry in tempVariables)
         {
             currentStory.variablesState[entry.Key] = entry.Value;
-            Debug.Log($"同步暫存變數到 Ink：{entry.Key} = {entry.Value}");
+            //Debug.Log($"同步暫存變數到 Ink：{entry.Key} = {entry.Value}");
         }
         tempVariables.Clear(); // 清空暫存變數
     }
@@ -56,6 +56,17 @@ public class InkVariableUpdater : MonoBehaviour
     public void SetCurrentStory(Story story)
     {
         currentStory = story;
-        Debug.Log("currentStory 已成功設定！");
+        //Debug.Log("currentStory 已成功設定！");
+    }
+
+    public void ApplyInventoryVariables(List<string> collectedItems)
+    {
+        //Debug.Log("ApplyInventoryVariables執行");
+        foreach (string item in collectedItems)
+        {
+            string variableName = $"has_{item}";
+            //Debug.Log($"📝 IVU更新 Ink 變數：has_{item}");
+            UpdateVariable(variableName, true);
+        }
     }
 }

@@ -824,13 +824,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   jumpForce: 10
-  hurtForce: 3
+  hurtForce: 4
   speed: 5
   attackDamage: 100
   defence: 10
   healthBar: {fileID: 3364195366605762102}
   deathMenu: {fileID: 0}
-  attack_damage: 20
 --- !u!114 &4716097349326002765
 MonoBehaviour:
   m_ObjectHideFlags: 0
