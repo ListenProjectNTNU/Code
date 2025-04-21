@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
 {
     
     private Rigidbody2D rb;
-    private Animator anim;
+    public Animator anim;
     private Collider2D coll;
     public LayerMask wallLayer;
     public int attackseg = 0;
@@ -19,8 +19,8 @@ public class PlayerController : MonoBehaviour
     //public Text cherryText;
 
     //FSM
-    private enum State{idle,running,jumping,falling,hurt,dead};
-    private State state = State.idle;
+    public enum State{idle,running,jumping,falling,hurt,dead};
+    public State state = State.idle;
     //Inspector variable
     public LayerMask ground;
     public float jumpForce = 15f;
@@ -81,7 +81,7 @@ public class PlayerController : MonoBehaviour
                 Destroy(collision.gameObject);
             }
         }
-        else if (collision.tag == "enemyhitbox" || collision.tag == "trap")  // 檢測是否碰到敵人的 Hitbox
+        else if (collision.tag == "trap")  // 檢測是否碰到敵人的 Hitbox
         {
             state = State.hurt;
             PlayerUtils.ApplyKnockback(rb, hurtForce, collision.transform, transform);  

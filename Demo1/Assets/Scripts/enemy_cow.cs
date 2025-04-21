@@ -76,7 +76,7 @@ public class enemy_cow : MonoBehaviour
 				{
 					//player.healthBar.SetHealth(player.healthBar.currenthp - 100);
 					PlayerUtils.TakeDamage(player.healthBar, 20 - player.curdefence );
-					//player.state = State.hurt;
+                    player.anim.SetTrigger("hurt");
 					Debug.Log("成功對 Player 造成傷害！");
 				}
 				else
@@ -205,11 +205,14 @@ public class enemy_cow : MonoBehaviour
             state = State.idle;
         }
     }
-    /* private void Disappear()
-    {
-        //GetComponent<SpriteRenderer>().enabled = false;
-        
-    } */
+    void OnDrawGizmosSelected()
+	{
+		Vector3 pos = transform.position;
+		pos += transform.right * attackOffset.x;
+		pos += transform.up * attackOffset.y;
+
+		Gizmos.DrawWireSphere(pos, attackRange);
+	}
 }
 
 
