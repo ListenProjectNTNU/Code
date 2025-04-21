@@ -22000,6 +22000,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 824339890}
     - target: {fileID: 7483003339669340689, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
+      propertyPath: chaseRange
+      value: 4.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 7483003339669340689, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
       propertyPath: attackRange
       value: 0.78
       objectReference: {fileID: 0}
@@ -22010,6 +22014,10 @@ PrefabInstance:
     - target: {fileID: 7483003339669340689, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
       propertyPath: attackOffset.y
       value: -0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 7483003339669340689, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
+      propertyPath: stopChaseRange
+      value: 6.88
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -22381,6 +22389,8 @@ MonoBehaviour:
     m_Bits: 256
   attackRange: 0.64
   attackCooldown: 0.2
+  chaseRange: 6
+  stopChaseRange: 10
 --- !u!1001 &1672318239
 PrefabInstance:
   m_ObjectHideFlags: 0
