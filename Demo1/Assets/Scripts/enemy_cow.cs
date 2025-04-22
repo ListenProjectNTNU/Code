@@ -173,7 +173,7 @@ public class enemy_cow : MonoBehaviour
         Move(); // 自動移動
 
         // 如果敵人正在受傷、死亡或攻擊中，則不改變狀態
-        if (state == State.hurt || state == State.dying || state == State.attack)
+        if (state == State.hurt || state == State.dying || state == State.attack || state == State.run)
         {
             return;
         }
