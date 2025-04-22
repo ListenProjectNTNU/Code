@@ -24,7 +24,15 @@ public class DataPersistenceManager : MonoBehaviour
     }
     public void LoadGame()
     {
-        //TODO Load any saved data from a flie using the data handler 
+        //TODO - Load any saved data from a flie using the data handler
+        //如果沒有就NewGame 
+        if(this.gameData == null)
+        {
+            Debug.Log("No data was found. A New Game needs to be started before data can be loaded.");
+            NewGame();
+            //return;
+        }
+        // ToDO - 把所以資料載入給需要的腳本
     }
     public void SaveGame()
     {
