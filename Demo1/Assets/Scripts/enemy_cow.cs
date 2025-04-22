@@ -172,27 +172,21 @@ public class enemy_cow : MonoBehaviour
     {
         Move(); // 自動移動
 
-        // 如果敵人正在受傷、死亡或攻擊中，則不改變狀態
         if (state == State.hurt || state == State.dying || state == State.attack)
         {
             return;
         }
 
-        // 如果處於攻擊狀態
-        if (state == State.attack)
+        if (isChasing)
         {
-            // 等待攻擊動畫持續時間結束後，切換回 idle 狀態
-            if (Time.time >= nextAttackTime)  // 攻擊結束後
-            {
-                state = State.idle;  // 攻擊結束後切換回 idle
-            }
+            state = State.run;
         }
         else
         {
-            // 如果不是在攻擊狀態，則強制設置為 idle
             state = State.idle;
         }
     }
+
     void OnTriggerEnter2D(Collider2D collision)
     {
 
