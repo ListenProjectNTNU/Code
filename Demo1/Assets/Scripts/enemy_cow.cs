@@ -51,15 +51,13 @@ public class enemy_cow : MonoBehaviour
     {
         transform.rotation = fixedRotation;
         //Move();
-        AnimationState();
         
         if (Vector2.Distance(transform.position, player.position) <= attackRange && Time.time >= nextAttackTime)
         {
             Attack();
         }
         anim.SetInteger("state", (int)state);
-        //Debug.Log((int)state);
-        
+        AnimationState();
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
         if (distanceToPlayer <= chaseRange)
@@ -128,8 +126,7 @@ public class enemy_cow : MonoBehaviour
         if (isChasing)
         {
             // 追玩家
-            state = State.dying;
-            Debug.Log((int)state);
+            state = State.run;
             Vector2 direction = (player.position - transform.position).normalized;
             rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
 
