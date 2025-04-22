@@ -19,7 +19,7 @@ public class enemy_cow : MonoBehaviour
     public healthbar healthBar;
     public GameObject hitbox;
 
-    private enum State {idle, attack,hurt, dying};
+    private enum State {idle, attack, hurt, dying, run};
     private State state = State.idle;
     private Vector3 originalScale;
     private float leftCap;
@@ -32,6 +32,9 @@ public class enemy_cow : MonoBehaviour
     public float attackCooldown = 0.2f;  // 攻擊冷卻時間
     private float nextAttackTime = 0f;  // 下一次攻擊時間
     //bool IsDead = false;
+    public float chaseRange = 6f;
+    public float stopChaseRange = 10f;
+    private bool isChasing = false;
     private void Start()
     {
         fixedRotation = transform.rotation;
@@ -54,6 +57,16 @@ public class enemy_cow : MonoBehaviour
             Attack();
         }
         anim.SetInteger("state", (int)state);
+
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        if (distanceToPlayer <= chaseRange)
+        {
+            isChasing = true;
+        }
+        else if (distanceToPlayer >= stopChaseRange)
+        {
+            isChasing = false;
+        }
     }
     private void Attack()
     {
@@ -107,33 +120,51 @@ public class enemy_cow : MonoBehaviour
 
     private void Move()
     {
-        float moveSpeed = 2f; // 你可以調整這個速度
+        float moveSpeed = 2f;
 
-        if (facingLeft)
+        if (isChasing)
         {
-            if (transform.position.x > leftCap)
-            {
-                rb.velocity = new Vector2(-moveSpeed, rb.velocity.y);
-                transform.localScale = new Vector3(-Mathf.Abs(originalScale.x), originalScale.y); // 面向左
-            }
+            // 追玩家
+            state = State.run;
+            Vector2 direction = (player.position - transform.position).normalized;
+            rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
+
+            // 調整面向
+            if (direction.x < 0)
+                transform.localScale = new Vector3(-Mathf.Abs(originalScale.x), originalScale.y);
             else
-            {
-                facingLeft = false;
-            }
+                transform.localScale = new Vector3(Mathf.Abs(originalScale.x), originalScale.y);
         }
         else
         {
-            if (transform.position.x < rightCap)
+            // 原本的左右巡邏
+            if (facingLeft)
             {
-                rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
-                transform.localScale = new Vector3(Mathf.Abs(originalScale.x), originalScale.y); // 面向右
+                if (transform.position.x > leftCap)
+                {
+                    rb.velocity = new Vector2(-moveSpeed, rb.velocity.y);
+                    transform.localScale = new Vector3(-Mathf.Abs(originalScale.x), originalScale.y);
+                }
+                else
+                {
+                    facingLeft = false;
+                }
             }
             else
             {
-                facingLeft = true;
+                if (transform.position.x < rightCap)
+                {
+                    rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
+                    transform.localScale = new Vector3(Mathf.Abs(originalScale.x), originalScale.y);
+                }
+                else
+                {
+                    facingLeft = true;
+                }
             }
         }
     }
+
 
 
     private void AnimationState()
@@ -212,7 +243,13 @@ public class enemy_cow : MonoBehaviour
 		pos += transform.up * attackOffset.y;
 
 		Gizmos.DrawWireSphere(pos, attackRange);
-	}
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, chaseRange);
+
+        // 停止追擊範圍（藍色）
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, stopChaseRange);
+        }
 }
 
 
