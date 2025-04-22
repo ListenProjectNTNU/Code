@@ -52,10 +52,6 @@ public class enemy_cow : MonoBehaviour
         transform.rotation = fixedRotation;
         //Move();
         
-        if (Vector2.Distance(transform.position, player.position) <= attackRange && Time.time >= nextAttackTime)
-        {
-            Attack();
-        }
         anim.SetInteger("state", (int)state);
         AnimationState();
 
@@ -68,6 +64,12 @@ public class enemy_cow : MonoBehaviour
         {
             isChasing = false;
         }
+
+        // 只有在追擊狀態才能攻擊
+        if (isChasing && distanceToPlayer <= attackRange && Time.time >= nextAttackTime)
+        {
+            Attack();
+        }
     }
     private void Attack()
     {
@@ -76,6 +78,7 @@ public class enemy_cow : MonoBehaviour
 		pos += transform.right * attackOffset.x;
 		pos += transform.up * attackOffset.y;
         // 觸發攻擊動畫
+        state = State.attack;
         anim.SetTrigger("attack");
         nextAttackTime = Time.time + attackCooldown;
         Collider2D colInfo = Physics2D.OverlapCircle(pos, attackRange, attackMask);
