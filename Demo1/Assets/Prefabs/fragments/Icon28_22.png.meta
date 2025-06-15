@@ -106,19 +106,6 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites: []
@@ -126,10 +113,10 @@ TextureImporter:
     physicsShape: []
     bones:
     - name: bone_1
-      guid: 78d33447b04105c479f017eb11b997f2
-      position: {x: 1.6710731, y: 1.9949937, z: 0}
-      rotation: {x: 0, y: 0, z: 0.37958944, w: 0.92515504}
-      length: 40.25976
+      guid: 5eb20bfb7c0aac94e9c76f67d629b848
+      position: {x: 2.847375, y: 3.336371, z: 0}
+      rotation: {x: 0, y: 0, z: 0.3760939, w: 0.92658156}
+      length: 34.54242
       parentId: -1
       color:
         serializedVersion: 2
