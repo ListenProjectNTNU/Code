@@ -29,14 +29,13 @@ public class DataPersistenceManager : MonoBehaviour
     public void NewGame()
     {
         this.gameData = new GameData();
-        Debug.Log("NewGame created with HP: " + gameData.currenthp);
     }
     public void LoadGame()
     {
         //Load any saved data from a flie using the data handler
         this.gameData = dataHandler.Load();
         //如果沒有就NewGame 
-        if(this.gameData == null)
+        if (this.gameData == null)
         {
             Debug.Log("No data was found. A New Game needs to be started before data can be loaded.");
             NewGame();
@@ -47,8 +46,12 @@ public class DataPersistenceManager : MonoBehaviour
         {
             dataPersistenceObj.LoadData(gameData);
         }
+        
+        foreach (var rec in gameData.allHPs)
+        {
+            Debug.Log($"[LoadGame] 角色 {rec.id} 載入 HP = {rec.hp}");
+        }
 
-        Debug.Log("Loaded Health = " + gameData.currenthp);
     }
     public void SaveGame()
     {
@@ -57,9 +60,10 @@ public class DataPersistenceManager : MonoBehaviour
             Debug.Log("Saving data from: " + dataPersistenceObj.GetType().Name);
             dataPersistenceObj.SaveData(ref gameData);
         }
-
-        Debug.Log("Saved Health = " + gameData.currenthp);
-        
+        foreach (var rec in gameData.allHPs)
+        {
+            Debug.Log($"[SaveGame] 角色 {rec.id} 儲存 HP = {rec.hp}");
+        }
         dataHandler.Save(gameData);
     }
 

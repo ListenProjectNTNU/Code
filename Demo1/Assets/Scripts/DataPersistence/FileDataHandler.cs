@@ -34,8 +34,10 @@ public class FileDataHandler
                 }
 
                 loadedData = JsonUtility.FromJson<GameData>(dataToLoad);
+                
+                Debug.Log($"[FileDataHandler] 讀檔成功 → {fullPath} ({dataToLoad.Length} bytes)");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.LogError("Error occured when trying to load data from file: " + fullPath + "/n" + e);
             }
@@ -57,8 +59,10 @@ public class FileDataHandler
             {
                 using (StreamWriter writer = new StreamWriter(stream))
                 {
+                    Debug.Log("[FileDataHandler] 轉成 JSON：\n" + dataToStore);
                     writer.Write(dataToStore);
                 }
+                Debug.Log($"[FileDataHandler] 存檔完成 → {fullPath} ({dataToStore.Length} bytes)");
             }
         }
         catch(Exception e)
