@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class healthbar : MonoBehaviour, IDataPersistence
+public class healthbar : MonoBehaviour
 {
-    public string characterID = "player";  // 角色唯一 ID，場景中每個 healthbar 都要設定
 
     public Image hpImg;
     public Image hpEffectImg;
@@ -20,7 +19,6 @@ public class healthbar : MonoBehaviour, IDataPersistence
     private void Awake()
     {
         currenthp = -1f; // 特殊值表示尚未載入資料
-        Debug.Log($"[Awake] {characterID} 初始化 currenthp = -1");
     }
 
     private void Start()
@@ -28,7 +26,6 @@ public class healthbar : MonoBehaviour, IDataPersistence
         if (!isDataLoaded)
         {
             currenthp = maxHP;
-            Debug.Log($"[Start] {characterID} 沒有載入資料，設 currenthp = maxHP = {currenthp}");
         }
         updatehealthbar();
     }
@@ -36,7 +33,6 @@ public class healthbar : MonoBehaviour, IDataPersistence
     public void SetHealth(float health)
     {
         currenthp = Mathf.Clamp(health, 0f, maxHP);
-        Debug.Log($"[SetHealth] {characterID} 設定 currenthp = {currenthp}");
 
         updatehealthbar();
     }
@@ -66,12 +62,4 @@ public class healthbar : MonoBehaviour, IDataPersistence
         hpEffectImg.fillAmount = hpImg.fillAmount;
     }
 
-    public void LoadData(GameData data) {
-        currenthp = data.GetHP(characterID, maxHP);
-        isDataLoaded = true;
-        updatehealthbar();
-    }
-    public void SaveData(ref GameData data) {
-        data.SetHP(characterID, currenthp);
-    }
 }

@@ -2,10 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
+using UnityEngine.SceneManagement;
 public class DataPersistenceManager : MonoBehaviour
 {
     //singleton class
+
+    [Header("Debugging")]
+    [SerializeField] private bool initializeDataIfNull = false;
+
     [Header("File Storage Config")]
     [SerializeField] private string fileName;
     private GameData gameData;
@@ -16,16 +20,39 @@ public class DataPersistenceManager : MonoBehaviour
     {
         if(instance != null)
         {
-            Debug.LogError("Found more than one Data Persistence Manager in the Scene.");
+            Debug.Log("Found more than one Data Persistence Manager in the Scene. Destroying the newest one.");
+            Destroy(this.gameObject);
+            return;
         }
         instance = this;
-    }
-    private void Start()
-    {
+        DontDestroyOnLoad(this.gameObject);
+
         this.dataHandler = new FileDataHandler(Application.persistentDataPath, fileName);
+    }
+
+    public void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
+    }
+
+    public void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneUnloaded -= OnSceneUnloaded;
+    }
+
+    public void OnSceneLoaded(Scene scenen, LoadSceneMode mode)
+    {
         this.dataPersistenceObjects = FindAllDataPersistenceObjects();
         LoadGame();
     }
+
+    public void OnSceneUnloaded(Scene scene)
+    {
+        SaveGame();
+    }
+
     public void NewGame()
     {
         this.gameData = new GameData();
@@ -34,12 +61,17 @@ public class DataPersistenceManager : MonoBehaviour
     {
         //Load any saved data from a flie using the data handler
         this.gameData = dataHandler.Load();
+
+
+        if(this.gameData == null && initializeDataIfNull)
+        {
+            NewGame();
+        }
         //如果沒有就NewGame 
         if (this.gameData == null)
         {
             Debug.Log("No data was found. A New Game needs to be started before data can be loaded.");
-            NewGame();
-            //return;
+            return;
         }
         // 把所以資料載入給需要的腳本
         foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
@@ -49,27 +81,33 @@ public class DataPersistenceManager : MonoBehaviour
         
         foreach (var rec in gameData.allHPs)
         {
-            Debug.Log($"[LoadGame] 角色 {rec.id} 載入 HP = {rec.hp}");
+            //Debug.Log($"[LoadGame] 角色 {rec.id} 載入 HP = {rec.hp}");
         }
 
     }
     public void SaveGame()
     {
-         foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
+        if (this.gameData == null)
         {
-            Debug.Log("Saving data from: " + dataPersistenceObj.GetType().Name);
+            Debug.LogWarning("No data found, a new game needs to be started.");
+            return;
+        }
+        
+        foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
+        {
+            //Debug.Log("Saving data from: " + dataPersistenceObj.GetType().Name);
             dataPersistenceObj.SaveData(ref gameData);
         }
         foreach (var rec in gameData.allHPs)
         {
-            Debug.Log($"[SaveGame] 角色 {rec.id} 儲存 HP = {rec.hp}");
+            //Debug.Log($"[SaveGame] 角色 {rec.id} 儲存 HP = {rec.hp}");
         }
         dataHandler.Save(gameData);
     }
 
     private void OnApplicationQuit()
     {
-        Debug.Log("[OnApplicationQuit] 嘗試保存遊戲資料");
+        //Debug.Log("[OnApplicationQuit] 嘗試保存遊戲資料");
         SaveGame();
     }
 
@@ -78,5 +116,10 @@ public class DataPersistenceManager : MonoBehaviour
         return FindObjectsOfType<MonoBehaviour>()
             .OfType<IDataPersistence>()
             .ToList();
+    }
+
+    public bool HasGameData()
+    {
+        return gameData != null;
     }
 }

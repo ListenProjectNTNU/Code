@@ -31,8 +31,8 @@ public class PlayerInventory : MonoBehaviour
         inkUpdater = FindObjectOfType<InkVariableUpdater>();
         playerController = FindObjectOfType<PlayerController>();
         
-        Debug.Log($"🔍 inkUpdater 是否為 null？{inkUpdater == null}");
-        Debug.Log($"🔍 playerController 是否為 null？{playerController == null}");
+        //Debug.Log($"🔍 inkUpdater 是否為 null？{inkUpdater == null}");
+        //Debug.Log($"🔍 playerController 是否為 null？{playerController == null}");
     }
 
     public void AddItem(Loot lootData)

@@ -13,7 +13,20 @@ public class GameData
 {
     // ❶ 一開始就建立 List，避免反序列化空物件時變 null
     public List<HPRecord> allHPs = new List<HPRecord>();
+    public Vector3 playerPosition;
+    
+    public int speed = 5;
+    public int attackDamage = 20;
+    public int defence = 15;
 
+    public int attackSeg = 0;
+    public int defenceSeg = 0;
+    public int speedSeg = 0;
+    public GameData()
+    {
+        playerPosition = Vector3.zero;
+    }
+    
     // 取得血量；若找不到就回傳預設值
     public float GetHP(string id, float defaultHP)
     {
