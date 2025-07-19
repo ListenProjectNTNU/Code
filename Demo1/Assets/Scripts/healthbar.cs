@@ -33,7 +33,7 @@ public class healthbar : MonoBehaviour
     public void SetHealth(float health)
     {
         currenthp = Mathf.Clamp(health, 0f, maxHP);
-
+        isDataLoaded = true; // ✅ 告訴 Start() 不要再重設 currenthp
         updatehealthbar();
     }
 

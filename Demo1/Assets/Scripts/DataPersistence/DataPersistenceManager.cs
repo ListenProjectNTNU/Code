@@ -14,6 +14,7 @@ public class DataPersistenceManager : MonoBehaviour
     [SerializeField] private string fileName;
     private GameData gameData;
     private FileDataHandler dataHandler;
+    private string selectedProfileId = "test2";
     public static DataPersistenceManager instance { get; private set;}
     private List<IDataPersistence> dataPersistenceObjects;
     private void Awake()
@@ -53,6 +54,12 @@ public class DataPersistenceManager : MonoBehaviour
         SaveGame();
     }
 
+    public void ChangeSelectedProfileId(string newProfiledId)
+    {
+        this.selectedProfileId = newProfiledId;
+        LoadGame();
+    }
+
     public void NewGame()
     {
         this.gameData = new GameData();
@@ -60,7 +67,7 @@ public class DataPersistenceManager : MonoBehaviour
     public void LoadGame()
     {
         //Load any saved data from a flie using the data handler
-        this.gameData = dataHandler.Load();
+        this.gameData = dataHandler.Load(selectedProfileId);
 
 
         if(this.gameData == null && initializeDataIfNull)
@@ -102,7 +109,7 @@ public class DataPersistenceManager : MonoBehaviour
         {
             //Debug.Log($"[SaveGame] 角色 {rec.id} 儲存 HP = {rec.hp}");
         }
-        dataHandler.Save(gameData);
+        dataHandler.Save(gameData, selectedProfileId);
     }
 
     private void OnApplicationQuit()
@@ -121,5 +128,10 @@ public class DataPersistenceManager : MonoBehaviour
     public bool HasGameData()
     {
         return gameData != null;
+    }
+
+    public Dictionary<string, GameData> GetAllProfilesGameData()
+    {
+        return dataHandler.LoadAllProfiles();
     }
 }

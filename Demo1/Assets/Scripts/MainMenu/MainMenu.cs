@@ -6,7 +6,8 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-
+    [Header("SaveSlotMenu")]
+    [SerializeField] private SaveSlotMenu saveSlotMenu;
     [Header("Menu Buttons")]
     [SerializeField] private Button newGameButton;
     [SerializeField] private Button continueGameButton;
@@ -20,10 +21,8 @@ public class MainMenu : MonoBehaviour
     }
     public void OnNewGameClicked()
     {
-        DisableMenuButtons();
-        //建立新遊戲，初始化資料
-        DataPersistenceManager.instance.NewGame(); 
-        SceneManager.LoadSceneAsync("SecondScene");
+        saveSlotMenu.ActivateMenu();
+        this.DeactivateMenu();
     }
 
     public void OnContinueGameClicked()
@@ -36,5 +35,15 @@ public class MainMenu : MonoBehaviour
     {
         newGameButton.interactable = false;
         continueGameButton.interactable = false;
+    }
+
+    public void ActivateMenu()
+    {
+        this.gameObject.SetActive(true);
+    }
+
+    public void DeactivateMenu()
+    {
+        this.gameObject.SetActive(false);
     }
 }
