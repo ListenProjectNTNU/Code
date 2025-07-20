@@ -14,7 +14,7 @@ public class DataPersistenceManager : MonoBehaviour
     [SerializeField] private string fileName;
     private GameData gameData;
     private FileDataHandler dataHandler;
-    private string selectedProfileId = "test2";
+    private string selectedProfileId = "";
     public static DataPersistenceManager instance { get; private set;}
     private List<IDataPersistence> dataPersistenceObjects;
     private void Awake()

@@ -87,7 +87,7 @@ public class FileDataHandler
             }
 
             GameData profileData = Load(profileId);
-            if(profileId != null)
+            if(profileData != null)
             {
                 profileDictionary.Add(profileId, profileData);
             }
