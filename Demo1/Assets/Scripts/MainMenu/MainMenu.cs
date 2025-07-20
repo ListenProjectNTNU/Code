@@ -11,18 +11,25 @@ public class MainMenu : MonoBehaviour
     [Header("Menu Buttons")]
     [SerializeField] private Button newGameButton;
     [SerializeField] private Button continueGameButton;
+    [SerializeField] private Button loadGameButton;
     
     private void Start()
     {
-        if(!DataPersistenceManager.instance.HasGameData())
+        if (!DataPersistenceManager.instance.HasGameData)
         {
             continueGameButton.interactable = false;
         }
     }
     public void OnNewGameClicked()
     {
-        saveSlotMenu.ActivateMenu();
+        saveSlotMenu.ActivateMenu(SaveSlotMenu.Mode.New);
         this.DeactivateMenu();
+    }
+
+    public void OnLoadGameClicked()
+    {
+        saveSlotMenu.ActivateMenu(SaveSlotMenu.Mode.Load);
+        DeactivateMenu();
     }
 
     public void OnContinueGameClicked()
@@ -34,6 +41,7 @@ public class MainMenu : MonoBehaviour
     private void DisableMenuButtons()
     {
         newGameButton.interactable = false;
+        continueGameButton.interactable = false;
         continueGameButton.interactable = false;
     }
 
