@@ -15,6 +15,8 @@ public class GameData
     public List<HPRecord> allHPs = new List<HPRecord>();
     public Vector3 playerPosition;
     
+    public string sceneName = "SecondScene";
+    
     public int speed = 5;
     public int attackDamage = 20;
     public int defence = 15;

@@ -1,137 +1,161 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+
+/// <summary>
+/// Central hub that coordinates every <see cref="IDataPersistence"/> object and the <see cref="FileDataHandler"/>,
+/// enabling **multi‑profile save / load**.
+/// </summary>
 public class DataPersistenceManager : MonoBehaviour
 {
-    //singleton class
+    // ─────────────────────────────── Singleton ───────────────────────────────
+    public static DataPersistenceManager instance { get; private set; }
 
+    // ─────────────────────────────── Inspector ───────────────────────────────
     [Header("Debugging")]
-    [SerializeField] private bool initializeDataIfNull = false;
+    [SerializeField] private bool initializeDataIfNull = true;
 
     [Header("File Storage Config")]
-    [SerializeField] private string fileName;
+    [SerializeField] private string fileName = "data.name"; // 若 Inspector 空白時使用這個
+
+    // ─────────────────────────────── Runtime ────────────────────────────────
+    private const string PREF_LAST_PROFILE = "lastProfileId";
+    private const string DEFAULT_PROFILE   = "0";
+
+    private string   selectedProfileId;
     private GameData gameData;
-    private FileDataHandler dataHandler;
-    private string selectedProfileId = "";
-    public static DataPersistenceManager instance { get; private set;}
-    private List<IDataPersistence> dataPersistenceObjects;
+
+    private FileDataHandler              dataHandler;
+    private List<IDataPersistence>       dataPersistenceObjects;
+
+    // ─────────────────────────────── Life‑cycle ─────────────────────────────
     private void Awake()
     {
-        if(instance != null)
+        // Singleton 保護
+        if (instance != null)
         {
-            Debug.Log("Found more than one Data Persistence Manager in the Scene. Destroying the newest one.");
-            Destroy(this.gameObject);
+            Debug.LogWarning("Found more than one DataPersistenceManager. Destroying the newest one.");
+            Destroy(gameObject);
             return;
         }
         instance = this;
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
 
-        this.dataHandler = new FileDataHandler(Application.persistentDataPath, fileName);
+        // 檔案處理器初始化
+        if (string.IsNullOrWhiteSpace(fileName)) fileName = "data.name";
+        dataHandler = new FileDataHandler(Application.persistentDataPath, fileName);
+
+        // 讀取上次使用的 Profile，若無則用預設 0
+        selectedProfileId = PlayerPrefs.GetString(PREF_LAST_PROFILE, DEFAULT_PROFILE);
     }
 
-    public void OnEnable()
+    private void OnEnable()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.sceneLoaded   += OnSceneLoaded;
         SceneManager.sceneUnloaded += OnSceneUnloaded;
     }
 
-    public void OnDisable()
+    private void OnDisable()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded   -= OnSceneLoaded;
         SceneManager.sceneUnloaded -= OnSceneUnloaded;
     }
 
-    public void OnSceneLoaded(Scene scenen, LoadSceneMode mode)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        this.dataPersistenceObjects = FindAllDataPersistenceObjects();
+        dataPersistenceObjects = FindAllDataPersistenceObjects();
         LoadGame();
     }
 
-    public void OnSceneUnloaded(Scene scene)
+    private void OnSceneUnloaded(Scene scene)
     {
         SaveGame();
     }
 
-    public void ChangeSelectedProfileId(string newProfiledId)
+    private void OnApplicationQuit()
     {
-        this.selectedProfileId = newProfiledId;
+        SaveGame();
+    }
+
+    // ─────────────────────────────── Public API ─────────────────────────────
+    public void ChangeSelectedProfileId(string newProfileId)
+    {
+        if (string.IsNullOrWhiteSpace(newProfileId)) return;
+        selectedProfileId = newProfileId;
+        PlayerPrefs.SetString(PREF_LAST_PROFILE, newProfileId);
         LoadGame();
     }
 
     public void NewGame()
     {
-        this.gameData = new GameData();
-    }
-    public void LoadGame()
-    {
-        //Load any saved data from a flie using the data handler
-        this.gameData = dataHandler.Load(selectedProfileId);
-
-
-        if(this.gameData == null && initializeDataIfNull)
-        {
-            NewGame();
-        }
-        //如果沒有就NewGame 
-        if (this.gameData == null)
-        {
-            Debug.Log("No data was found. A New Game needs to be started before data can be loaded.");
-            return;
-        }
-        // 把所以資料載入給需要的腳本
-        foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
-        {
-            dataPersistenceObj.LoadData(gameData);
-        }
-        
-        foreach (var rec in gameData.allHPs)
-        {
-            //Debug.Log($"[LoadGame] 角色 {rec.id} 載入 HP = {rec.hp}");
-        }
-
-    }
-    public void SaveGame()
-    {
-        if (this.gameData == null)
-        {
-            Debug.LogWarning("No data found, a new game needs to be started.");
-            return;
-        }
-        
-        foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
-        {
-            //Debug.Log("Saving data from: " + dataPersistenceObj.GetType().Name);
-            dataPersistenceObj.SaveData(ref gameData);
-        }
-        foreach (var rec in gameData.allHPs)
-        {
-            //Debug.Log($"[SaveGame] 角色 {rec.id} 儲存 HP = {rec.hp}");
-        }
-        dataHandler.Save(gameData, selectedProfileId);
-    }
-
-    private void OnApplicationQuit()
-    {
-        //Debug.Log("[OnApplicationQuit] 嘗試保存遊戲資料");
+        gameData = new GameData();
+        // 立即存檔以確保磁碟上有檔案，也能讓 LoadGame() 找到
         SaveGame();
     }
 
+    public bool HasGameData => gameData != null;
+
+    public Dictionary<string, GameData> GetAllProfilesGameData() => dataHandler.LoadAllProfiles();
+
+    // For UI 快速取得最後 profile
+    public string GetLastProfileId() => selectedProfileId;
+
+    // ─────────────────────────────── Core Logic ────────────────────────────
+    public void LoadGame()
+    {
+        gameData = dataHandler.Load(selectedProfileId);
+
+        if (gameData == null)
+        {
+            if (initializeDataIfNull)
+            {
+                Debug.Log("No data found. Creating new game for profile " + selectedProfileId);
+                NewGame();
+            }
+            else
+            {
+                Debug.Log("No data was found for profile " + selectedProfileId + " and initializeDataIfNull == false.");
+                return;
+            }
+        }
+
+        // 將資料派發給所有 IDataPersistence 物件
+        foreach (var dpObj in dataPersistenceObjects)
+            dpObj.LoadData(gameData);
+    }
+
+    public void SaveGame()
+{
+    if (gameData == null)
+    {
+        Debug.LogWarning("[SaveGame] No gameData — nothing to save.");
+        return;
+    }
+
+    // ★ 每次存檔前，重新收集「還活著」的 IDataPersistence 物件
+    dataPersistenceObjects = FindAllDataPersistenceObjects();
+
+    // ★ 逐一呼叫，但跳過已被銷毀的物件
+    foreach (var dpObj in dataPersistenceObjects)
+    {
+        if (dpObj == null) continue;                     // ① 參考已是 null
+        if (dpObj is MonoBehaviour mb && !mb) continue;  // ② Unity 假 null (已 Destroy)
+        dpObj.SaveData(ref gameData);
+    }
+
+    // 記錄目前場景名稱
+    gameData.sceneName = SceneManager.GetActiveScene().name;
+
+    // 最終寫入磁碟
+    dataHandler.Save(gameData, selectedProfileId);
+}
+
+    // ─────────────────────────────── Helper Methods ────────────────────────
     private List<IDataPersistence> FindAllDataPersistenceObjects()
     {
         return FindObjectsOfType<MonoBehaviour>()
-            .OfType<IDataPersistence>()
-            .ToList();
-    }
-
-    public bool HasGameData()
-    {
-        return gameData != null;
-    }
-
-    public Dictionary<string, GameData> GetAllProfilesGameData()
-    {
-        return dataHandler.LoadAllProfiles();
+               .OfType<IDataPersistence>()
+               .ToList();
     }
 }
