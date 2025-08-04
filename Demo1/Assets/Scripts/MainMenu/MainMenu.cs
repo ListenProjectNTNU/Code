@@ -35,7 +35,7 @@ public class MainMenu : MonoBehaviour
     public void OnContinueGameClicked()
     {
         DisableMenuButtons();
-        SceneManager.LoadSceneAsync("SecondScene");
+        DataPersistenceManager.instance.LoadGame();   // 會自動跳存檔場景
     }
 
     private void DisableMenuButtons()

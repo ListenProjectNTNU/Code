@@ -43,28 +43,22 @@ public class SaveSlotMenu : MonoBehaviour
         }
     }
 
-    // Button event from SaveSlot prefab
     public void OnSaveSlotClicked(SaveSlot slot)
     {
         DisableMenuButtons();
         string pid = slot.GetProfileId();
 
-        // 切換到目標 Profile
         DataPersistenceManager.instance.ChangeSelectedProfileId(pid);
 
         if (currentMode == Mode.New)
         {
-            // 若此格已有存檔，彈覆寫確認視窗（示意）
-            if (cachedProfiles.ContainsKey(pid))
-            {
-                // TODO: 你的 UI 彈窗 → 若玩家取消，則 ReEnable 並 return
-                // 這裡先直接覆寫
-            }
-            DataPersistenceManager.instance.NewGame();
+            DataPersistenceManager.instance.NewGame("SecondScene");  // 👈 新遊戲起點
+            SceneManager.LoadScene("SecondScene");
+            return;
         }
-        // Load 模式不呼叫 NewGame()，直接沿用舊檔
 
-        SceneManager.LoadSceneAsync("SecondScene");
+        // Load 模式：讀檔後自動跳正確場景
+        DataPersistenceManager.instance.LoadGame();
     }
 
     public void OnBackClicked()

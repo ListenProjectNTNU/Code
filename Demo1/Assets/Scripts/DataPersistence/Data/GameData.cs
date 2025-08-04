@@ -1,53 +1,42 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class HPRecord
+[System.Serializable] public class HPRecord   { public string id; public float hp; }
+
+[System.Serializable] public class SceneHPGroup   // 🔸 一張圖一包
 {
-    public string id;
-    public float  hp;
+    public string               sceneName;
+    public List<HPRecord>       hpList = new();
+
+    public SceneHPGroup(string scene) => sceneName = scene;
 }
 
 [System.Serializable]
 public class GameData
 {
-    // ❶ 一開始就建立 List，避免反序列化空物件時變 null
-    public List<HPRecord> allHPs = new List<HPRecord>();
-    public Vector3 playerPosition;
-    
-    public string sceneName = "SecondScene";
-    
-    public int speed = 5;
-    public int attackDamage = 20;
-    public int defence = 15;
+    public List<SceneHPGroup> sceneHPGroups = new();
+    public Vector3  playerPosition = Vector3.zero;
+    public string   sceneName      = "MainMenu";
 
-    public int attackSeg = 0;
-    public int defenceSeg = 0;
-    public int speedSeg = 0;
-    public GameData()
+    public int speed = 5, attackDamage = 20, defence = 15;
+    public int attackSeg = 0, defenceSeg = 0, speedSeg = 0;
+
+    /* ────── 讀 / 寫血量 ────── */
+    public float GetHP(string id, float def, string scene = null)
     {
-        playerPosition = Vector3.zero;
+        scene ??= sceneName;
+        var g = sceneHPGroups.Find(x => x.sceneName == scene);
+        var r = g?.hpList.Find(x => x.id == id);
+        return r == null ? def : r.hp;
     }
-    
-    // 取得血量；若找不到就回傳預設值
-    public float GetHP(string id, float defaultHP)
+    public void SetHP(string id, float hp, string scene = null)
     {
-        // allHPs 可能在讀檔失敗時為 null，先保護一下
-        if (allHPs == null) return defaultHP;
+        scene ??= sceneName;
+        var g = sceneHPGroups.Find(x => x.sceneName == scene) ?? new SceneHPGroup(scene);
+        if (!sceneHPGroups.Contains(g)) sceneHPGroups.Add(g);
 
-        var rec = allHPs.Find(r => r.id == id);
-        return rec == null ? defaultHP : rec.hp;
-    }
-
-    // 設定血量；若沒找到此角色就新增
-    public void SetHP(string id, float hp)
-    {
-        if (allHPs == null) allHPs = new List<HPRecord>();
-
-        int idx = allHPs.FindIndex(r => r.id == id);
-        var newRec = new HPRecord { id = id, hp = hp };
-
-        if (idx >= 0) allHPs[idx] = newRec;
-        else          allHPs.Add(newRec);
+        int idx = g.hpList.FindIndex(x => x.id == id);
+        var rec = new HPRecord { id = id, hp = hp };
+        if (idx >= 0) g.hpList[idx] = rec; else g.hpList.Add(rec);
     }
 }
