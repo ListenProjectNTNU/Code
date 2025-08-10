@@ -54,7 +54,7 @@ public class DataPersistenceManager : MonoBehaviour
 
     /* ───── 公開 API ───── */
     public void ChangeSelectedProfileId(string id){ selectedProfileId=id; PlayerPrefs.SetString(PREF_LAST,id); }
-    public void NewGame(string startScene="SecondScene"){ gameData=new GameData{sceneName=startScene}; SaveGame(); }
+    public void NewGame(string startScene="FirstScene"){ gameData=new GameData{sceneName=startScene}; SaveGame(); }
     public bool HasGameData => gameData!=null;
     public Dictionary<string,GameData> GetAllProfilesGameData()=>dataHandler.LoadAllProfiles();
 
@@ -66,7 +66,7 @@ public class DataPersistenceManager : MonoBehaviour
         if (gameData == null)
         {
             if (!initializeDataIfNull) return;
-            NewGame("SecondScene");           // 首次建立
+            NewGame("FirstScene");           // 首次建立
             return;                           // NewGame 內已有 LoadScene
         }
 
