@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDataPersistence
 {
     
     private Rigidbody2D rb;
@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     public int defenceseg = 0;
     public int speedseg = 0;
     //public Text cherryText;
-
+    [SerializeField] private string playerID = "player";
     //FSM
     public enum State{idle,running,jumping,falling,hurt,dead};
     public State state = State.idle;
@@ -121,7 +121,35 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void LoadData(GameData data)
+    {
+        this.transform.position = data.playerPosition;
+        float loadedHP = data.GetHP(playerID, healthBar.maxHP);
+        healthBar.SetHealth(loadedHP);
 
+        speed = data.speed;
+        attackDamage = data.attackDamage;
+        defence = data.defence;
+
+        attackseg = data.attackSeg;
+        defenceseg = data.defenceSeg;
+        speedseg = data.speedSeg;
+    }
+
+    public void SaveData(ref GameData data)
+    {
+        data.playerPosition = this.transform.position;
+
+        data.SetHP(playerID, healthBar.currenthp);
+
+        data.speed = speed;
+        data.attackDamage = attackDamage;
+        data.defence = defence;
+
+        data.attackSeg = attackseg;
+        data.defenceSeg = defenceseg;
+        data.speedSeg = speedseg;
+    }
 
     public void Movement()
     {

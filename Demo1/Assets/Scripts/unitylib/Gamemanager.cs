@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject); // 確保 GameManager 不會被銷毀
 
-            if (audioManagerPrefab != null) 
+            /*if (audioManagerPrefab != null) 
             {
                 audioManager = Instantiate(audioManagerPrefab).GetComponent<AudioManager>();
                 DontDestroyOnLoad(audioManager.gameObject); // 確保 AudioManager 不會被銷毀
@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
             else 
             {
                 Debug.LogError("audioManagerPrefab 尚未在 Inspector 設定！");
-            }
+            }*/
         }
         else 
         {

@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class enemy_cow : MonoBehaviour
+public class enemy_cow : MonoBehaviour, IDataPersistence
 {
 
     public int maxHealth = 100;
     public int health = 100;
     [SerializeField] private Transform leftPoint;
     [SerializeField] private Transform rightPoint;  
+    [SerializeField] private string enemyID = "cow1";
     private Quaternion fixedRotation;
     public LayerMask ground;
     
@@ -199,7 +200,7 @@ public class enemy_cow : MonoBehaviour
             PlayerController playerController = collision.GetComponentInParent<PlayerController>();
             // 減少血量
             health = Mathf.Max(health - playerController.curattack, 0);
-            PlayerUtils.TakeDamage(healthBar, playerController.curattack);
+            healthBar.SetHealth(health);
             //healthBar.SetHealth(health);
             
             Debug.Log($"{gameObject.name} is hurt!");
@@ -247,7 +248,26 @@ public class enemy_cow : MonoBehaviour
         // 停止追擊範圍（藍色）
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, stopChaseRange);
+    }
+    public void LoadData(GameData data)
+    {
+        // 使用你 GameData 中的 GetHP 方法
+        health = (int)data.GetHP(enemyID, maxHealth);
+        healthBar.SetHealth(health);
+
+        if (health <= 0)
+        {
+            Destroy(gameObject); // 不重生
         }
+    }
+
+    public void SaveData(ref GameData data)
+    {
+        if (health > 0)
+            data.SetHP(enemyID, health);
+        else
+            data.SetHP(enemyID, 0);  // 儲存 0 也可以保留資料（讓你之後可以看哪隻死了）
+    }
 }
 
 
