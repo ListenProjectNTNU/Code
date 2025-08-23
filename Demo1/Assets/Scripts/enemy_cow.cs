@@ -32,7 +32,7 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
     public float attackRange = 3f;  // 攻擊範圍
     public float attackCooldown = 0.2f;  // 攻擊冷卻時間
     private float nextAttackTime = 0f;  // 下一次攻擊時間
-    //bool IsDead = false;
+    public bool isDead = false;
     public float chaseRange = 6f;
     public float stopChaseRange = 10f;
     private bool isChasing = false;
@@ -109,18 +109,36 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
 		}
     }
     
+    public void SetState(int s)
+    {
+        // 將 int 轉換到你的狀態列舉，並同步到 Animator
+        state = (State)s;
+        if (anim != null) anim.SetInteger("state", (int)state);
+    }
+
+    public void DestroySelf()
+    {
+        // 避免多次掉落
+        var loot = GetComponent<LootBag>();
+        if (loot != null) loot.InstantiateLoot(transform.position);
+
+        Destroy(gameObject);
+    }
+
     public void Die()
     {
+        if (isDead) return;        // 重入保護
+        isDead = true;
+
         Debug.Log("Enemy Died");
-        state = State.dying;
+        SetState((int)State.dying);
+
         rb.velocity = Vector2.zero;
         rb.simulated = false;
         coll.enabled = false;
 
-        anim.SetInteger("state", 3);  // 設定動畫狀態
-        GetComponent<LootBag>().InstantiateLoot(transform.position);
-        Destroy(gameObject, 1f);
-        //StartCoroutine(WaitAndDisappear(1.0f)); // 等待死亡動畫完成
+        // 不直接 Destroy，也不立刻掉落，改為延遲呼叫 DestroySelf
+        Invoke(nameof(DestroySelf), 1.0f);
     }
 
     private void Move()
@@ -251,9 +269,10 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
     }
     public void LoadData(GameData data)
     {
-        // 使用你 GameData 中的 GetHP 方法
-        health = (int)data.GetHP(enemyID, maxHealth);
-        healthBar.SetHealth(health);
+        if (healthBar == null) return;
+        float hp = data.GetHP(enemyID, maxHealth);
+        healthBar.SetHealth(hp);
+        health = (int)healthBar.currenthp;
 
         if (health <= 0)
         {
@@ -263,10 +282,8 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
 
     public void SaveData(ref GameData data)
     {
-        if (health > 0)
-            data.SetHP(enemyID, health);
-        else
-            data.SetHP(enemyID, 0);  // 儲存 0 也可以保留資料（讓你之後可以看哪隻死了）
+        if (healthBar == null) return;
+        data.SetHP(enemyID, health > 0 ? health : 0);
     }
 }
 

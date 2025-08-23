@@ -48,7 +48,7 @@ public static class PlayerUtils
     }
     
     //小怪死亡
-    public static void Die(EnemyBehavior enemy, int deathState)
+    public static void Die(enemy_cow enemy, int deathState)
     {
         if (enemy.isDead) return;
 
