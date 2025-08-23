@@ -112,14 +112,20 @@ public class PauseMenu : MonoBehaviour
         // 若有 Checkpoint 系統，這裡可改成回存點
         ApplyPause(false);
         var idx = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(idx);
+        if (DataPersistenceManager.instance != null)
+            DataPersistenceManager.instance.LoadSceneAndUpdate(SceneManager.GetActiveScene().name);
+        else
+            SceneManager.LoadScene(idx);
     }
 
     void ToMainMenu()
     {
         // TODO: 換成你的主選單場景名稱或 Build Index
         ApplyPause(false);
-        SceneManager.LoadScene("MainMenu");
+        if (DataPersistenceManager.instance != null)
+            DataPersistenceManager.instance.LoadSceneAndUpdate("MainMenu");
+        else
+            SceneManager.LoadScene("MainMenu");
     }
 
     void QuitGame()

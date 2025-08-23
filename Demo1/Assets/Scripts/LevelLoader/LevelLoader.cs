@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 using UnityEngine.SceneManagement;
 
 public class LevelLoader : MonoBehaviour
@@ -13,7 +14,10 @@ public class LevelLoader : MonoBehaviour
 
     public void LoadNextLevel()
     {
-        SceneManager.LoadScene(targetSceneName);    
+        if (DataPersistenceManager.instance != null)
+            DataPersistenceManager.instance.LoadSceneAndUpdate(targetSceneName);
+        else
+            SceneManager.LoadScene(targetSceneName);   
     }
 
     IEnumerator LoadLevel(int levelIndex)
@@ -25,6 +29,14 @@ public class LevelLoader : MonoBehaviour
         yield return new WaitForSeconds(transitionTime);
 
         //load next scene
-        SceneManager.LoadScene(levelIndex);
+        if (DataPersistenceManager.instance != null)
+        {
+            string sceneName = Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(levelIndex));
+            DataPersistenceManager.instance.LoadSceneAndUpdate(sceneName);
+        }
+        else
+        {
+            SceneManager.LoadScene(levelIndex);
+        }
     }
 }

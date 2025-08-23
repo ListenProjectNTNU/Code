@@ -53,7 +53,7 @@ public class SaveSlotMenu : MonoBehaviour
         if (currentMode == Mode.New)
         {
             DataPersistenceManager.instance.NewGame("ReFirstScene");  // 👈 新遊戲起點
-            SceneManager.LoadScene("ReFirstScene");
+            DataPersistenceManager.instance.LoadSceneAndUpdate("ReFirstScene");
             return;
         }
 

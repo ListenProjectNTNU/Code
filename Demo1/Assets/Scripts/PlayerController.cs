@@ -104,7 +104,10 @@ public class PlayerController : MonoBehaviour, IDataPersistence
 
         // 關閉死亡選單
         deathMenu.SetActive(false);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (DataPersistenceManager.instance != null)
+            DataPersistenceManager.instance.LoadSceneAndUpdate(SceneManager.GetActiveScene().name);
+        else
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     private void ResetPlayerPosition()

@@ -106,6 +106,17 @@ public class DataPersistenceManager : MonoBehaviour
         dataHandler.Save(gameData, selectedProfileId);               // ③ 最後存檔
     }
 
+    public void LoadSceneAndUpdate(string sceneName)
+    {
+        if (gameData != null)
+        {
+            gameData.sceneName = sceneName;
+            SaveGame(false);
+        }
+        skipNextSave = true;
+        SceneManager.LoadScene(sceneName);
+    }
+
     /* ───── utils ───── */
     List<IDataPersistence> FindAll() =>
         FindObjectsOfType<MonoBehaviour>().OfType<IDataPersistence>().ToList();
