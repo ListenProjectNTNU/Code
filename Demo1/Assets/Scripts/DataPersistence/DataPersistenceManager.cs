@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+    using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -54,7 +54,14 @@ public class DataPersistenceManager : MonoBehaviour
 
     /* ───── 公開 API ───── */
     public void ChangeSelectedProfileId(string id){ selectedProfileId=id; PlayerPrefs.SetString(PREF_LAST,id); }
-    public void NewGame(string startScene="FirstScene"){ gameData=new GameData{sceneName=startScene}; SaveGame(); }
+    
+     public void NewGame(string startScene="FirstScene")
+    {
+        gameData     = new GameData { sceneName = startScene };
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+            skipNextSave = true;           // 切換場景時略過 MainMenu 的 Save
+        SaveGame(false);                   // 初始存檔，保留指定的場景名稱
+    }
     public bool HasGameData => gameData!=null;
     public Dictionary<string,GameData> GetAllProfilesGameData()=>dataHandler.LoadAllProfiles();
 
@@ -66,8 +73,8 @@ public class DataPersistenceManager : MonoBehaviour
         if (gameData == null)
         {
             if (!initializeDataIfNull) return;
-            NewGame("FirstScene");           // 首次建立
-            return;                           // NewGame 內已有 LoadScene
+            NewGame("FirstScene");           // 首次建立並存檔
+            return;
         }
 
         string savedScene   = gameData.sceneName;
@@ -85,16 +92,18 @@ public class DataPersistenceManager : MonoBehaviour
         gameData.sceneName = currentScene;    // 同步
         objs = FindAll();
         foreach (var o in objs) o.LoadData(gameData);
+        alreadySwitched = false;
     }
 
-    public void SaveGame()
+    public void SaveGame(bool overwriteScene = true)
     {
         if (gameData == null) return;
 
-        gameData.sceneName = SceneManager.GetActiveScene().name; // ① 先記錄場景
+        if (overwriteScene)
+            gameData.sceneName = SceneManager.GetActiveScene().name;
         objs = FindAll();
-        foreach (var o in objs) o.SaveData(ref gameData);        // ② 再把資料寫進 gameData
-        dataHandler.Save(gameData, selectedProfileId);           // ③ 最後存檔
+        foreach (var o in objs) o.SaveData(ref gameData);            // ② 再把資料寫進 gameData
+        dataHandler.Save(gameData, selectedProfileId);               // ③ 最後存檔
     }
 
     /* ───── utils ───── */
