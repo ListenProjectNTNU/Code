@@ -73,6 +73,7 @@ public class FileDataHandler
 
     public Dictionary<string, GameData> LoadAllProfiles()
     {
+        if (!Directory.Exists(dataDirPath)) return new Dictionary<string, GameData>();
         Dictionary<string, GameData> profileDictionary = new Dictionary<string, GameData>();
 
         IEnumerable<DirectoryInfo> dirInfos = new DirectoryInfo(dataDirPath).EnumerateDirectories();
