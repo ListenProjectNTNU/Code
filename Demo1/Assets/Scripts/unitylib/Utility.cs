@@ -28,8 +28,10 @@ public static class PlayerUtils
     }
 
     // 讓玩家受傷
-    public static void TakeDamage(healthbar healthBar, float damage)
+    public static void TakeDamage(HealthBar healthBar, float damage)
     {
+        damage = Mathf.Max(0, damage);
+        if (damage == 0) return;
         if (healthBar != null)
         {
             healthBar.SetHealth(ClampValue(healthBar.currenthp - damage, 0, healthBar.maxHP));
@@ -42,7 +44,7 @@ public static class PlayerUtils
     }
 
     // 檢查是否死亡
-    public static bool CheckDeath(healthbar healthBar)
+    public static bool CheckDeath(HealthBar healthBar)
     {
         return healthBar != null && healthBar.currenthp <= 0;
     }

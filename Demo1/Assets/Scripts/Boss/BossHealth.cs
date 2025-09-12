@@ -5,7 +5,7 @@ using UnityEngine;
 public class BossHealth : MonoBehaviour
 {
     public int health = 500;
-    public healthbar healthBar;
+    public HealthBar healthBar;
     public bool isInvulnerable = false;
     public GameObject hitbox;
     private Animator animator;

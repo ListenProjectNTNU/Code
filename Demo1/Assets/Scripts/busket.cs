@@ -6,7 +6,7 @@ public class busket : MonoBehaviour
 {
     public float health = 100f; // 敵人血量
     public bool isDead = false;
-    public healthbar healthBar;
+    public HealthBar healthBar;
     void Start()
     {
         

@@ -8,7 +8,7 @@ using UnityEngine.UI;
 /// - 自動撐開「血量降低緩降效果」(hpEffectImg)。  
 /// - 實作 <see cref="IDataPersistence"/>，可被 DataPersistenceManager 自動存讀。  
 /// </summary>
-public class healthbar : MonoBehaviour
+public class HealthBar : MonoBehaviour, IDataPersistence
 {
     [Header("Data ID (必填)\nplayer / enemy / boss …")]
     public string id = "enemy";               // 每個血條唯一
@@ -66,5 +66,14 @@ public class healthbar : MonoBehaviour
         hpEffectImg.fillAmount = end;
     }
 
+    public void LoadData(GameData data)
+    {
+        currenthp = data.GetHP(id, maxHP);
+    }
+
+    public void SaveData(ref GameData data)
+    {
+        data.SetHP(id, currenthp);
+    }
 
 }

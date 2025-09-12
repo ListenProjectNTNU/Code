@@ -10,13 +10,8 @@ public class PlayerCombat : MonoBehaviour
     public GameObject attackPoint;
     public float attackRange = 0.5f;
     public LayerMask enemyLayers;
-    public int attackDamage =30;
-    public float attackDuration = 0.2f;
-
-    private void Start()
-    {
-        attackPoint.SetActive(false); // 遊戲開始時先關閉
-    }
+    public int attackDamage = 30;
+    public float knockbackForce = 5f;
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.K))
@@ -28,15 +23,37 @@ public class PlayerCombat : MonoBehaviour
 
     void Attack()
     {
-        // 播放攻击动画
+        // 播放攻擊動畫
         animator.SetTrigger("Attack");
-        // 開啟攻擊範圍
-        attackPoint.SetActive(true);
-        Invoke("DisableAttack", attackDuration);
+        // 搜尋攻擊範圍內的敵人
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
+            attackPoint.transform.position,
+            attackRange,
+            enemyLayers
+        );
+
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            // 嘗試呼叫 TakeDamage
+            enemy.SendMessage("TakeDamage", attackDamage, SendMessageOptions.DontRequireReceiver);
+
+            // 加入擊退效果
+            Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                Vector2 direction = (enemy.transform.position - attackPoint.transform.position).normalized;
+                rb.AddForce(direction * knockbackForce, ForceMode2D.Impulse);
+            }
+        }
     }
 
-    void DisableAttack()
+    private void OnDrawGizmosSelected()
     {
         attackPoint.SetActive(false);
+        if (attackPoint == null)
+            return;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPoint.transform.position, attackRange);
     }
 }
