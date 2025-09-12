@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour, IDataPersistence
     public int curattack => attackDamage + attackseg * 10;
     public int curspeed => speed + speedseg * 20;
 
-    public HealthBar  healthBar;
+    public HealthBar healthBar;
     public GameObject deathMenu;
 
     private void Start() {
@@ -46,6 +46,10 @@ public class PlayerController : MonoBehaviour, IDataPersistence
     // Update is called once per frame
     void Update()
     {
+        if(state != State.hurt)
+        {
+            Movement();
+        }
         AnimationState();
         anim.SetInteger("state", (int)state);//sets animation based on Enumerator state
         //Debug.Log((int)state);
@@ -63,13 +67,6 @@ public class PlayerController : MonoBehaviour, IDataPersistence
             rb.velocity = Vector2.zero;
             this.enabled = false;
             deathMenu.SetActive(true);
-        }
-    }
-    void FixedUpdate()
-    {
-        if(state != State.hurt)
-        {
-            Movement();
         }
     }
 

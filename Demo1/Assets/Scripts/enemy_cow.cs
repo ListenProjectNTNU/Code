@@ -33,7 +33,7 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
     public LayerMask attackMask;
     public float attackRange = 3f;  // 攻擊範圍
     public float attackCooldown = 0.2f;  // 攻擊冷卻時間
-    public float attackDuration = 0.5f; // 攻擊動畫持續時間
+    public float attackDuration = 0.5f;
     private float nextAttackTime = 0f;  // 下一次攻擊時間
     public bool isDead = false;
     public float chaseRange = 6f;
@@ -72,7 +72,7 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
         }
 
         // 只有在追擊狀態才能攻擊
-        if (isChasing && distanceToPlayer <= attackRange && Time.time >= nextAttackTime)
+        if (isChasing && distanceToPlayer <= attackRange && Time.time >= nextAttackTime && state != State.attack)
         {
             Attack();
         }
@@ -88,17 +88,17 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
         anim.SetTrigger("attack");
         nextAttackTime = Time.time + attackCooldown;
         Collider2D colInfo = Physics2D.OverlapCircle(pos, attackRange, attackMask);
-		    if (colInfo != null)
-                {
+                if (colInfo != null)
+                    {
                     // 嘗試從 Player 取得 PlayerController
                     PlayerController player = colInfo.GetComponent<PlayerController>();
-			if (player != null)
-			{
-				// 使用 PlayerController 中的 Health Bar
-				if (player.healthBar != null)
-				{
-					//player.healthBar.SetHealth(player.healthBar.currenthp - 100);
-					PlayerUtils.TakeDamage(player.healthBar, 20 - player.curdefence );
+                if (player != null)
+                        {
+                            // 使用 PlayerController 中的 Health Bar
+                            if (player.healthBar != null)
+                            {
+                                    //player.healthBar.SetHealth(player.healthBar.currenthp - 100);
+                                    PlayerUtils.TakeDamage(player.healthBar, 20 - player.curdefence );
                     player.anim.SetTrigger("hurt");
 					Debug.Log("成功對 Player 造成傷害！");
 				}
@@ -112,6 +112,7 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
 				Debug.LogWarning("碰到的物体没有 PlayerController 组件：" + colInfo.name);
 			}
 		}
+        StartCoroutine(ResetAfterAttack());
     }
 
     private IEnumerator ResetAfterAttack()
@@ -119,6 +120,13 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
         yield return new WaitForSeconds(attackDuration);
         state = isChasing ? State.run : State.idle;
     }
+
+    // Animation event callback to reset state after attack animation finishes
+    public void OnAttackAnimationEnd()
+    {
+        StartCoroutine(ResetAfterAttack());
+    }
+
     public void SetState(int s)
     {
         // 將 int 轉換到你的狀態列舉，並同步到 Animator
@@ -230,25 +238,29 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
         }
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    public void TakeDamage(int damage)
     {
 
-        if (collision.CompareTag("playerhitbox"))
+        state = State.hurt;
+        health = Mathf.Max(health - damage, 0);
+        if (healthBar != null)
         {
-            state = State.hurt;
-            PlayerController playerController = collision.GetComponentInParent<PlayerController>();
-            // 減少血量
-            health = Mathf.Max(health - playerController.curattack, 0);
             healthBar.SetHealth(health);
-            //healthBar.SetHealth(health);
-            
-            Debug.Log($"{gameObject.name} is hurt!");
-            Invoke("ResetToIdle", 0.5f);
-            // ✅ 如果血量歸零，執行死亡
-            if (health <= 0)
-            {
-                Die();
-            }
+        }
+        Debug.Log($"{gameObject.name} is hurt!");
+        Invoke("ResetToIdle", 0.5f);
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        PlayerController playerController = collision.GetComponentInParent<PlayerController>();
+        if (playerController != null)
+        {
+            TakeDamage(playerController.curattack);
         }
     }
 
@@ -288,21 +300,6 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, stopChaseRange);
 
-        // 視線射線
-        if (player != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, player.position);
-        }
-
-        if (coll != null)
-        {
-            Vector2 groundCheckOrigin = facingLeft
-                ? new Vector2(coll.bounds.min.x, coll.bounds.min.y)
-                : new Vector2(coll.bounds.max.x, coll.bounds.min.y);
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(groundCheckOrigin, groundCheckOrigin + Vector2.down * edgeCheckDistance);
-        }
     }
     public void LoadData(GameData data)
     {
