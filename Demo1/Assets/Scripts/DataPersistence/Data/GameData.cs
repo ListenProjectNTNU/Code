@@ -3,7 +3,7 @@ using UnityEngine;
 
 [System.Serializable] public class HPRecord   { public string id; public float hp; }
 
-[System.Serializable] public class SceneHPGroup   // 🔸 一張圖一包
+[System.Serializable] public class SceneHPGroup
 {
     public string               sceneName;
     public List<HPRecord>       hpList = new();

@@ -57,7 +57,7 @@ public class DataPersistenceManager : MonoBehaviour
     
      public void NewGame(string startScene="FirstScene")
     {
-        gameData     = new GameData { sceneName = startScene };
+        gameData= new GameData { sceneName = startScene };
         if (SceneManager.GetActiveScene().name == "MainMenu")
             skipNextSave = true;           // 切換場景時略過 MainMenu 的 Save
         SaveGame(false);                   // 初始存檔，保留指定的場景名稱
