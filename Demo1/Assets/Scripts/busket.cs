@@ -1,41 +1,52 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class busket : MonoBehaviour
+public class Busket : MonoBehaviour
 {
-    public float health = 100f; // 敵人血量
+    public float health = 100f; 
     public bool isDead = false;
     public HealthBar healthBar;
+
     void Start()
     {
-        
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(health);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    void OnTriggerEnter2D(Collider2D collision)
+    // 玩家攻擊命中時，必須有一個帶 "playerhitbox" Tag 的 Collider 碰到木樁
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         if (isDead) return;
-            if (collision.CompareTag("playerhitbox"))
-            {
-                PlayerController playerController = collision.GetComponentInParent<PlayerController>();
-                // 減少血量
-                health = Mathf.Max(health - playerController.curattack , 0);
-                PlayerUtils.TakeDamage(healthBar, playerController.curattack);
-                healthBar.SetHealth(health);
 
-                Debug.Log($"{gameObject.name} is hurt!");
-                // ✅ 血量歸零，執行死亡
+        if (collision.collider.CompareTag("playerhitbox"))
+        {
+            PlayerController playerController = collision.collider.GetComponentInParent<PlayerController>();
+
+            if (playerController != null)
+            {
+                // 扣血
+                health = Mathf.Max(health - playerController.curattack, 0);
+                if (healthBar != null)
+                {
+                    healthBar.SetHealth(health);
+                }
+
+                Debug.Log($"{gameObject.name} 被打，剩餘血量: {health}");
+
+                // 判斷死亡
                 if (health <= 0)
                 {
                     isDead = true;
-                    Destroy(gameObject);
+                    Die();
                 }
             }
+        }
+    }
+
+    private void Die()
+    {
+        Debug.Log($"{gameObject.name} 被打壞了！");
+        Destroy(gameObject);
     }
 }

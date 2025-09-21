@@ -23,12 +23,14 @@ public class DialogueTrigger : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log($"Update: playerInRange={playerInRange}, dialogueIsPlaying={DialogueManager.GetInstance().dialogueIsPlaying}, E={Input.GetKeyDown(KeyCode.E)}");
+
         if(playerInRange && !DialogueManager.GetInstance().dialogueIsPlaying)
         {
             visualCue.SetActive(true);
             if(Input.GetKeyDown(KeyCode.E))
             {
-                //InputManager.GetInstance().GetInteractPressed()
+                Debug.Log("✅ E 被偵測到，進入對話模式");
                 DialogueManager.GetInstance().EnterDialogueMode(inkJSON);
             }
         }
@@ -40,14 +42,15 @@ public class DialogueTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other) 
     {
-        if(other.CompareTag("Player"))
+        Debug.Log("Player 進入對話範圍");
+        if(other.gameObject.CompareTag("Player"))
         {
             playerInRange = true;
         }
     }
     private void OnTriggerExit2D(Collider2D other) 
     {
-        if(other.CompareTag("Player"))
+        if(other.gameObject.CompareTag("Player"))
         {
             playerInRange = false;
         }

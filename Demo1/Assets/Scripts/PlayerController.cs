@@ -19,12 +19,12 @@ public class PlayerController : MonoBehaviour, IDataPersistence
     //public Text cherryText;
     [SerializeField] private string playerID = "player";
     //FSM
-    public enum State{idle,running,jumping,falling,hurt,dead};
-    public State state = State.idle;
+    public enum State{idle,jump,fall,hurt,dying};
+    private State state = State.idle;
     //Inspector variable
     public LayerMask ground;
-    public float jumpForce = 15f;
-    public float hurtForce = 10f;
+    public float jumpForce = 3f;
+    public float hurtForce = 3f;
     
     public int speed = 5 ;
     public int attackDamage = 20;
@@ -57,12 +57,12 @@ public class PlayerController : MonoBehaviour, IDataPersistence
         if (transform.position.y < -10) // 設定掉落的臨界點
         {
             ResetPlayerPosition(); // 重置玩家位置並扣血
-        }
+        } 
 
         if (PlayerUtils.CheckDeath(healthBar))
         {
-            state = State.dead;
-            anim.SetInteger("state", (int)State.dead);
+            state = State.dying;
+            anim.SetInteger("state", (int)State.dying);
             Debug.Log("Player is dead!");
             rb.velocity = Vector2.zero;
             this.enabled = false;
@@ -157,7 +157,7 @@ public class PlayerController : MonoBehaviour, IDataPersistence
     public void Movement()
     {
         float hDirection = Input.GetAxis("Horizontal");
-
+        Vector3 scale = transform.localScale;
         // 判斷是否碰牆
         bool touchingWallLeft = Physics2D.Raycast(transform.position, Vector2.left, 0.6f, wallLayer);
         bool touchingWallRight = Physics2D.Raycast(transform.position, Vector2.right, 0.6f, wallLayer);
@@ -171,15 +171,17 @@ public class PlayerController : MonoBehaviour, IDataPersistence
             // 如果正在推牆，停止水平速度
             rb.velocity = new Vector2(0, rb.velocity.y);
         }
-        else if (hDirection < 0)
+        if (hDirection < 0)
         {
             rb.velocity = new Vector2(-curspeed, rb.velocity.y);
-            transform.localScale = new Vector2(-1, 1);
+            scale.x = -Mathf.Abs(scale.x);  // 保持原始縮放大小
+            transform.localScale = scale;
         }
         else if (hDirection > 0)
         {
             rb.velocity = new Vector2(curspeed, rb.velocity.y);
-            transform.localScale = new Vector2(1, 1);
+            scale.x = Mathf.Abs(scale.x);   // 保持原始縮放大小
+            transform.localScale = scale;
         }
         else
         {
@@ -191,48 +193,38 @@ public class PlayerController : MonoBehaviour, IDataPersistence
         {
             jump();
         }
+        // 設定 Blend Tree 的 speed
+        float moveSpeed = Mathf.Abs(rb.velocity.x) / curspeed; // 正規化成 0~1
+        anim.SetFloat("speed", moveSpeed);
     }
     
     public void jump()
     {
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-        state = State.jumping;
+        state = State.jump;
     }
 
     public void AnimationState()
     {
-        if(state == State.jumping)
+        if (state == State.jump)
         {
-           //state = State.idle;
-            if(rb.velocity.y < .1f)
-            {
-                state = State.falling;
-            }
+            if (rb.velocity.y < .1f)
+                state = State.fall;
         }
-        else if(state == State.falling)
+        else if (state == State.fall)
         {
-            if(coll.IsTouchingLayers(ground))
-            {
+            if (coll.IsTouchingLayers(ground))
                 state = State.idle;
-            }
         }
-        //Math.Abs means absloute value
-        else if(state == State.hurt)
+        else if (state == State.hurt)
         {
-            if(Math.Abs(rb.velocity.x) < .1f)
-            {
+            if (Math.Abs(rb.velocity.x) < .1f)
                 state = State.idle;
-            }
         }
-        else if(Math.Abs(rb.velocity.x) > 4.5f)
+        else if (state == State.dying)
         {
-            //is running
-            state = State.running;
+            // 死亡保持 dead 狀態
+            state = State.dying;
         }
-        else
-        {
-            state = State.idle;
-        }
-        //Debug.Log(state);
     }
 }
