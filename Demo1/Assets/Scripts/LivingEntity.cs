@@ -10,7 +10,7 @@ public class LivingEntity : MonoBehaviour
     [Header("Optional UI")]
     public HealthBar healthBar; // 可以綁 UI 血條，也可以留空
 
-    void Start()
+    protected virtual void Start()
     {
         currentHealth = maxHealth;
         if (healthBar != null)
@@ -19,7 +19,7 @@ public class LivingEntity : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float damage)
+    public virtual void TakeDamage(float damage)
     {
         if (isDead) return;
 

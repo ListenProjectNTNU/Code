@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class PlayerController : MonoBehaviour, IDataPersistence
+public class PlayerController : LivingEntity,IDataPersistence
 {
     
     private Rigidbody2D rb;
@@ -34,22 +34,20 @@ public class PlayerController : MonoBehaviour, IDataPersistence
     public int curattack => attackDamage + attackseg * 10;
     public int curspeed => speed + speedseg * 20;
 
-    public HealthBar healthBar;
     public GameObject deathMenu;
 
     private void Start() {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
+        base.Start();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(state != State.hurt)
-        {
-            Movement();
-        }
+ 
+        Movement();
         AnimationState();
         anim.SetInteger("state", (int)state);//sets animation based on Enumerator state
         //Debug.Log((int)state);
@@ -83,14 +81,21 @@ public class PlayerController : MonoBehaviour, IDataPersistence
         }
         else if (collision.tag == "trap")  // 檢測是否碰到敵人的 Hitbox
         {
-            state = State.hurt;
+            anim.SetTrigger("hurt");
             PlayerUtils.ApplyKnockback(rb, hurtForce, collision.transform, transform);  
         }
+    }
+
+    private void Awake() {
+        rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+        coll = GetComponent<Collider2D>();
     }
 
     //重生
     public void RevivePlayer()
     {
+        if (anim == null) anim = GetComponent<Animator>();
         Debug.Log("RevivePlayer() 被執行！");
         Debug.Log("RevivePlayer() 被執行！重新載入場景！");
         healthBar.SetHealth(healthBar.maxHP);
@@ -110,6 +115,23 @@ public class PlayerController : MonoBehaviour, IDataPersistence
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    protected override void Die()
+    {
+        if (isDead) return;
+        isDead = true;
+
+        state = State.dying;
+        anim.SetTrigger("die");
+        rb.velocity = Vector2.zero;
+        this.enabled = false;
+
+        if (deathMenu != null)
+            deathMenu.SetActive(true);
+
+        Debug.Log("玩家死亡 → 顯示死亡選單，不 Destroy 玩家物件");
+    }
+
+
     private void ResetPlayerPosition()
     {
         Debug.Log("玩家掉落過低，重置位置並扣血！");
@@ -120,10 +142,21 @@ public class PlayerController : MonoBehaviour, IDataPersistence
         // 扣血
         if (healthBar != null)
         {
-            PlayerUtils.TakeDamage(healthBar, 9999); 
+            base.TakeDamage(9999); 
         }
     }
+    public override void TakeDamage(float damage)
+    {
+        base.TakeDamage(damage);
 
+        if (!isDead)
+        {
+            // 播放受傷動畫
+            anim.SetTrigger("hurt");
+
+            // 這裡可選擇要不要 knockback，或交由觸發來源決定
+        }
+    }
     public void LoadData(GameData data)
     {
         this.transform.position = data.playerPosition;
@@ -214,11 +247,6 @@ public class PlayerController : MonoBehaviour, IDataPersistence
         else if (state == State.fall)
         {
             if (coll.IsTouchingLayers(ground))
-                state = State.idle;
-        }
-        else if (state == State.hurt)
-        {
-            if (Math.Abs(rb.velocity.x) < .1f)
                 state = State.idle;
         }
         else if (state == State.dying)

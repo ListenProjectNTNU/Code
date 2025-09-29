@@ -48,20 +48,4 @@ public static class PlayerUtils
     {
         return healthBar != null && healthBar.currenthp <= 0;
     }
-    
-    //小怪死亡
-    public static void Die(enemy_cow enemy, int deathState)
-    {
-        if (enemy.isDead) return;
-
-        enemy.isDead = true;
-        enemy.SetState(deathState);
-        Debug.Log($"{enemy.gameObject.name} is dead with state {deathState}!");
-
-        enemy.GetComponent<Collider2D>().enabled = false;
-        enemy.enabled = false;
-
-        // ✅ 讓 `EnemyBehavior` 自己處理掉落物品
-        enemy.Invoke("DestroySelf", 1.5f);
-    }
 }

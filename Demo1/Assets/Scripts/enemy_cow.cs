@@ -1,46 +1,44 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class enemy_cow : MonoBehaviour, IDataPersistence
+public class enemy_cow : LivingEntity, IDataPersistence
 {
-
-    public int maxHealth = 100;
-    public int health = 100;
     [SerializeField] private Transform leftPoint;
     [SerializeField] private Transform rightPoint;  
     [SerializeField] private string enemyID = "cow1";
     private Quaternion fixedRotation;
     public LayerMask ground;
-    public LayerMask obstructionMask; // 遮蔽物圖層
-    public float edgeCheckDistance = 1f; // 檢測前方地面距離
+    public float edgeCheckDistance = 1f;
     
     private bool facingLeft = true;
     private Collider2D coll;
     private Rigidbody2D rb;
     private Animator anim;
-    public HealthBar healthBar;
     public GameObject hitbox;
 
-    private enum State {idle, attack, hurt, dying, run};
+    private enum State { idle, attack, hurt, dying, run };
     private State state = State.idle;
     private Vector3 originalScale;
     private float leftCap;
     private float rightCap;
 
-    public Transform player;  // 玩家物件
+    public Transform player;  
     public Vector3 attackOffset;
     public LayerMask attackMask;
-    public float attackRange = 3f;  // 攻擊範圍
-    public float attackCooldown = 0.2f;  // 攻擊冷卻時間
-    public float attackDuration = 0.5f;
-    private float nextAttackTime = 0f;  // 下一次攻擊時間
-    public bool isDead = false;
+    public float attackRange = 3f;  
+    public float attackCooldown = 10f;   // ⚡ 建議設 ≥ 攻擊動畫時長
+    private float nextAttackTime = 0f;  
     public float chaseRange = 6f;
     public float stopChaseRange = 10f;
     private bool isChasing = false;
-    private void Start()
+
+    // ⚡ 攻擊鎖定
+    private bool isAttacking = false;
+    private bool hasDealtDamage = false;
+
+    protected override void Start()
     {
+        base.Start(); // LivingEntity 初始化血量
         fixedRotation = transform.rotation;
         coll = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
@@ -48,115 +46,86 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
         originalScale = transform.localScale;
         leftCap = leftPoint.position.x;
         rightCap = rightPoint.position.x;
-        hitbox.SetActive(false);
+        if (hitbox != null) hitbox.SetActive(false);
     }
 
     private void Update()
     {
         transform.rotation = fixedRotation;
-        //Move();
-        
         anim.SetInteger("state", (int)state);
         AnimationState();
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-        Vector2 directionToPlayer = (player.position - transform.position).normalized;
-        RaycastHit2D sightHit = Physics2D.Raycast(transform.position, directionToPlayer, distanceToPlayer, obstructionMask);
-        if (sightHit.collider == null && distanceToPlayer <= chaseRange)
+
+        if (state != State.attack) // 正在攻擊時不改 isChasing
         {
-            isChasing = true;
+            if (distanceToPlayer <= chaseRange)
+                isChasing = true;
+            else if (distanceToPlayer >= stopChaseRange)
+                isChasing = false;
         }
-        else if (distanceToPlayer >= stopChaseRange || sightHit.collider != null)
+        else
         {
-            isChasing = false;
+            // 🔥 如果正在攻擊但玩家已經離開範圍，強制回 Idle
+            if (distanceToPlayer > chaseRange)
+            {
+                isAttacking = false;
+                state = State.idle;
+                anim.ResetTrigger("attack"); // 避免動畫繼續播
+                Debug.Log("[Update] 玩家離開範圍 → 中斷攻擊，回到 Idle");
+            }
         }
 
-        // 只有在追擊狀態才能攻擊
-        if (isChasing && distanceToPlayer <= attackRange && Time.time >= nextAttackTime && state != State.attack)
+        // 攻擊判斷
+        if (isChasing && !isAttacking && distanceToPlayer <= attackRange &&
+            Time.time >= nextAttackTime && state != State.attack)
         {
             Attack();
         }
     }
+
     private void Attack()
     {
-        
-        Vector3 pos = transform.position;
-		    pos += transform.right * attackOffset.x;
-            pos += transform.up * attackOffset.y;
-        // 觸發攻擊動畫
+        if (isAttacking) return; // 🚫 避免連續攻擊
+
+        isAttacking = true; 
+        hasDealtDamage = false; // ✅ 新一輪攻擊，重置傷害狀態
         state = State.attack;
         anim.SetTrigger("attack");
+        Debug.Log("[Attack] 設定 trigger → attack");
+
         nextAttackTime = Time.time + attackCooldown;
+
+        Vector3 pos = transform.position;
+        pos += transform.right * attackOffset.x;
+        pos += transform.up * attackOffset.y;
+
         Collider2D colInfo = Physics2D.OverlapCircle(pos, attackRange, attackMask);
-                if (colInfo != null)
-                    {
-                    // 嘗試從 Player 取得 PlayerController
-                    PlayerController player = colInfo.GetComponent<PlayerController>();
-                if (player != null)
-                        {
-                            // 使用 PlayerController 中的 Health Bar
-                            if (player.healthBar != null)
-                            {
-                                    //player.healthBar.SetHealth(player.healthBar.currenthp - 100);
-                                    PlayerUtils.TakeDamage(player.healthBar, 20 - player.curdefence );
-                    player.anim.SetTrigger("hurt");
-					Debug.Log("成功對 Player 造成傷害！");
-				}
-				else
-				{
-					Debug.LogWarning("Player 的 Health Bar 為空！");
-				}
-			}
-			else
-			{
-				Debug.LogWarning("碰到的物体没有 PlayerController 组件：" + colInfo.name);
-			}
-		}
-        StartCoroutine(ResetAfterAttack());
+        if (colInfo != null && !hasDealtDamage) // ✅ 加鎖
+        {
+            Debug.Log($"[Attack] 檢測到物件: {colInfo.name}");
+            LivingEntity target = colInfo.GetComponent<LivingEntity>();
+            if (target != null)
+            {
+                target.TakeDamage(20);
+                hasDealtDamage = true; // ✅ 這次攻擊已經生效
+                Debug.Log("[Attack] 成功對玩家造成傷害！");
+            }
+        }
+        else if (colInfo == null)
+        {
+            Debug.Log("[Attack] 攻擊範圍內沒有檢測到任何目標");
+        }
     }
 
-    private IEnumerator ResetAfterAttack()
-    {
-        yield return new WaitForSeconds(attackDuration);
-        state = isChasing ? State.run : State.idle;
-    }
 
-    // Animation event callback to reset state after attack animation finishes
+
+    // 🔥 在攻擊動畫最後一幀加 Animation Event 呼叫這個
     public void OnAttackAnimationEnd()
     {
-        StartCoroutine(ResetAfterAttack());
-    }
-
-    public void SetState(int s)
-    {
-        // 將 int 轉換到你的狀態列舉，並同步到 Animator
-        state = (State)s;
-        if (anim != null) anim.SetInteger("state", (int)state);
-    }
-
-    public void DestroySelf()
-    {
-        // 避免多次掉落
-        var loot = GetComponent<LootBag>();
-        if (loot != null) loot.InstantiateLoot(transform.position);
-
-        Destroy(gameObject);
-    }
-
-    public void Die()
-    {
-        if (isDead) return;        // 重入保護
-        isDead = true;
-
-        Debug.Log("Enemy Died");
-        SetState((int)State.dying);
-
-        rb.velocity = Vector2.zero;
-        rb.simulated = false;
-        coll.enabled = false;
-
-        // 不直接 Destroy，也不立刻掉落，改為延遲呼叫 DestroySelf
-        Invoke(nameof(DestroySelf), 1.0f);
+        isAttacking = false; // ✅ 解鎖，允許下一次攻擊
+        state = isChasing ? State.run : State.idle;
+        Debug.Log("[Attack] 攻擊動畫結束 → 回到 " + state);
     }
 
     private void Move()
@@ -165,12 +134,10 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
 
         if (isChasing)
         {
-            // 追玩家
             state = State.run;
             Vector2 direction = (player.position - transform.position).normalized;
             rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
 
-            // 調整面向
             if (direction.x < 0)
                 transform.localScale = new Vector3(-Mathf.Abs(originalScale.x), originalScale.y);
             else
@@ -178,15 +145,11 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
         }
         else
         {
-            // 原本的左右巡邏，並檢查前方是否有地面
             Vector2 groundCheckOrigin = facingLeft
                 ? new Vector2(coll.bounds.min.x, coll.bounds.min.y)
                 : new Vector2(coll.bounds.max.x, coll.bounds.min.y);
             RaycastHit2D groundInfo = Physics2D.Raycast(groundCheckOrigin, Vector2.down, edgeCheckDistance, ground);
-            if (groundInfo.collider == null)
-            {
-                facingLeft = !facingLeft;
-            }
+            if (groundInfo.collider == null) facingLeft = !facingLeft;
 
             if (facingLeft)
             {
@@ -215,110 +178,104 @@ public class enemy_cow : MonoBehaviour, IDataPersistence
         }
     }
 
-
-
     private void AnimationState()
     {
-       
-
         if (state == State.hurt || state == State.dying || state == State.attack)
-        {
             return;
-        }
-        
-        Move(); // 自動移動
+
+        Move(); 
         
         if (isChasing)
-        {
             state = State.run;
-        }
         else
-        {
             state = State.idle;
-        }
     }
 
-    public void TakeDamage(int damage)
+    public override void TakeDamage(float damage)
     {
+        base.TakeDamage(damage); 
 
-        state = State.hurt;
-        health = Mathf.Max(health - damage, 0);
-        if (healthBar != null)
+        if (!isDead)
         {
-            healthBar.SetHealth(health);
-        }
-        Debug.Log($"{gameObject.name} is hurt!");
-        Invoke("ResetToIdle", 0.5f);
-        if (health <= 0)
-        {
-            Die();
+            state = State.hurt;
+            Invoke(nameof(ResetToIdle), 0.5f);
         }
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    public void SetState(int s)
     {
-        PlayerController playerController = collision.GetComponentInParent<PlayerController>();
-        if (playerController != null)
-        {
-            TakeDamage(playerController.curattack);
-        }
+        state = (State)s;  
+        if (anim != null)
+            anim.SetInteger("state", (int)state); 
     }
 
-    public void EnableHitbox()
+    protected override void Die()
     {
-        if (hitbox != null)
-        {
-            hitbox.SetActive(true); // 啟用 hitbox
-        }
+        if (isDead) return;
+        base.Die(); 
+
+        SetState((int)State.dying);
+        rb.velocity = Vector2.zero;
+        rb.simulated = false;
+        coll.enabled = false;
+
+        Invoke(nameof(DestroySelf), 1.0f);
     }
 
-    public void DisableHitbox()
+    public void DestroySelf()
     {
-        if (hitbox != null)
-        {
-            hitbox.SetActive(false); // 禁用 hitbox
-        }
+        var loot = GetComponent<LootBag>();
+        if (loot != null) loot.InstantiateLoot(transform.position);
+        Destroy(gameObject);
     }
+
     public void ResetToIdle()
     {
-        if (state == State.hurt)
-        {
-            state = State.idle;
-        }
+        if (state == State.hurt) state = State.idle;
     }
-    void OnDrawGizmosSelected()
-	{
-		Vector3 pos = transform.position;
-		pos += transform.right * attackOffset.x;
-		pos += transform.up * attackOffset.y;
 
-		Gizmos.DrawWireSphere(pos, attackRange);
+    void OnDrawGizmosSelected()
+    {
+        Vector3 pos = transform.position;
+        pos += transform.right * attackOffset.x;
+        pos += transform.up * attackOffset.y;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(pos, attackRange);
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
-
-        // 停止追擊範圍（藍色）
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, stopChaseRange);
-
     }
+
+    /* IDataPersistence */
     public void LoadData(GameData data)
     {
         if (healthBar == null) return;
         float hp = data.GetHP(enemyID, maxHealth);
         healthBar.SetHealth(hp);
-        health = (int)healthBar.currenthp;
+        currentHealth = hp;
 
-        if (health <= 0)
-        {
-            Destroy(gameObject); // 不重生
-        }
+        if (currentHealth <= 0)
+            Destroy(gameObject); 
     }
 
     public void SaveData(ref GameData data)
     {
         if (healthBar == null) return;
-        data.SetHP(enemyID, health > 0 ? health : 0);
+        data.SetHP(enemyID, currentHealth > 0 ? currentHealth : 0);
     }
+    public void EnableHitbox()
+    {
+        hasDealtDamage = false; // ✅ 每次出手前重置
+        if (hitbox != null)
+            hitbox.SetActive(true);
+    }
+
+    public void DisableHitbox()
+    {
+        if (hitbox != null)
+            hitbox.SetActive(false);
+    }
+
 }
-
-
