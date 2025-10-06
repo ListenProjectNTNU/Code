@@ -75,7 +75,7 @@ public class PlayerController : LivingEntity,IDataPersistence
             LootItem lootItem = collision.GetComponent<LootItem>();
             if (lootItem != null)
             {
-                PlayerInventory.Instance.AddItem(lootItem.lootData);
+                    PlayerInventory.Instance.AddItem(lootItem.lootData);
                 Destroy(collision.gameObject);
             }
         }

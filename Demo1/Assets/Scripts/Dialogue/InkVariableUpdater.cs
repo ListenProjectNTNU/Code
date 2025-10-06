@@ -1,12 +1,27 @@
 using UnityEngine;
 using Ink.Runtime;
 using System.Collections.Generic;
-using System;
 
 public class InkVariableUpdater : MonoBehaviour
 {
     private Story currentStory;
-    private Dictionary<string, bool> tempVariables = new Dictionary<string, bool>(); // 暫存變數
+    private Dictionary<string, bool> tempVariables = new Dictionary<string, bool>();
+
+    private static InkVariableUpdater instance;
+    public static InkVariableUpdater Instance => instance;
+
+    private void Awake()
+    {
+        // 單例保護
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
     private void Start()
     {
@@ -14,58 +29,55 @@ public class InkVariableUpdater : MonoBehaviour
         if (dialogueManager != null)
         {
             currentStory = dialogueManager.currentStory;
+            Debug.Log("✅ InkVariableUpdater 已連接到 DialogueManager");
         }
         else
         {
-            //Debug.LogError("無法找到 DialogueManager！");
+            Debug.LogWarning("⚠️ 找不到 DialogueManager，Ink 變數將暫存直到劇情開始");
         }
+    }
+
+    public void SetCurrentStory(Story story)
+    {
+        currentStory = story;
+        Debug.Log("📘 currentStory 已設定");
+
+        // 同步暫存變數
+        ApplyTempVariables();
     }
 
     public void UpdateVariable(string variableName, bool value)
     {
         if (currentStory == null)
         {
-            // 📝 劇情未開始，先存到暫存區
+            // 劇情未開始 → 暫存
             tempVariables[variableName] = value;
-            //Debug.Log($"{variableName} 尚未能更新，暫存起來！目前暫存區內容：{string.Join(", ", tempVariables)}");
+            Debug.Log($"🕐 劇情尚未啟動，暫存 Ink 變數 {variableName} = {value}");
             return;
         }
 
-        // 劇情已開始，直接更新
         currentStory.variablesState[variableName] = value;
-        //Debug.Log($"直接更新 Ink 變數：{variableName} = {value}");
+        Debug.Log($"✅ 立即更新 Ink 變數：{variableName} = {value}");
     }
 
     public void ApplyTempVariables()
     {
-        //Debug.Log($"ApplyTempVariables() 被呼叫！目前暫存區大小：{tempVariables.Count}");
-        if (currentStory == null)
-        {
-            //Debug.LogWarning("❌ ApplyTempVariables() 執行時，currentStory 仍為 null！");
-            return;
-        }
+        if (currentStory == null) return;
 
         foreach (var entry in tempVariables)
         {
             currentStory.variablesState[entry.Key] = entry.Value;
-            //Debug.Log($"同步暫存變數到 Ink：{entry.Key} = {entry.Value}");
+            Debug.Log($"🔄 同步暫存變數 → Ink：{entry.Key} = {entry.Value}");
         }
-        tempVariables.Clear(); // 清空暫存變數
-    }
 
-    public void SetCurrentStory(Story story)
-    {
-        currentStory = story;
-        //Debug.Log("currentStory 已成功設定！");
+        tempVariables.Clear();
     }
 
     public void ApplyInventoryVariables(List<string> collectedItems)
     {
-        //Debug.Log("ApplyInventoryVariables執行");
         foreach (string item in collectedItems)
         {
             string variableName = $"has_{item}";
-            //Debug.Log($"📝 IVU更新 Ink 變數：has_{item}");
             UpdateVariable(variableName, true);
         }
     }
