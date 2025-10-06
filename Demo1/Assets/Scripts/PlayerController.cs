@@ -119,8 +119,7 @@ public class PlayerController : LivingEntity,IDataPersistence
     {
         if (isDead) return;
         isDead = true;
-
-        state = State.dying;
+        
         anim.SetTrigger("die");
         rb.velocity = Vector2.zero;
         this.enabled = false;
@@ -130,7 +129,7 @@ public class PlayerController : LivingEntity,IDataPersistence
 
         Debug.Log("玩家死亡 → 顯示死亡選單，不 Destroy 玩家物件");
     }
-
+    
 
     private void ResetPlayerPosition()
     {

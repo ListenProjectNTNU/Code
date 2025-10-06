@@ -27,9 +27,9 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 56346770930078841}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 15.199535, y: 15.199535, z: 15.199535}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3404438834110319434}
@@ -39,9 +39,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 9835.771, y: 4709.424}
+  m_SizeDelta: {x: 1274, y: 630}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &9115641654419436732
 Canvas:
   m_ObjectHideFlags: 0
@@ -397,6 +397,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0f115577d4b1fa44a3e12c1d0f92a45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 0
+  isDead: 0
+  healthBar: {fileID: 2739089054650263086}
   anim: {fileID: 7810144776706345080}
   wallLayer:
     serializedVersion: 2
@@ -413,7 +417,6 @@ MonoBehaviour:
   speed: 5
   attackDamage: 20
   defence: 15
-  healthBar: {fileID: 2739089054650263086}
   deathMenu: {fileID: 0}
 --- !u!50 &9139467024135535162
 Rigidbody2D:

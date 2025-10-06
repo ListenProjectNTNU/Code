@@ -52,6 +52,7 @@ public class enemy_cow : LivingEntity, IDataPersistence
     private void Update()
     {
         transform.rotation = fixedRotation;
+        if (isDead) return;
         anim.SetInteger("state", (int)state);
         AnimationState();
 
@@ -200,6 +201,10 @@ public class enemy_cow : LivingEntity, IDataPersistence
             state = State.hurt;
             Invoke(nameof(ResetToIdle), 0.5f);
         }
+        if (currentHealth <= 0)
+        {
+            anim.SetTrigger("die");
+        }
     }
 
     public void SetState(int s)
@@ -211,15 +216,50 @@ public class enemy_cow : LivingEntity, IDataPersistence
 
     protected override void Die()
     {
-        if (isDead) return;
-        base.Die(); 
+        if (isDead) return;   // ✅ 保險：再檢查一次
+        isDead = true;
 
-        SetState((int)State.dying);
+        anim.ResetTrigger("attack");
+        anim.SetTrigger("die");
+        state = State.dying;
+
         rb.velocity = Vector2.zero;
         rb.simulated = false;
         coll.enabled = false;
+        if (hitbox) hitbox.SetActive(false);
 
-        Invoke(nameof(DestroySelf), 1.0f);
+        StartCoroutine(DeathSequence());
+    }
+
+    private IEnumerator DeathSequence()
+    {
+        // 等進入動畫狀態
+        yield return null;
+        while (!anim.GetCurrentAnimatorStateInfo(0).IsName("dying"))
+            yield return null;
+
+        // 播放完動畫
+        while (anim.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.99f)
+            yield return null;
+
+        // ✅ 這裡再檢查一次，確保不重複掉落
+        if (this == null || !isDead) yield break;
+
+        var loot = GetComponent<LootBag>();
+        if (loot != null)
+            loot.InstantiateLoot(transform.position);
+
+        Destroy(gameObject);
+    }
+
+
+    public void OnDeathAnimationEnd()
+    {
+        var loot = GetComponent<LootBag>();
+        if (loot != null)
+            loot.InstantiateLoot(transform.position);
+
+        Destroy(gameObject);
     }
 
     public void DestroySelf()

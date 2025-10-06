@@ -84,7 +84,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 85746091062491581}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: left cap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -115,7 +115,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2915411613450337864}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: right cap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -276,9 +276,9 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 11.3323965, y: -2.8433332}
+  m_Offset: {x: 8.000047, y: -1.4801111}
   serializedVersion: 2
-  m_Radius: 15.155215
+  m_Radius: 19.850798
 --- !u!1 &2918784421876243179
 GameObject:
   m_ObjectHideFlags: 0
@@ -294,6 +294,7 @@ GameObject:
   - component: {fileID: 4391496779238050349}
   - component: {fileID: 2293140914306977931}
   - component: {fileID: 7483003339669340689}
+  - component: {fileID: 3924592054354686114}
   m_Layer: 7
   m_Name: enemy
   m_TagString: Enemy
@@ -311,7 +312,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -27.46, y: 0.84, z: 0.0068}
-  m_LocalScale: {x: 0.04174968, y: 0.04174968, z: 0.04174968}
+  m_LocalScale: {x: 0.022394529, y: 0.022394529, z: 0.022394529}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7198628487060310110}
@@ -361,7 +362,7 @@ SpriteRenderer:
   m_SortingLayerID: -1609922355
   m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: f521e892c2cf2554fb9a742232bfae4d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f02a2926c8560164ea6502add25bf4b3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -435,7 +436,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 56.25, y: 56.25}
+    oldSize: {x: 81.276855, y: 135}
     newSize: {x: 56.25, y: 56.25}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -479,11 +480,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   droppedItemPrefab: {fileID: 6897369363764271678, guid: 8c3a97b6e0ffa974da1f30b6ffbb3abd, type: 3}
   lootList:
-  - {fileID: 11400000, guid: be566db420a28244585558a6cf79613b, type: 2}
   - {fileID: 11400000, guid: 731e1905e7558cd46b0168cf607e76be, type: 2}
-  - {fileID: 11400000, guid: 05586a8453876214fb4fa2c9fd8ad621, type: 2}
-  - {fileID: 11400000, guid: 862ac52a2f835b340a938f2babd2d6d9, type: 2}
-  - {fileID: 11400000, guid: 36b7f025ace52e44eaf6424d6af0868e, type: 2}
 --- !u!114 &7483003339669340689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,21 +494,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  health: 100
+  currentHealth: 0
+  isDead: 0
+  healthBar: {fileID: 2161786921408713922}
   leftPoint: {fileID: 85746091062491581}
   rightPoint: {fileID: 2915411613450337864}
+  enemyID: enemy
   ground:
     serializedVersion: 2
     m_Bits: 64
-  healthBar: {fileID: 2161786921408713922}
+  edgeCheckDistance: 1
   hitbox: {fileID: 2451310809598310590}
   player: {fileID: 0}
-  attackOffset: {x: 0.8, y: -0.17, z: 0}
+  attackOffset: {x: 0.38, y: 0, z: 0}
   attackMask:
     serializedVersion: 2
     m_Bits: 256
-  attackRange: 0.6
+  attackRange: 1.44
   attackCooldown: 1
+  chaseRange: 3.38
+  stopChaseRange: 6.88
+--- !u!114 &3924592054354686114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918784421876243179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39ee6233223a29a49b00558c79d8d22f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 0
+  isDead: 0
+  healthBar: {fileID: 2161786921408713922}
 --- !u!1 &3362104566922464249
 GameObject:
   m_ObjectHideFlags: 0
@@ -551,8 +569,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -3.06, y: 17.67}
-  m_SizeDelta: {x: 1.59, y: 0.32}
+  m_AnchoredPosition: {x: -2.3, y: 71.9}
+  m_SizeDelta: {x: 2.03, y: 0.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &7743133738512176008
 Canvas:
@@ -629,11 +647,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1387d491dcd1a64d80ce0ab279779a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: cow
   hpImg: {fileID: 5149414812459234855}
-  hpeffectgImg: {fileID: 1378114132902202640}
+  hpEffectImg: {fileID: 1378114132902202640}
   maxHP: 100
-  currenthp: 100
   bufftime: 0.5
+  currenthp: 100
 --- !u!1 &5657715667115514824
 GameObject:
   m_ObjectHideFlags: 0
