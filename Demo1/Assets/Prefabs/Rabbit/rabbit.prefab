@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3555466454340382072}
   - component: {fileID: 8731696836654836431}
   - component: {fileID: 2739089054650263086}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: healthbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,9 +27,9 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 56346770930078841}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 15.199535, y: 15.199535, z: 15.199535}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3404438834110319434}
@@ -39,9 +39,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 9835.771, y: 4709.424}
-  m_SizeDelta: {x: 1274, y: 630}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
 --- !u!223 &9115641654419436732
 Canvas:
   m_ObjectHideFlags: 0
@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 3404438834110319434}
   - component: {fileID: 5875692054351942238}
   - component: {fileID: 3829500849698073038}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: bg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -157,8 +157,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 125, y: 25}
-  m_SizeDelta: {x: 250, y: 50}
+  m_AnchoredPosition: {x: 222.3, y: 90.8}
+  m_SizeDelta: {x: 257.3312, y: 39.7865}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5875692054351942238
 CanvasRenderer:
@@ -209,7 +209,7 @@ GameObject:
   - component: {fileID: 5369804242689471369}
   - component: {fileID: 2235429154062636827}
   - component: {fileID: 2960131485578000695}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: hp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -232,8 +232,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 125, y: 25}
-  m_SizeDelta: {x: 250, y: 50}
+  m_AnchoredPosition: {x: 222.2987, y: 90.80055}
+  m_SizeDelta: {x: 257.3312, y: 39.7865}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2235429154062636827
 CanvasRenderer:
@@ -288,7 +288,8 @@ GameObject:
   - component: {fileID: 9139467024135535162}
   - component: {fileID: 429871080984878579}
   - component: {fileID: 2923893116272935182}
-  m_Layer: 0
+  - component: {fileID: 4781995476166064621}
+  m_Layer: 8
   m_Name: rabbit
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -413,7 +414,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   jumpForce: 5
-  hurtForce: 1
+  hurtForce: 5
   speed: 5
   attackDamage: 20
   defence: 15
@@ -477,7 +478,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -1.4742074, y: 1.364708}
+  m_Offset: {x: -1.7602417, y: 1.364708}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -488,7 +489,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 20.18216, y: 64.770584}
+  m_Size: {x: 18.752058, y: 64.770584}
   m_EdgeRadius: 0
 --- !u!114 &2923893116272935182
 MonoBehaviour:
@@ -504,12 +505,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 7810144776706345080}
   attackPoint: {fileID: 2421688673043968343}
-  attackRange: 1.02
+  attackRange: 4.95
   enemyLayers:
     serializedVersion: 2
     m_Bits: 128
-  attackDamage: 30
+  attackDamage: 111
   knockbackForce: 5
+--- !u!114 &4781995476166064621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376125773283568411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39ee6233223a29a49b00558c79d8d22f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 0
+  isDead: 0
+  healthBar: {fileID: 2739089054650263086}
 --- !u!1 &2461298629769137879
 GameObject:
   m_ObjectHideFlags: 0
@@ -520,7 +537,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2421688673043968343}
   - component: {fileID: 1821649589591540847}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: attack_point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -536,7 +553,7 @@ Transform:
   m_GameObject: {fileID: 2461298629769137879}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 15.4, y: 5.6, z: 97.4875}
+  m_LocalPosition: {x: 19.7, y: 4.6, z: 97.4875}
   m_LocalScale: {x: 15.199535, y: 15.199535, z: 15.199535}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -574,9 +591,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.4374531}
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.9374531
 --- !u!1 &3564376295061059657
 GameObject:
   m_ObjectHideFlags: 0
@@ -588,7 +605,7 @@ GameObject:
   - component: {fileID: 2099502239724729690}
   - component: {fileID: 6609278267648788767}
   - component: {fileID: 3365235715004227492}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: effect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -611,8 +628,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 125, y: 25}
-  m_SizeDelta: {x: 250, y: 50}
+  m_AnchoredPosition: {x: 222.2987, y: 90.80055}
+  m_SizeDelta: {x: 257.3312, y: 39.7865}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6609278267648788767
 CanvasRenderer:
