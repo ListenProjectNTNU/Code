@@ -932,6 +932,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0f115577d4b1fa44a3e12c1d0f92a45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 0
+  isDead: 0
+  healthBar: {fileID: 3364195366605762102}
   anim: {fileID: 0}
   wallLayer:
     serializedVersion: 2
@@ -940,7 +944,6 @@ MonoBehaviour:
   defenceseg: 0
   speedseg: 0
   playerID: player
-  state: 0
   ground:
     serializedVersion: 2
     m_Bits: 64
@@ -949,7 +952,6 @@ MonoBehaviour:
   speed: 5
   attackDamage: 10
   defence: 10
-  healthBar: {fileID: 3364195366605762102}
   deathMenu: {fileID: 0}
 --- !u!114 &4716097349326002765
 MonoBehaviour:
@@ -989,7 +991,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 2022524553762292222}
-  attackPoint: {fileID: 199459251319893644}
+  attackPoint: {fileID: 491241150475046559}
   attackRange: 0.86
   enemyLayers:
     serializedVersion: 2
@@ -1008,6 +1010,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23411b8eed7953344977cdd203af4639, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerController: {fileID: 0}
+  inkUpdater: {fileID: 0}
   collectedItems: []
 --- !u!1 &8259465549455345414
 GameObject:

@@ -23,6 +23,7 @@ public class PauseMenu : MonoBehaviour
 
     void Awake()
     {
+        DontDestroyOnLoad(gameObject);
         // 防呆：如果沒綁，試著在場景中自動找
         if (menuRoot == null)     menuRoot = transform.Find("Canvas/Panel")?.gameObject;
         if (settingsPanel == null) settingsPanel = transform.Find("Canvas/SettingsPanel")?.gameObject;
@@ -109,8 +110,12 @@ public class PauseMenu : MonoBehaviour
 
     void RestartLevel()
     {
-        // 若有 Checkpoint 系統，這裡可改成回存點
+        // 關閉選單並恢復時間流動
+        isPaused = false;
         ApplyPause(false);
+        HideAll();  // ✅ 關閉所有 UI (menuRoot, settingsPanel)
+
+        // 重新載入場景
         var idx = SceneManager.GetActiveScene().buildIndex;
         if (DataPersistenceManager.instance != null)
             DataPersistenceManager.instance.LoadSceneAndUpdate(SceneManager.GetActiveScene().name);
