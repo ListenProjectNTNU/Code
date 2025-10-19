@@ -37,10 +37,10 @@ public class PlayerController : LivingEntity,IDataPersistence
     public GameObject deathMenu;
 
     private void Start() {
+        base.Start();
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
-        base.Start();
     }
 
     // Update is called once per frame

@@ -25,7 +25,7 @@ public class LivingEntity : MonoBehaviour
     {
         // ✅ 若已死亡，直接忽略（多餘命中不影響）
         if (isDead) return;
-
+        Debug.Log($"[LE] {name} 收到傷害 {damage}，上次受傷到現在：{Time.time - lastDamageTime:0.000}s");
         // ✅ 若在短時間內剛受傷過 → 略過（防同幀重複）
         if (Time.time - lastDamageTime < damageCooldown)
             return;
@@ -33,7 +33,7 @@ public class LivingEntity : MonoBehaviour
         lastDamageTime = Time.time;
 
         currentHealth = Mathf.Max(currentHealth - damage, 0);
-
+        Debug.Log($"[LE] {name} 扣血後剩 {currentHealth}");
         if (healthBar != null)
             healthBar.SetHealth(currentHealth);
 
