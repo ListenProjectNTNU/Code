@@ -21531,7 +21531,7 @@ Transform:
   m_GameObject: {fileID: 1427279314}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -27.920727, y: 0.0356, z: -10}
+  m_LocalPosition: {x: -27.274723, y: 0.03469, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -22410,6 +22410,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rabbit
       objectReference: {fileID: 0}
+    - target: {fileID: 2960131485578000695, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 273844e12286b034fae4fdd992e1cc85, type: 3}
     - target: {fileID: 3123781270002784855, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: deathMenu
       value: 
@@ -22454,15 +22458,68 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7489421846287841465, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 1427279316}
     - target: {fileID: 9115641654419436732, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1427279316}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5296017381177136222, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2977903723551449368, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3345866707284583947}
   m_SourcePrefab: {fileID: 100100000, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+--- !u!114 &3345866707284583944 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5076081929150029911, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+  m_PrefabInstance: {fileID: 3345866707284583943}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3345866707284583945 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8300444995709374, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+  m_PrefabInstance: {fileID: 3345866707284583943}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &3345866707284583946 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2977903723551449368, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+  m_PrefabInstance: {fileID: 3345866707284583943}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3345866707284583947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3345866707284583946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8e316ed28a3b5547a956f4337fc337b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: stress
+  stressImg: {fileID: 3345866707284583944}
+  stressEffectImg: {fileID: 3345866707284583945}
+  maxStress: 100
+  effectTime: 0.5
+  currentStress: 0
 --- !u!1001 &8694858001396172673
 PrefabInstance:
   m_ObjectHideFlags: 0
