@@ -13,7 +13,7 @@
 
 （轉過頭，一位笑得燦爛的學姊正站在他身後） #speaker:家豪#portrait:default#layout:left#scene:fox_appear
 
-「我……我……這就進去！」（臉紅，吱吱嗚嗚地說）#speaker:家豪#portrait:default#layout:right
+「我……我……這就進去！」（臉紅，吱吱嗚嗚地說）#speaker:家豪#portrait:default#layout:right#scene:player_turnBack
 
 //動畫：畫面切到滿人教室PNG  音效：人群吵雜聲
 （看向教室內，教室內，每張桌子都坐滿了人，大家有說有笑地聊著天。主角感到無地自容，視線開始因為緊張而模糊。） #speaker:家豪#portrait:default#layout:left

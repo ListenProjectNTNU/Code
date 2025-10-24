@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SceneController : MonoBehaviour
+public class SceneController : MonoBehaviour, ISceneController
 {
     public LoopingBackground loopingBG;
     public GameObject senpai; // 學姊物件
@@ -17,7 +17,13 @@ public class SceneController : MonoBehaviour
             case "fox_appear":
                 senpai.SetActive(true);
                 Debug.Log("學姊出現！");
-                FlipPlayer(true); // 主角面向左
+                Debug.Log("主角轉身");
+                FlipPlayer(true);
+                break;
+
+            case "player_turn":
+                Debug.Log("主角轉身");
+                FlipPlayer(true);
                 break;
 
             case "player_turnBack":

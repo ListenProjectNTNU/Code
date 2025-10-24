@@ -27,6 +27,11 @@ public class DialogueManager : MonoBehaviour
 
     public UnityEvent onDialogueEnd;
 
+    [Header("Scene Controller Reference")]
+    public GameObject currentSceneController;
+    private ISceneController sceneController; // 介面，用來兼容不同版本的 Scene Controller
+
+
     private const string SPEAKER_TAG = "speaker";
     private const string PORTRAIT_TAG = "portrait";
     private const string LAYOUT_TAG = "layout";
@@ -60,6 +65,8 @@ public class DialogueManager : MonoBehaviour
             choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
             index++;
         }
+
+        
     }
 
     private void Update()
@@ -87,6 +94,12 @@ public class DialogueManager : MonoBehaviour
         currentStory = new Story(inkJSON.text);// 🔁 1. 創建 story
         dialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
+
+        if (currentSceneController != null)
+        {
+           sceneController = currentSceneController.GetComponent<ISceneController>(); 
+        }
+            
 
         //更新變數
         InkVariableUpdater inkUpdater = FindObjectOfType<InkVariableUpdater>();
@@ -175,10 +188,15 @@ public class DialogueManager : MonoBehaviour
                 //SetCurrentAudioInfo(tagValue);
                 //break;
                 case "scene":
-                    SceneController sceneCtrl = FindObjectOfType<SceneController>();
-                    Debug.Log("scene = " + tagValue);
-                    if (sceneCtrl != null)
-                        sceneCtrl.HandleTag(tagValue);
+                    if (sceneController != null)
+                    {
+                        sceneController.HandleTag(tagValue);
+                        Debug.Log("scene = " + tagValue);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("No SceneController assigned to DialogueManager!");
+                    }
                     break;
             }
         }
