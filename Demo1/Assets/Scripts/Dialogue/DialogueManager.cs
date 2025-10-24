@@ -160,21 +160,30 @@ public class DialogueManager : MonoBehaviour
                     break;
                 case PORTRAIT_TAG:
                     //Debug.Log("portrait = " + tagValue);
-                    portraitAnimator.Play(tagValue);
+                    //portraitAnimator.Play(tagValue);
+                    if (portraitAnimator != null && portraitAnimator.HasState(0, Animator.StringToHash(tagValue)))
+                        portraitAnimator.Play(tagValue);
+                    //else
+                        //Debug.LogWarning($"❗找不到動畫狀態: {tagValue}");
                     break;
+
+
                 case LAYOUT_TAG:
                     //layoutAnimator.Play(tagValue);
                     break;
                 //case AUDIO_TAG: 
                 //SetCurrentAudioInfo(tagValue);
                 //break;
-                default:
-                    Debug.LogWarning("Tag came in but is not currently being handled: " + tag);
+                case "scene":
+                    SceneController sceneCtrl = FindObjectOfType<SceneController>();
+                    Debug.Log("scene = " + tagValue);
+                    if (sceneCtrl != null)
+                        sceneCtrl.HandleTag(tagValue);
                     break;
             }
         }
     }
-
+    
     private void DisplayChoices()
     {
         List<Choice> currentChoices = currentStory.currentChoices;
