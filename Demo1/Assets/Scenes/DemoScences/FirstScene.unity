@@ -14868,6 +14868,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 510889330}
     - target: {fileID: 6058715792962781089, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: currentSceneController
+      value: 
+      objectReference: {fileID: 1861279134}
+    - target: {fileID: 6058715792962781089, guid: ec6087b620debe04093b594023afd197, type: 3}
       propertyPath: onDialogueEnd.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -15417,6 +15421,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1710628992 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6748596313305583503, guid: 983cbfddb03bbb3419005b156f9f4574, type: 3}
+  m_PrefabInstance: {fileID: 2108117160}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1759890043 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 430352267711730876, guid: 3a3f9ac3aa5c5de4bab8768391ac7ee1, type: 3}
@@ -15524,6 +15533,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loopingBG: {fileID: 189280084}
+  senpai: {fileID: 1710628992}
+  player: {fileID: 1678532887}
 --- !u!1001 &1921411727
 PrefabInstance:
   m_ObjectHideFlags: 0
