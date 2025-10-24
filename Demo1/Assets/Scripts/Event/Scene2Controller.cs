@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Scene1Controller : MonoBehaviour, ISceneController
+public class Scene2Controller : MonoBehaviour, ISceneController
 {
     public LoopingBackground loopingBG;
     public GameObject senpai; // 學姊物件
