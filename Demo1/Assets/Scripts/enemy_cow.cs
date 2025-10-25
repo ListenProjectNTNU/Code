@@ -36,6 +36,9 @@ public class enemy_cow : LivingEntity, IDataPersistence
     private bool isAttacking = false;
     private bool hasDealtDamage = false;
 
+    [Header("非自由模式控制用")]
+    public bool isActive = true;
+
     protected override void Start()
     {
         base.Start(); // LivingEntity 初始化血量
@@ -83,6 +86,8 @@ public class enemy_cow : LivingEntity, IDataPersistence
         {
             Attack();
         }
+        
+        if (!isActive) return;
     }
 
     private void Attack()

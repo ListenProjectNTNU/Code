@@ -94,6 +94,7 @@ public class DialogueManager : MonoBehaviour
         currentStory = new Story(inkJSON.text);// 🔁 1. 創建 story
         dialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
+        Debug.Log($"🟢 dialoguePanel.activeSelf = {dialoguePanel.activeSelf}");
 
         if (currentSceneController != null)
         {

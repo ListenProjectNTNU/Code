@@ -1,43 +1,62 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
-public class Scene2Controller : MonoBehaviour, ISceneController
+
+public class Scene2Controller : MonoBehaviour
 {
-    public LoopingBackground loopingBG;
-    public GameObject senpai; // 學姊物件
-    public GameObject player; // 主角物件
+    public Transform monster;
+    public Transform player;
+    public float moveDistance = 2f;
+    public float moveSpeed = 2f;
+    private bool isRunningEvent = false;
+
+    private void Start()
+    {
+        monster.GetComponent<enemy_cow>().isActive = false;// 確保進場時不會亂動
+        monster.GetComponent<Animator>().Play("idle");
+
+        player.GetComponent<PlayerController>().canControl = false;
+        player.localScale = new Vector3(-1f, 1f, 1f); // 面向左邊
+
+    }
 
     public void HandleTag(string tagValue)
     {
         switch (tagValue)
         {
-            case "corridor_withDoor":
-                loopingBG.SwitchToNextBGOpen();
-                break;
-
-            case "fox_appear":
-                senpai.SetActive(true);
-                Debug.Log("學姊出現！");
-                Debug.Log("主角轉身");
-                FlipPlayer(true);
-                break;
-
-            case "player_turn":
-                Debug.Log("主角轉身");
-                FlipPlayer(true);
-                break;
-
-            case "player_turnBack":
-                FlipPlayer(false); // 主角轉回右邊
+            case "monster_approach":
+                if (!isRunningEvent)
+                    StartCoroutine(MonsterApproachEvent());
                 break;
         }
     }
-    void FlipPlayer(bool faceLeft) //之後看要不要整理playerController裡
+
+    private IEnumerator MonsterApproachEvent()
     {
-        Vector3 scale = player.transform.localScale;
-        if (faceLeft)
-            scale.x = Mathf.Abs(scale.x) * -1; // 左
-        else
-            scale.x = Mathf.Abs(scale.x);      // 右
-        player.transform.localScale = scale;
+        isRunningEvent = true;
+
+        Animator monsterAnim = monster.GetComponent<Animator>();
+        monsterAnim.Play("run"); // 播放移動動畫
+
+        Vector3 monsterTarget = monster.position + monster.forward * moveDistance;
+        Vector3 playerTarget = player.position - player.forward * moveDistance;
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime * moveSpeed;
+            monster.position = Vector3.Lerp(monster.position, monsterTarget, t);
+            player.position = Vector3.Lerp(player.position, playerTarget, t);
+            yield return null;
+        }
+
+        monsterAnim.Play("idle"); // 回到 Idle
+
+        // 恢復 AI
+        //monster.GetComponent<enemy_cow>().isActive = true;
+
+        //isRunningEvent = false;
     }
+
 }

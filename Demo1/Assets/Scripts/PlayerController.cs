@@ -6,9 +6,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class PlayerController : LivingEntity,IDataPersistence
+public class PlayerController : LivingEntity, IDataPersistence
 {
-    
+
     private Rigidbody2D rb;
     public Animator anim;
     private Collider2D coll;
@@ -19,15 +19,15 @@ public class PlayerController : LivingEntity,IDataPersistence
     //public Text cherryText;
     [SerializeField] private string playerID = "player";
     //FSM
-    public enum State{idle,jump,fall,hurt,dying};
+    public enum State { idle, jump, fall, hurt, dying };
     private State state = State.idle;
     //Inspector variable
     public LayerMask ground;
     [Header("角色數值")]
     public float jumpForce = 3f;
     public float hurtForce = 3f;
-    
-    public int speed = 5 ;
+
+    public int speed = 5;
     public int attackDamage = 20;
     public int defence = 15;
 
@@ -45,10 +45,14 @@ public class PlayerController : LivingEntity,IDataPersistence
     public string[] AnimatorLayerNames = { "Base Layer" }; // 預設 Base Layer
 
     [Tooltip("設定當前要啟用 (權重為 1) 的 Layer 名稱。")]
-    [SerializeField] 
-    private string activeLayerName = "Base Layer"; 
+    [SerializeField]
+    private string activeLayerName = "Base Layer";
 
-    private void Start() {
+    [Tooltip("是否可以控制")]
+    public bool canControl = true;
+
+
+    protected override void Start() {
         base.Start();
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -70,7 +74,7 @@ public class PlayerController : LivingEntity,IDataPersistence
         if (transform.position.y < -10) // 設定掉落的臨界點
         {
             ResetPlayerPosition(); // 重置玩家位置並扣血
-        } 
+        }
 
         if (PlayerUtils.CheckDeath(healthBar))
         {
@@ -81,6 +85,9 @@ public class PlayerController : LivingEntity,IDataPersistence
             this.enabled = false;
             deathMenu.SetActive(true);
         }
+        
+        if (!canControl) return;
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
