@@ -18,16 +18,22 @@ public class BossController : LivingEntity
     public float attackCooldown = 3f;
 
     [Header("Drop Attack Tunings")]
-    public float riseHeightAbovePlayer = 4.0f; // 無天花板時的上方高度
+    public float riseHeightAbovePlayer = 4.0f; // 無天花板時的上方高度基準
     public float dropSpeed = 20f;              // 下砸初速度（向下）
     public float gravityDuringDrop = 5f;       // 下砸時重力（暫時覆蓋 rb.gravityScale）
     public float postLandPause = 0.35f;        // 落地後僵直
 
     [Header("Teleport & Telegraph")]
-    public float ceilingProbeDistance = 1f;   // 往上找天花板距離
+    public float ceilingProbeDistance = 1f;    // 往上找天花板距離（視場景高度可調大到 8~12）
     public float ceilingClearance = 0.2f;      // 與天花板保留的縫
-    public float telegraphTime = 10f;        // 瞬移到位後「預告」等待時間
+    public float telegraphTime = 10f;          // 瞬移到位後「預告」等待時間
     public bool  freezeXDuringDrop = true;     // 下砸期間鎖住 X
+
+    [Header("Teleport Collision Safety")]
+    public LayerMask playerMask;               // 只勾 Player 的 Layer
+    public float headClearance = 0.35f;        // 玩家頭頂與 Boss 腳底要留的安全距離
+    public float sideOffset = 1.2f;            // 正上方不行時，左右嘗試的水平偏移量
+    public int sideSweepSteps = 2;             // 左右各試幾格（1~3）
 
     [Header("Ground Check (Optional)")]
     public float groundCheckRadius = 0.15f;
@@ -115,18 +121,19 @@ public class BossController : LivingEntity
         bool oldSim = rb.simulated;
         rb.simulated = false;
 
-        // 2) 計算瞬移點（玩家上方；若有天花板就貼下）
+        // 2) 計算瞬移點（安全版：避免與玩家/地形重疊，必要時左右偏移）
         Vector2 tp = GetTeleportPointAbovePlayer();
 
-        // 3) 瞬移到位並朝向玩家
+        // 3) 瞬移到位（關主體碰撞器再傳送，避免瞬間觸發）
+        bool colWasEnabled = col.enabled;
+        col.enabled = false;
         transform.position = tp;
-        //FaceTowards(player.position.x);
+        col.enabled = colWasEnabled;
 
         // 4) Telegraph：鎖死位置，給玩家反應時間
         telegraphAnchor = transform.position;
         inTelegraph = true;
 
-        // 這裡我們已經把 rb.simulated = false，所以物理不會動；再用 anchor 保險鎖死
         yield return new WaitForSeconds(telegraphTime);
 
         // 開始下砸前解除 telegraph 鎖
@@ -174,6 +181,7 @@ public class BossController : LivingEntity
         // Telegraph 期間，每幀強制把位置拉回錨點，避免任何動畫/其他腳本造成抖動
         if (inTelegraph)
             transform.position = telegraphAnchor;
+
         // 測試鍵：手動觸發
         if (Input.GetKeyDown(KeyCode.T))
             StartCoroutine(Co_DropAttack());
@@ -187,28 +195,74 @@ public class BossController : LivingEntity
         transform.localScale = s;
     }
 
+    // —— 安全版：取得玩家頭上可用的瞬移位置（帶側向補位） ——
     Vector2 GetTeleportPointAbovePlayer()
     {
-        Vector2 from = player.position;
-        RaycastHit2D hit = Physics2D.Raycast(from, Vector2.up, ceilingProbeDistance, groundMask);
+        if (!col) col = GetComponent<Collider2D>();
 
-        float targetY;
-        if (hit.collider != null)
+        // 取得玩家 Collider 與頭頂高度
+        var pCol = player ? player.GetComponent<Collider2D>() : null;
+        float playerTopY = pCol ? pCol.bounds.max.y : player.position.y;
+
+        // Boss 尺寸（用目前主體 Collider 尺寸）
+        Bounds bossB = col.bounds;
+        float bossHalfH = bossB.extents.y;
+        float bossHalfW = bossB.extents.x;
+
+        // 理想「正上方」中心 Y：玩家頭頂 + 安全距離 + Boss 半高
+        float desiredCenterY = playerTopY + headClearance + bossHalfH;
+
+        // 往上找天花板，把 Y 限制在天花板下方
+        Vector2 upOrigin = new Vector2(player.position.x, playerTopY);
+        RaycastHit2D ceil = Physics2D.Raycast(upOrigin, Vector2.up, ceilingProbeDistance, groundMask);
+
+        // 在天花板下方能放的最高中心 Y
+        float maxCenterY = (ceil.collider != null)
+            ? ceil.point.y - ceilingClearance - bossHalfH
+            : player.position.y + riseHeightAbovePlayer;
+
+        // 取能放得下的實際中心 Y（至少 desired，不超過 max）
+        float centerY = Mathf.Min(Mathf.Max(desiredCenterY, player.position.y + riseHeightAbovePlayer), maxCenterY);
+
+        // 產生候選點：正上方 → 右 → 左 → 更右 → 更左 ...
+        Vector2[] candidateCenters = BuildCandidateCenters(player.position, centerY, bossHalfW);
+
+        // 逐一測試「此位置是否與玩家/地形重疊」，選第一個可用的
+        foreach (var c in candidateCenters)
         {
-            // 有天花板：貼著天花板下方一點點，但也別低於玩家上方最低高度
-            targetY = Mathf.Max(hit.point.y - ceilingClearance,
-                                player.position.y + riseHeightAbovePlayer * 1.5f + 20f);
-        }
-        else
-        {
-            // 無天花板：用預設上方高度
-            targetY = player.position.y + riseHeightAbovePlayer;
+            if (IsPlacementClear(c, bossB.size, playerMask) && IsPlacementClear(c, bossB.size, groundMask))
+                return c;
         }
 
-        return new Vector2(player.position.x, targetY);
+        // 如果全都不清，退而求其次：回傳正上方（至少不會拋例外）
+        return new Vector2(player.position.x, centerY);
     }
 
-    // 穩定版地面偵測（BoxCast + IsTouchingLayers）
+    // 產生候選中心點：正上方 → 左右掃描
+    Vector2[] BuildCandidateCenters(Vector3 playerPos, float centerY, float bossHalfW)
+    {
+        int count = 1 + sideSweepSteps * 2;
+        Vector2[] arr = new Vector2[count];
+        arr[0] = new Vector2(playerPos.x, centerY);
+
+        int idx = 1;
+        for (int s = 1; s <= sideSweepSteps; s++)
+        {
+            float dx = sideOffset * s + bossHalfW * 0.2f; // 讓側移量略大於半寬，避免邊緣相切
+            arr[idx++] = new Vector2(playerPos.x + dx, centerY); // 右
+            arr[idx++] = new Vector2(playerPos.x - dx, centerY); // 左
+        }
+        return arr;
+    }
+
+    // 檢查以「Boss 大小」放在 center 時，是否會與 mask 中任何 Collider 重疊
+    bool IsPlacementClear(Vector2 center, Vector2 size, LayerMask mask)
+    {
+        var hit = Physics2D.OverlapBox(center, size * 0.98f, 0f, mask); // 0.98f 給一點鬆緊
+        return hit == null;
+    }
+
+    // —— 穩定版地面偵測（BoxCast + IsTouchingLayers） ——
     bool IsGrounded()
     {
         if (!col) col = GetComponent<Collider2D>();
