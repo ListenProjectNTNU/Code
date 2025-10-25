@@ -6,9 +6,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class PlayerController : LivingEntity,IDataPersistence
+public class PlayerController : LivingEntity, IDataPersistence
 {
-    
+
     private Rigidbody2D rb;
     public Animator anim;
     private Collider2D coll;
@@ -19,14 +19,15 @@ public class PlayerController : LivingEntity,IDataPersistence
     //public Text cherryText;
     [SerializeField] private string playerID = "player";
     //FSM
-    public enum State{idle,jump,fall,hurt,dying};
+    public enum State { idle, jump, fall, hurt, dying };
     private State state = State.idle;
     //Inspector variable
     public LayerMask ground;
+    [Header("角色數值")]
     public float jumpForce = 3f;
     public float hurtForce = 3f;
-    
-    public int speed = 5 ;
+
+    public int speed = 5;
     public int attackDamage = 20;
     public int defence = 15;
 
@@ -34,13 +35,31 @@ public class PlayerController : LivingEntity,IDataPersistence
     public int curattack => attackDamage + attackseg * 10;
     public int curspeed => speed + speedseg * 20;
 
+    [Header("UI")]
     public GameObject deathMenu;
+    // ==========================================================
+    // 新增：Animator Layer 管理相關變數和屬性
+    // ==========================================================
+    [Header("Animator Layer Control")]
+    [Tooltip("請輸入 Animator Controller 中所有 Layer 的名稱 (如 Base Layer, CutsceneAnimation)。")]
+    public string[] AnimatorLayerNames = { "Base Layer" }; // 預設 Base Layer
 
-    private void Start() {
+    [Tooltip("設定當前要啟用 (權重為 1) 的 Layer 名稱。")]
+    [SerializeField]
+    private string activeLayerName = "Base Layer";
+
+    [Tooltip("是否可以控制")]
+    public bool canControl = true;
+
+
+    protected override void Start() {
         base.Start();
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
+
+        //確保初始 Layer (Base Layer) 的權重被設定為 1
+        UpdateAnimatorLayerWeight();
     }
 
     // Update is called once per frame
@@ -55,7 +74,7 @@ public class PlayerController : LivingEntity,IDataPersistence
         if (transform.position.y < -10) // 設定掉落的臨界點
         {
             ResetPlayerPosition(); // 重置玩家位置並扣血
-        } 
+        }
 
         if (PlayerUtils.CheckDeath(healthBar))
         {
@@ -66,6 +85,9 @@ public class PlayerController : LivingEntity,IDataPersistence
             this.enabled = false;
             deathMenu.SetActive(true);
         }
+        
+        if (!canControl) return;
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -252,6 +274,65 @@ public class PlayerController : LivingEntity,IDataPersistence
         {
             // 死亡保持 dead 狀態
             state = State.dying;
+        }
+    }
+
+    // Public Property 供其他腳本切換 Layer
+    public string ActiveLayerName
+    {
+        get { return activeLayerName; }
+        set
+        {
+            if (activeLayerName != value)
+            {
+                activeLayerName = value;
+                UpdateAnimatorLayerWeight(); // 當名稱改變時，立即更新權重
+            }
+        }
+    }
+
+    // ==========================================================
+    // 核心功能：更新 Animator Layer 權重
+    // ==========================================================
+
+    /// <summary>
+    /// 根據 ActiveLayerName 的值，設定該 Layer 權重為 1，其餘為 0。
+    /// 此方法應在 ActiveLayerName 改變時被呼叫。
+    /// </summary>
+    public void UpdateAnimatorLayerWeight()
+    {
+        if (anim == null)
+        {
+            anim = GetComponent<Animator>(); // 嘗試取得 Animator
+            if (anim == null)
+            {
+                Debug.LogWarning("Animator is missing on " + gameObject.name);
+                return;
+            }
+        }
+
+        if (AnimatorLayerNames == null || AnimatorLayerNames.Length == 0)
+        {
+            // 至少應包含 "Base Layer"
+            Debug.LogWarning("AnimatorLayerNames is empty. Please define layers in the Inspector.");
+            return;
+        }
+
+        for (int i = 0; i < anim.layerCount; i++)
+        {
+            string layerName = anim.GetLayerName(i);
+            
+            if (layerName == ActiveLayerName)
+            {
+                // 啟用目標 Layer (權重設為 1)
+                anim.SetLayerWeight(i, 1f);
+                // Debug.Log($"Animator Layer: '{layerName}' set to Weight 1."); // 可選的 Log
+            }
+            else
+            {
+                // 禁用其他 Layer (權重設為 0)
+                anim.SetLayerWeight(i, 0f);
+            }
         }
     }
 }

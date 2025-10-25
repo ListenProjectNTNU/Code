@@ -278,7 +278,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 8.000047, y: -1.4801111}
   serializedVersion: 2
-  m_Radius: 19.850798
+  m_Radius: 25.56
 --- !u!1 &2918784421876243179
 GameObject:
   m_ObjectHideFlags: 0
@@ -312,8 +312,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -27.46, y: 0.84, z: 0.0068}
-  m_LocalScale: {x: 0.022394529, y: 0.022394529, z: 0.022394529}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.059999995, y: 0.059999995, z: 0.059999995}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7198628487060310110}
   - {fileID: 2584727925256720800}
@@ -432,7 +432,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -2.6221752, y: -3.1297154}
+  m_Offset: {x: -4.666271, y: 7.772026}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -443,7 +443,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 26.644691, y: 32.058136}
+  m_Size: {x: 60.031265, y: 106.32625}
   m_EdgeRadius: 0
 --- !u!95 &4391496779238050349
 Animator:
@@ -506,14 +506,14 @@ MonoBehaviour:
   edgeCheckDistance: 1
   hitbox: {fileID: 2451310809598310590}
   player: {fileID: 0}
-  attackOffset: {x: 0.38, y: 0, z: 0}
+  attackOffset: {x: 0.57, y: 0, z: 0}
   attackMask:
     serializedVersion: 2
     m_Bits: 256
-  attackRange: 1.44
+  attackRange: 3.36
   attackCooldown: 1.33
-  chaseRange: 3.38
-  stopChaseRange: 6.88
+  chaseRange: 8.29
+  stopChaseRange: 12.2
 --- !u!114 &3924592054354686114
 MonoBehaviour:
   m_ObjectHideFlags: 0
