@@ -253,7 +253,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c32ea990e4fdc8a4ca393bff5f86fcdf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 273844e12286b034fae4fdd992e1cc85, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -667,13 +667,13 @@ MonoBehaviour:
   - m_Script
   m_LockStageInInspector: 
   m_StreamingVersion: 20170927
-  m_Priority: 10
+  m_Priority: 11
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 621703902}
   m_Follow: {fileID: 621703902}
   m_Lens:
     FieldOfView: 60
-    OrthographicSize: 4.46
+    OrthographicSize: 8.46
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -1054,7 +1054,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 4.46
+  orthographic size: 8.46
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1079,7 +1079,7 @@ Transform:
   m_GameObject: {fileID: 1427279314}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -20.38, y: -7.1899996, z: -10}
+  m_LocalPosition: {x: -20.344904, y: -7.18998, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1387,7 +1387,7 @@ GameObject:
   - component: {fileID: 1801418264}
   - component: {fileID: 1801418263}
   - component: {fileID: 1801418262}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "\u5730\u677F\u78B0\u649E\u7BB1"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1660,7 +1660,7 @@ MonoBehaviour:
   currentHealth: 200
   isDead: 0
   healthBar: {fileID: 613732728}
-  player: {fileID: 0}
+  player: {fileID: 621703902}
   attackHitbox: {fileID: 804710164}
   groundMask:
     serializedVersion: 2
@@ -1671,13 +1671,15 @@ MonoBehaviour:
   attackRangeX: 3.5
   attackCooldown: 3
   riseHeightAbovePlayer: 4
-  riseSpeed: 10
-  dropStartDelay: 0.1
   dropSpeed: 20
   gravityDuringDrop: 5
   postLandPause: 0.35
+  ceilingProbeDistance: 12
+  ceilingClearance: 0.2
+  telegraphTime: 0.25
+  freezeXDuringDrop: 1
   groundCheckRadius: 0.15
-  groundCheck: {fileID: 0}
+  groundCheck: {fileID: 1801418265}
   hurtStun: 0.5
   disableColliderOnDeath: 1
 --- !u!50 &1840781541
