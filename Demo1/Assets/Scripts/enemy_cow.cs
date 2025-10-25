@@ -56,6 +56,7 @@ public class enemy_cow : LivingEntity, IDataPersistence
     {
         transform.rotation = fixedRotation;
         if (isDead) return;
+        if (!isActive) return;
         anim.SetInteger("state", (int)state);
         AnimationState();
 
@@ -86,8 +87,6 @@ public class enemy_cow : LivingEntity, IDataPersistence
         {
             Attack();
         }
-        
-        if (!isActive) return;
     }
 
     private void Attack()

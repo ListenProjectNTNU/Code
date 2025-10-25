@@ -65,7 +65,7 @@ public class PlayerController : LivingEntity, IDataPersistence
     // Update is called once per frame
     void Update()
     {
- 
+        if (!canControl) return;
         Movement();
         AnimationState();
         anim.SetInteger("state", (int)state);//sets animation based on Enumerator state
@@ -85,9 +85,6 @@ public class PlayerController : LivingEntity, IDataPersistence
             this.enabled = false;
             deathMenu.SetActive(true);
         }
-        
-        if (!canControl) return;
-
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -321,7 +318,7 @@ public class PlayerController : LivingEntity, IDataPersistence
         for (int i = 0; i < anim.layerCount; i++)
         {
             string layerName = anim.GetLayerName(i);
-            
+
             if (layerName == ActiveLayerName)
             {
                 // 啟用目標 Layer (權重設為 1)
@@ -334,5 +331,13 @@ public class PlayerController : LivingEntity, IDataPersistence
                 anim.SetLayerWeight(i, 0f);
             }
         }
+    }
+    
+    //給動畫模式用的主角轉向
+    public void FaceLeft()
+    {
+        Vector3 s = transform.localScale;
+        s.x = -Mathf.Abs(s.x);
+        transform.localScale = s;
     }
 }
