@@ -135,5 +135,19 @@ public class Scene2Controller : MonoBehaviour, ISceneController
 
         monsterAnim.Play("idle");
         if (playerAnim != null) playerAnim.Play("idle");
+        
+        var monsterController = monster.GetComponent<enemy_cow>();
+        if (monsterController != null)
+        {
+            monsterController.isActive = true;
+        }
+
+        var playerController = player.GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            playerController.canControl = true;
+        }
+
+        isRunningEvent = false;
     }
 }
