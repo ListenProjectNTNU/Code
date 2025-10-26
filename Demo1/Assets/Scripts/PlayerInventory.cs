@@ -13,6 +13,13 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private List<string> collectedItems = new List<string>();
     public IReadOnlyList<string> CollectedItems => collectedItems;
 
+    // 🎵 撿取音效
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource audioSource;  // 用來播放音效
+    [SerializeField] private AudioClip defaultPickupSound; // 撿取音效
+    [SerializeField] private bool randomizePitch = true;
+    [Range(0.8f, 1.2f)] [SerializeField] private float pitchVariance = 0.1f;
+
     private void Awake()
     {
         // 單例設計
@@ -49,6 +56,14 @@ public class PlayerInventory : MonoBehaviour
             else
                 Debug.LogWarning("⚠️ 場景中找不到 InkVariableUpdater，將無法更新 Ink 變數");
         }
+
+        // 🎵 若沒綁 AudioSource，自動尋找
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+                Debug.LogWarning("⚠️ 未綁定 AudioSource，撿取音效將無法播放");
+        }
     }
 
     public void AddItem(Loot lootData)
@@ -62,7 +77,7 @@ public class PlayerInventory : MonoBehaviour
         Debug.Log($"✅ 獲得物品：{lootData.lootName}");
         collectedItems.Add(lootData.lootName);
 
-        // 更新 Ink 變數
+        // 📝 更新 Ink 變數
         if (inkUpdater != null)
         {
             inkUpdater.UpdateVariable($"has_{lootData.lootName}", true);
@@ -72,6 +87,9 @@ public class PlayerInventory : MonoBehaviour
         {
             Debug.LogWarning("⚠️ InkVariableUpdater 為 null，暫時無法更新 Ink 變數");
         }
+
+        // 🎵 播放撿取音效
+        PlayPickupSound(lootData);
 
         // 應用物品效果
         ApplyLootEffects(lootData);
@@ -111,5 +129,22 @@ public class PlayerInventory : MonoBehaviour
     public bool HasItem(string itemName)
     {
         return collectedItems.Contains(itemName);
+    }
+
+    // 🎵 撿取音效邏輯
+    private void PlayPickupSound(Loot lootData)
+    {
+        if (audioSource == null || defaultPickupSound == null)
+        {
+            Debug.LogWarning("⚠️ 沒有撿取音效或 AudioSource，略過播放");
+            return;
+        }
+
+        if (randomizePitch)
+            audioSource.pitch = Random.Range(1f - pitchVariance, 1f + pitchVariance);
+        else
+            audioSource.pitch = 1f;
+
+        audioSource.PlayOneShot(defaultPickupSound);
     }
 }

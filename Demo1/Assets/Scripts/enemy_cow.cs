@@ -44,6 +44,9 @@ public class enemy_cow : LivingEntity, IDataPersistence
     public bool controlledBySC = false; // 是否由 SC 控制
     private bool canMove = true;         // SC 控制的移動開關
 
+    [Header("Loot")]
+    private bool lootDropped = false; // ✅ 防止重複掉落
+
     // 🔹 SC 控制用介面
     public void SetCanMove(bool value)
     {
@@ -262,29 +265,53 @@ public class enemy_cow : LivingEntity, IDataPersistence
     private IEnumerator DeathSequence()
     {
         // 等進入動畫狀態
+        Debug.Log("DeathSequence()");
+        OnDeathAnimationEnd();
         yield return null;
-        while (!anim.GetCurrentAnimatorStateInfo(0).IsName("dying"))
+        float timeout = 5f; // ⏱️ 最長等待 5 秒避免死循環
+
+        while (!anim.GetCurrentAnimatorStateInfo(0).IsName("dying") && timeout > 0f)
+        {
+            timeout -= Time.deltaTime;
             yield return null;
+        }
 
         // 播放完動畫
-        while (anim.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.99f)
+        while (anim.GetCurrentAnimatorStateInfo(0).IsName("dying") &&
+            anim.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.99f &&
+            timeout > 0f)
+        {
+            timeout -= Time.deltaTime;
             yield return null;
+        }
 
-        // ✅ 這裡再檢查一次，確保不重複掉落
-        if (this == null || !isDead) yield break;
-
-        var loot = GetComponent<LootBag>();
-        if (loot != null)
-            loot.InstantiateLoot(transform.position);
-
-        Destroy(gameObject);
+        //這裡的程式不會被執行到
+        Debug.Log("OnDeathAnimationEnd()");
+        OnDeathAnimationEnd();
+        DropLootAndDestroy();
     }
 
     public void OnDeathAnimationEnd()
     {
+        Debug.Log("OnDeathAnimationEnd()");
+        DropLootAndDestroy();
+    }
+
+    private void DropLootAndDestroy()
+    {
+        if (lootDropped) return; // ✅ 防止重複
+        lootDropped = true;
+
         var loot = GetComponent<LootBag>();
         if (loot != null)
+        {
             loot.InstantiateLoot(transform.position);
+            Debug.Log($"[enemy_cow] 掉落物已生成於 {transform.position}");
+        }
+        else
+        {
+            Debug.LogWarning("[enemy_cow] 沒找到 LootBag 元件，無法掉落物品。");
+        }
 
         Destroy(gameObject);
     }
