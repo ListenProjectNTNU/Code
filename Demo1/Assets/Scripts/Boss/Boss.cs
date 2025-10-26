@@ -14,7 +14,7 @@ public class BossController : LivingEntity
     public int contactDamage = 25;
     public float moveSpeed = 2.5f;
     public float chaseRange = 15f;
-    public float attackRangeX = 3.5f;    // 與玩家 X 軸距離門檻
+    public float attackRangeX = 35f;    // 與玩家 X 軸距離門檻
     public float attackCooldown = 3f;
 
     [Header("Drop Attack Tunings")]
@@ -66,7 +66,7 @@ public class BossController : LivingEntity
         col = GetComponent<Collider2D>();
 
         if (!player) player = GameObject.FindGameObjectWithTag("Player")?.transform;
-        if (attackHitbox) attackHitbox.enabled = false;
+        if (attackHitbox) attackHitbox.gameObject.SetActive(false);
 
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
@@ -83,7 +83,7 @@ public class BossController : LivingEntity
         bool g = IsGrounded();
         bool cd = Time.time >= nextAttackTime;
         if (Time.frameCount % 20 == 0)
-            Debug.Log($"[BossDebug] ax={ax:F2} grounded={g} cd={cd} isAttacking={isAttacking}");
+            //Debug.Log($"[BossDebug] ax={ax:F2} grounded={g} cd={cd} isAttacking={isAttacking}");
 
         // Animator 參數
         anim.SetFloat("SpeedX", Mathf.Abs(rb.velocity.x));
@@ -154,13 +154,18 @@ public class BossController : LivingEntity
         // 垂直向下
         rb.velocity = new Vector2(0f, -Mathf.Abs(dropSpeed));
 
-        if (attackHitbox) attackHitbox.enabled = true;
+        if (attackHitbox)
+        {
+            attackHitbox.gameObject.SetActive(true);
+            var hb = attackHitbox.GetComponent<BossAttackHitbox>();
+            if (hb) hb.Arm();                 // ← 每輪攻擊重置一次
+        }
 
         // 6) 等到落地（碰撞事件 + 容錯）
         yield return WaitForLanding();
 
         // 7) 收尾：關 Hitbox、恢復重力與剛體限制、清空速度、落地硬直
-        if (attackHitbox) attackHitbox.enabled = false;
+        if (attackHitbox) attackHitbox.gameObject.SetActive(false);
         rb.gravityScale = oldGravity;
 
         // 恢復原本剛體限制

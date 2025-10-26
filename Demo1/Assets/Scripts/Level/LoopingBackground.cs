@@ -37,7 +37,10 @@ public class LoopingBackground : MonoBehaviour
 
         // 預設門 trigger 關閉（除非是開門版本）
         if (doorTrigger != null)
-            doorTrigger.SetActive(false);
+            {
+                Debug.Log("啟動DoorTrigger");
+                doorTrigger.SetActive(true);
+            }
     }
 
     void Update()
