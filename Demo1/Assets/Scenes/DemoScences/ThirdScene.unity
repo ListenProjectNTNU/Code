@@ -652,7 +652,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   owner: {fileID: 1840781540}
-  damage: 20
+  damage: 0
   playerMask:
     serializedVersion: 2
     m_Bits: 256
@@ -1256,12 +1256,16 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2421688673043968343, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 20.139385
+      objectReference: {fileID: 0}
+    - target: {fileID: 2421688673043968343, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 33.5
+      value: 19.3
       objectReference: {fileID: 0}
     - target: {fileID: 2421688673043968343, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: -4.161
       objectReference: {fileID: 0}
     - target: {fileID: 2923893116272935182, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: attackRange
@@ -1706,25 +1710,27 @@ MonoBehaviour:
     m_Bits: 64
   contactDamage: 25
   moveSpeed: 2.5
-  chaseRange: 40.4
+  chaseRange: 40.6
   attackRangeX: 3.5
   attackCooldown: 3
-  riseHeightAbovePlayer: 4
+  riseHeightAbovePlayer: 7
   dropSpeed: 20
   gravityDuringDrop: 5
   postLandPause: 0.35
   ceilingProbeDistance: 12
   ceilingClearance: 0.2
-  telegraphTime: 0.25
+  telegraphTime: 3
   freezeXDuringDrop: 1
   playerMask:
     serializedVersion: 2
     m_Bits: 256
   headClearance: 0.35
-  sideOffset: 1.2
+  sideOffset: 0.34
   sideSweepSteps: 2
   groundCheckRadius: 0.15
   groundCheck: {fileID: 1801418265}
+  teleportTriggerRangeX: 10
+  offsetAboveHead: 2
   hurtStun: 0.5
   disableColliderOnDeath: 1
 --- !u!50 &1840781541
