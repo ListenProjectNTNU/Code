@@ -1,110 +1,33 @@
-// 第二場景：焦慮的化身
-// ====================================
-// ① 遭遇怪物
-// ====================================
+//動畫 走在沒有開門的走廊png loop裡
+（估計大學也跟高中一樣吧？只要繼續當個邊緣人就不會受到傷害。）#speaker:家豪#portrait:default#layout:right
 
-主角：「！！！！！！」
-#speaker:主角
-#portrait:default
-#layout:right
-// （眼前的學姊變成了一個怪物。）
+（不想參加新生訓練的家豪，被媽媽強行拎到大學門口，邊說著：「大學是新的開始，要體驗人生！」 ）#speaker:家豪#portrait:default#layout:left
+//動畫 打破沒有開門的走廊png loop 下一張走廊png有開門
 
-（怪物嘴裡發出細小的呢喃聲，令人不適。）
-#speaker:主角
-#portrait:default
-#layout:right
-// 音效：怪物低語
-#scene:monster_whisper
+（雖心有不滿，但也不想忤逆媽媽，戴上耳機一邊平靜自己的心情一邊前往教室。）#speaker:家豪#portrait:default#layout:left#scene:corridor_withDoor
+//動畫 走到有開門的地方
+（走到教室門口還沒平復好心情，突然，後面傳來一道聲音—— ）#speaker:家豪#portrait:default#layout:left
 
-（隨著怪物逼近，主角開始越來越慌亂，突然）
-#speaker:主角
-#portrait:default
-#layout:right
-// 音效變大聲；怪物向前移動指定距離；主角後退指定距離
-#scene:monster_approach
+// 動畫 畫面快速閃白後回到正盛時學姊出現
+「嘿！是新生嗎？怎麼不進去？」 #speaker:學姊#portrait:default#layout:left
 
-// ====================================
-// ② 耳機介入
-// ====================================
+（轉過頭，一位笑得燦爛的學姊正站在他身後） #speaker:家豪#portrait:default#layout:left#scene:fox_appear
 
-（耳機發出聲音）
-#speaker:主角
-#portrait:default
-#layout:right
-// 恐怖音效響起；音效與角色都停下；耳機小精靈聲出現
-#scene:stop_all_for_headphone
+「我……我……這就進去！」（臉紅，吱吱嗚嗚地說）#speaker:家豪#portrait:default#layout:right#scene:player_turnBack
 
-耳機：「按下 'Q 或 C 或 R' 攻擊」
-#speaker:耳機
-#portrait:default
-#layout:left
-#scene:start_battle
-// 怪物與主角解除暫停，讓玩家可操作（戰鬥開始）
+//動畫：畫面切到滿人教室PNG  音效：人群吵雜聲
+（看向教室內，教室內，每張桌子都坐滿了人，大家有說有笑地聊著天。主角感到無地自容，視線開始因為緊張而模糊。） #speaker:家豪#portrait:default#layout:left
 
-// ====================================
-// （此區為戰鬥階段）
-// 玩家操控主角擊殺怪物後，會自動觸發下段對話
-// ====================================
+//動畫閃白後回到在走廊的場景，並且身後出現學姊(啟動FOX物件) 關掉剛剛的音效
+「嘿！剛剛的新生！」（突然，學姊的聲音再次響起—— ）#speaker:學姊#portrait:default#layout:left
 
-#scene:end_battle
-（怪物消失後，掉落了一個微微發出聲音的物體，聽起來像學姊的聲音。）
-#speaker:主角
-#portrait:default
-#layout:right
-#scene:item_drop
+//動畫閃紅
+（對上學姊燦爛的笑容，臉上的血液再次沸騰） #speaker:家豪#portrait:default#layout:left
 
-// ====================================
-// ③ 耳機說明階段
-// ====================================
+「我剛剛對了名單，你是最後一個到的人，我是你新訓期間的隊輔。」 #speaker:學姊#portrait:default#layout:left
 
-耳機：「你剛剛擊倒的是你心中的焦慮，這裡是你的心理世界」
-#speaker:耳機
-#portrait:default
-#layout:left
+//動畫忽明忽暗+雜訊 音效：耳鳴
+（聽著學姊的話語，視線越來越模糊，開始忽明忽暗——） #speaker:家豪#portrait:default#layout:left
 
-耳機：「但因為你的焦慮還沒完全消除，所以你必須在擊倒更多焦慮，才有機會回到現實世界」
-#speaker:耳機
-#portrait:default
-#layout:left
-
-耳機：「怪物掉落的是『對話碎片』，在你在心理世界時現實世界還是在流動，對話碎片是你暫時擊敗焦慮時聽到的現實世界的聲音，也是你成長的證明，可以讓你在心理世界的能力提升」
-#speaker:耳機
-#portrait:default
-#layout:left
-
-耳機：「靠近後按下 E 可以拾取」
-#speaker:耳機
-#portrait:default
-#layout:left
-#scene:enable_pickup
-
-耳機：「喔對了～忘記自我介紹。我是你的守護靈，我會在你在心理世界時提供你協助」
-#speaker:耳機
-#portrait:default
-#layout:left
-
-耳機：「那現在我們一起想辦法回到現實世界吧」
-#speaker:耳機
-#portrait:default
-#layout:left
-#scene:end_tutorial
-// 結束對話狀態，玩家恢復可控制角色
-
-// ====================================
-// ④ 前往傳送門
-// ====================================
-
-#scene:reach_final_gate_trigger
-耳機：「太好了，你已經擊敗你心中大多的焦慮了，但是還不夠徹底」
-#speaker:耳機
-#portrait:default
-#layout:left
-
-耳機：「繼續往前面探索吧，耳機。」
-#speaker:耳機
-#portrait:default
-#layout:left
-#scene:enable_portal
-// 結束對話，玩家可操作角色走到門前觸發轉場（進入第三場景）
-
-#scene:end_scene2
+//切換到第二場景 關掉耳鳴
+（再度睜眼時，主角已經不在教室內，眼前的學姊也變成了不可名狀的生物……） #speaker:家豪#portrait:default#layout:left
