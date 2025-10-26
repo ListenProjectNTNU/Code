@@ -179,6 +179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58c029490a069e740b8bdacd70c6650d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 5
   reference: {fileID: 0}
   openBG: {fileID: 21300000, guid: 80af29a0fed60404e9ed435e8be8d906, type: 3}
   playerAnimator: {fileID: 1678532901}
@@ -451,6 +452,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58c029490a069e740b8bdacd70c6650d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 5
   reference: {fileID: 189280085}
   openBG: {fileID: 21300000, guid: 80af29a0fed60404e9ed435e8be8d906, type: 3}
   playerAnimator: {fileID: 1678532901}
@@ -3429,7 +3431,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1063261991
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3472,7 +3474,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0.088679194, b: 0.088679194, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3558,6 +3560,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   linkedLoopingBG: {fileID: 189280084}
+  isDialogueDoor: 0
+  dialogueTriggerCollider: {fileID: 1063261994}
 --- !u!224 &1088310724 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4124224336898441614, guid: dcfd1fd47cf22154688622306e64efbc, type: 3}
@@ -14753,7 +14757,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 430352267711730876, guid: 3a3f9ac3aa5c5de4bab8768391ac7ee1, type: 3}
       propertyPath: targetSceneName
-      value: Tutorial
+      value: SecondScene
       objectReference: {fileID: 0}
     - target: {fileID: 2090304802380399114, guid: 3a3f9ac3aa5c5de4bab8768391ac7ee1, type: 3}
       propertyPath: m_Name
@@ -14890,6 +14894,46 @@ PrefabInstance:
       propertyPath: onDialogueEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 6433835582326466023, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 1678532887}
+    - target: {fileID: 6433835582326466023, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: inkJSON
+      value: 
+      objectReference: {fileID: 4900000, guid: 2ada22f3e0b1cca40bf1941a14ff3029, type: 3}
+    - target: {fileID: 6433835582326466023, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: dialogueText
+      value: 
+      objectReference: {fileID: 191276309}
+    - target: {fileID: 6433835582326466023, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: dialoguePanel
+      value: 
+      objectReference: {fileID: 1253663558}
+    - target: {fileID: 6433835582326466023, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: displayNameText
+      value: 
+      objectReference: {fileID: 1921411728}
+    - target: {fileID: 6433835582326466023, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: portraitAnimator
+      value: 
+      objectReference: {fileID: 1921411729}
+    - target: {fileID: 6433835582326466023, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: choices.Array.data[0]
+      value: 
+      objectReference: {fileID: 185924082}
+    - target: {fileID: 6433835582326466023, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: choices.Array.data[1]
+      value: 
+      objectReference: {fileID: 101025555}
+    - target: {fileID: 6433835582326466023, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: choices.Array.data[2]
+      value: 
+      objectReference: {fileID: 510889330}
+    - target: {fileID: 6433835582326466023, guid: ec6087b620debe04093b594023afd197, type: 3}
+      propertyPath: onDialogueEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1759890043}
     - target: {fileID: 8496905158961647622, guid: ec6087b620debe04093b594023afd197, type: 3}
       propertyPath: m_Name
       value: Manager
@@ -14946,10 +14990,14 @@ PrefabInstance:
       propertyPath: loopingBG
       value: 
       objectReference: {fileID: 189280084}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3662916400042267423, guid: ec6087b620debe04093b594023afd197, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1898515874196505601, guid: ec6087b620debe04093b594023afd197, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1861279135}
   m_SourcePrefab: {fileID: 100100000, guid: ec6087b620debe04093b594023afd197, type: 3}
 --- !u!1 &1427279314
 GameObject:
@@ -15075,7 +15123,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1564969629
 Transform:
   m_ObjectHideFlags: 0
@@ -15133,7 +15181,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0.088679194, b: 0.088679194, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -15204,6 +15252,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   linkedLoopingBG: {fileID: 636643980}
+  isDialogueDoor: 0
+  dialogueTriggerCollider: {fileID: 1564969632}
 --- !u!1001 &1678532886
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15493,6 +15543,21 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1898515874196505601, guid: ec6087b620debe04093b594023afd197, type: 3}
   m_PrefabInstance: {fileID: 1368963124}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1861279135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1861279134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64fd79737373b7742b5cf0755725d673, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loopingBG: {fileID: 189280084}
+  senpai: {fileID: 1710628992}
+  player: {fileID: 1678532887}
 --- !u!1001 &1921411727
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -21474,6 +21474,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1165963015645889196, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1376125773283568411, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: m_Name
       value: rabbit
@@ -21489,6 +21493,10 @@ PrefabInstance:
     - target: {fileID: 3123781270002784855, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: jumpForce
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3555466454340382072, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6026982861198479447, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: m_LocalPosition.x

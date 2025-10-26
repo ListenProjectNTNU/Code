@@ -31,6 +31,7 @@ public class Scene1Controller : MonoBehaviour, ISceneController
                 break;
         }
     }
+    
     void FlipPlayer(bool faceLeft) //之後看要不要整理playerController裡
     {
         Vector3 scale = player.transform.localScale;
@@ -39,5 +40,11 @@ public class Scene1Controller : MonoBehaviour, ISceneController
         else
             scale.x = Mathf.Abs(scale.x);      // 右
         player.transform.localScale = scale;
+    }
+
+    public void TriggerPortalDialogue()
+    {
+        // 這個場景沒有傳送門對話功能，所以留空
+        Debug.Log("Scene1Controller：TriggerPortalDialogue() 被呼叫，但此場景無需處理。");
     }
 }
