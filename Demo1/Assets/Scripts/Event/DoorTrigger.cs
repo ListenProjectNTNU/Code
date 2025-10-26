@@ -11,32 +11,56 @@ public class DoorTrigger : MonoBehaviour
     [Header("可選：連動的 LoopingBackground（非戰鬥門用）")]
     public LoopingBackground linkedLoopingBG;
 
+    // 🔹新增：可選的對話觸發範圍（Collider Trigger）
+    [Header("可選：碰到此 Collider 觸發最後對話")]
+    public bool isDialogueDoor = false; // 這個門是不是要對話的門？
+    public Collider2D dialogueTriggerCollider;
+    [Tooltip("可選：SceneController 參考用來通知進入對話")]
+    public Scene2Controller sceneController;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return; // 只偵測玩家
+        Debug.Log("玩家觸發OnTriggerEnter2D → " + gameObject.name);
 
-        Debug.Log("玩家觸發OnTriggerEnter2D");
+        // 🌀 LoopingBG 門
         if (linkedLoopingBG != null)
         {
             Debug.Log("🚪 玩家碰到門（LoopingBG 版本）");
-
-            // 🧩 找出所有的 LoopingBackground，一起停下
             LoopingBackground[] allBGs = FindObjectsOfType<LoopingBackground>();
             foreach (var bg in allBGs)
             {
                 bg.OnDoorTriggered();
             }
-
             return;
         }
-        // 🔹以下是原本傳送門的戰鬥邏輯，完全不動
+
+        // 🗣️ 對話門（特別的門）
+        if (isDialogueDoor) // 👈 改成用一個 bool 旗標判定這是不是對話門
+        {
+            if (AllEnemiesDefeated())
+            {
+                Debug.Log("🚪 玩家碰到【對話門】，敵人已清空 → 觸發對話");
+                if (sceneController != null)
+                {
+                    sceneController.TriggerPortalDialogue();
+                }
+            }
+            else
+            {
+                Debug.Log("🚪 玩家碰到【對話門】，但敵人還存在");
+            }
+            return;
+        }
+
+        // 🧩 一般傳送門
         if (AllEnemiesDefeated())
         {
             onEnemiesEnd?.Invoke();
         }
         else
         {
-            Debug.Log("還有敵人，無法進入下一個場景！");
+            Debug.Log("🚪 玩家碰到【傳送門】，但敵人還存在！");
         }
     }
 

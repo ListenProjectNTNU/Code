@@ -48,8 +48,7 @@ public class PlayerController : LivingEntity, IDataPersistence
     [SerializeField]
     private string activeLayerName = "Base Layer";
 
-    [Tooltip("是否可以控制")]
-    public bool canControl = true;
+    
 
 
     protected override void Start() {
@@ -65,7 +64,7 @@ public class PlayerController : LivingEntity, IDataPersistence
     // Update is called once per frame
     void Update()
     {
-        if (!canControl) return;
+        if (!enabled) return;
         Movement();
         AnimationState();
         anim.SetInteger("state", (int)state);//sets animation based on Enumerator state

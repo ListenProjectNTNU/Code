@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class LivingEntity : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class LivingEntity : MonoBehaviour
 
     [Header("Optional UI")]
     public HealthBar healthBar; // 可以綁 UI 血條，也可以留空
+
+    [Tooltip("廣播給S2C進對話模式用的")]
+    public event Action<LivingEntity> OnDeathEvent;
 
     protected virtual void Start()
     {
@@ -52,8 +56,14 @@ public class LivingEntity : MonoBehaviour
     {
         isDead = true;
         Debug.Log($"{gameObject.name} 死亡");
+
+        // ✅ 廣播死亡事件給訂閱者
+        OnDeathEvent?.Invoke(this);
+
         OnDeath(); // 給子類覆寫
     }
+    
+    // ✅ 改成 protected internal，保留原有功能但允許同 Assembly 類別存取（不報CS0122）
     protected virtual void OnDeath()
     {
         Destroy(gameObject);

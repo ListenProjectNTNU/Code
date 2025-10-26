@@ -39,6 +39,22 @@ public class enemy_cow : LivingEntity, IDataPersistence
     [Header("非自由模式控制用")]
     public bool isActive = true;
 
+    // 🔹 新增：SceneController 控制相關
+    [Header("SceneController 控制")]
+    public bool controlledBySC = false; // 是否由 SC 控制
+    private bool canMove = true;         // SC 控制的移動開關
+
+    // 🔹 SC 控制用介面
+    public void SetCanMove(bool value)
+    {
+        canMove = value;
+        if (!canMove)
+        {
+            rb.velocity = Vector2.zero;
+            anim.SetInteger("state", (int)State.idle);
+        }
+    }
+
     protected override void Start()
     {
         base.Start(); // LivingEntity 初始化血量
@@ -56,12 +72,23 @@ public class enemy_cow : LivingEntity, IDataPersistence
     {
         transform.rotation = fixedRotation;
         if (isDead) return;
-        if (!isActive) return;
+
         anim.SetInteger("state", (int)state);
-        AnimationState();
+        AnimationState(); // ✅ 始終呼叫 AnimationState，讓巡邏、移動判斷正常
+
+        // 🔹 SC 控制：若由 SC 控制且暫停移動，就不做追擊攻擊判斷
+        if (controlledBySC && !canMove) return;
+
+        // 以下只在 SC 控制的敵人上運作
+        if (!isActive) return;
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        CheckAttack(distanceToPlayer);
+    }
 
+    // 🔹 將攻擊與追擊判斷拆出
+    private void CheckAttack(float distanceToPlayer)
+    {
         if (state != State.attack) // 正在攻擊時不改 isChasing
         {
             if (distanceToPlayer <= chaseRange)
@@ -123,8 +150,6 @@ public class enemy_cow : LivingEntity, IDataPersistence
         }
     }
 
-
-
     // 🔥 在攻擊動畫最後一幀加 Animation Event 呼叫這個
     public void OnAttackAnimationEnd()
     {
@@ -137,7 +162,10 @@ public class enemy_cow : LivingEntity, IDataPersistence
     {
         float moveSpeed = 2f;
 
-        if (isChasing)
+        // 🔹 SC 控制判斷：若受 SC 控制且暫停移動，直接 return
+        if (controlledBySC && !canMove) return;
+
+        if (isChasing) // SC 控制：追擊玩家
         {
             state = State.run;
             Vector2 direction = (player.position - transform.position).normalized;
@@ -148,14 +176,9 @@ public class enemy_cow : LivingEntity, IDataPersistence
             else
                 transform.localScale = new Vector3(Mathf.Abs(originalScale.x), originalScale.y);
         }
-        else
+        else // 巡邏邏輯
         {
-            Vector2 groundCheckOrigin = facingLeft
-                ? new Vector2(coll.bounds.min.x, coll.bounds.min.y)
-                : new Vector2(coll.bounds.max.x, coll.bounds.min.y);
-            RaycastHit2D groundInfo = Physics2D.Raycast(groundCheckOrigin, Vector2.down, edgeCheckDistance, ground);
-            if (groundInfo.collider == null) facingLeft = !facingLeft;
-
+            // 🔹 先檢查是否到達巡邏邊界
             if (facingLeft)
             {
                 if (transform.position.x > leftCap)
@@ -165,7 +188,7 @@ public class enemy_cow : LivingEntity, IDataPersistence
                 }
                 else
                 {
-                    facingLeft = false;
+                    facingLeft = false; // 反向
                 }
             }
             else
@@ -177,7 +200,7 @@ public class enemy_cow : LivingEntity, IDataPersistence
                 }
                 else
                 {
-                    facingLeft = true;
+                    facingLeft = true; // 反向
                 }
             }
         }
@@ -232,6 +255,7 @@ public class enemy_cow : LivingEntity, IDataPersistence
         coll.enabled = false;
         if (hitbox) hitbox.SetActive(false);
 
+        base.Die(); // ✅ 通知 LivingEntity & 廣播事件
         StartCoroutine(DeathSequence());
     }
 
@@ -255,7 +279,6 @@ public class enemy_cow : LivingEntity, IDataPersistence
 
         Destroy(gameObject);
     }
-
 
     public void OnDeathAnimationEnd()
     {
@@ -321,5 +344,4 @@ public class enemy_cow : LivingEntity, IDataPersistence
         if (hitbox != null)
             hitbox.SetActive(false);
     }
-
 }
