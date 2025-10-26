@@ -16,7 +16,20 @@ public class DoorTrigger : MonoBehaviour
     public bool isDialogueDoor = false; // 這個門是不是要對話的門？
     public Collider2D dialogueTriggerCollider;
     [Tooltip("可選：SceneController 參考用來通知進入對話")]
-    public Scene2Controller sceneController;
+    public ISceneController sceneController;
+
+    private void Start()
+    {
+        // 🧠 自動尋找場景中的 ISceneController 實例（例如 S1C、S2C、S3C）
+        if (sceneController == null)
+        {
+            sceneController = FindObjectOfType<MonoBehaviour>() as ISceneController;
+            if (sceneController != null)
+                Debug.Log("✅ 自動找到場景控制器：" + sceneController.GetType().Name);
+            else
+                Debug.LogWarning("⚠️ 場景中找不到任何 ISceneController 實作，對話門將無法運作。");
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -44,6 +57,10 @@ public class DoorTrigger : MonoBehaviour
                 if (sceneController != null)
                 {
                     sceneController.TriggerPortalDialogue();
+                }
+                else
+                {
+                    Debug.LogWarning("⚠️ 無法觸發對話，因為找不到 sceneController。");
                 }
             }
             else

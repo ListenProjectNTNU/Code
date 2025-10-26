@@ -3,7 +3,7 @@ using UnityEngine;
 public class LoopingBackground : MonoBehaviour
 {
     [Header("背景設定")]
-    private float speed = 5f; // 背景移動速度
+    [SerializeField] private float speed = 5f; // 背景移動速度
     public SpriteRenderer reference;           // 若這張是第二張，指定前一張的 SpriteRenderer
     public Sprite openBG;                      // 「開門」版本的背景圖
     private SpriteRenderer sr;                 // 本身的 SpriteRenderer
@@ -13,16 +13,16 @@ public class LoopingBackground : MonoBehaviour
     [Header("開門動畫需要")]
     private bool useOpenNextLoop = false;      // 下一輪是否要換成開門背景
     private bool hasLooped = false;            // 是否已經完成一次循環（避免誤觸）
-    public Animator playerAnimator;                     // 主角 Animator，用來切換動畫
+    public Animator playerAnimator;            // 主角 Animator，用來切換動畫
     [HideInInspector] public bool isMoving = true; // 控制背景是否移動
-    public GameObject doorTrigger;                 // 門的 trigger（循環時跟著背景移動）
+    public GameObject doorTrigger;             // 門的 trigger（循環時跟著背景移動）
 
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
         length = sr.bounds.size.x;
 
-        // 如果這張有指定參考的前一張，就自動「並排對齊」
+        // 若有設定 reference，將此背景緊接上一張
         if (reference != null)
         {
             float refWidth = reference.bounds.size.x;
@@ -35,12 +35,12 @@ public class LoopingBackground : MonoBehaviour
 
         startPos = transform.position.x;
 
-        // 預設門 trigger 關閉（除非是開門版本）
+        // ✅ 預設關閉門的 trigger（開門後才啟用）
         if (doorTrigger != null)
-            {
-                Debug.Log("啟動DoorTrigger");
-                doorTrigger.SetActive(true);
-            }
+        {
+            doorTrigger.SetActive(false);
+            Debug.Log("🚪 DoorTrigger 預設關閉");
+        }
     }
 
     void Update()
@@ -63,10 +63,12 @@ public class LoopingBackground : MonoBehaviour
                 useOpenNextLoop = false;
                 Debug.Log("✅ 背景已切換成開門版本！");
 
-                // 啟用門的 trigger
+                // ✅ 啟用門的 trigger（加上括號修正作用範圍）
                 if (doorTrigger != null)
-                    Debug.Log("啟動DoorTrigger");
+                {
                     doorTrigger.SetActive(true);
+                    Debug.Log("🚪 DoorTrigger 已啟用");
+                }
             }
         }
     }
@@ -81,17 +83,20 @@ public class LoopingBackground : MonoBehaviour
         Debug.Log("📩 已設定：下一次循環將切換成開門背景");
     }
 
-
-    /// 給門的Trigger呼叫：主角碰到時背景停下，角色切Idle
+    /// <summary>
+    /// 被門的 Trigger 呼叫：主角碰到時背景停下、角色切 Idle
+    /// </summary>
     public void OnDoorTriggered()
     {
         isMoving = false;
-        Debug.Log("碰到DoorTrigger");
+        Debug.Log("🧍‍♀️ 玩家碰到門，停止背景移動");
         if (playerAnimator != null)
             playerAnimator.SetTrigger("Idle");
     }
 
-    /// 這個方法會由門Trigger上的Collider呼叫
+    /// <summary>
+    /// 若這個物件本身帶有 Trigger Collider，也能自動呼叫停下
+    /// </summary>
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (doorTrigger == null || !doorTrigger.activeSelf) return;
@@ -101,5 +106,4 @@ public class LoopingBackground : MonoBehaviour
             OnDoorTriggered();
         }
     }
-
 }
