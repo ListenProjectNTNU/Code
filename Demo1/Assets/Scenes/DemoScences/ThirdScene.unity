@@ -652,7 +652,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   owner: {fileID: 1840781540}
-  damage: 0
+  damage: 20
   playerMask:
     serializedVersion: 2
     m_Bits: 256
