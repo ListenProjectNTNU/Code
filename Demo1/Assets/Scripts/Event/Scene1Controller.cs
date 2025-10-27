@@ -6,15 +6,24 @@ public class Scene1Controller : MonoBehaviour, ISceneController
     public GameObject senpai; // 學姊物件
     public GameObject player; // 主角物件
 
+    [Header("動畫 Canvas")]
+    public Animator animCanva;  // 直接拖 AnimCanva 的 Animator
+
+    [Header("Audio Settings")]
+    public AudioSource audioSource; // 指定 AudioSource
+    public AudioClip headphoneClip; // 🎧 耳機音效 (請在 Inspector 指定)
+
     public void HandleTag(string tagValue)
     {
         switch (tagValue)
         {
             case "corridor_withDoor":
                 loopingBG.SwitchToNextBGOpen();
+                AudioHeadphone();
                 break;
 
             case "fox_appear":
+                PlayAnimation("Flash_White");
                 senpai.SetActive(true);
                 Debug.Log("學姊出現！");
                 Debug.Log("主角轉身");
@@ -23,6 +32,7 @@ public class Scene1Controller : MonoBehaviour, ISceneController
 
             case "player_turn":
                 Debug.Log("主角轉身");
+                PlayAnimation("Flash_Red");
                 FlipPlayer(true);
                 break;
 
@@ -31,7 +41,33 @@ public class Scene1Controller : MonoBehaviour, ISceneController
                 break;
         }
     }
-    
+    // 🔹 統一播放動畫函式
+    private void PlayAnimation(string clipName)
+    {
+        if (animCanva != null)
+        {
+            animCanva.Play(clipName, 0, 0f); // 從頭播放
+            Debug.Log("播放動畫: " + clipName);
+        }
+        else
+        {
+            Debug.LogWarning("animCanva 尚未設定：" + clipName);
+        }
+    }
+
+    private void AudioHeadphone()
+    {
+        if (audioSource != null && headphoneClip != null)
+        {
+            audioSource.PlayOneShot(headphoneClip);
+            Debug.Log("🎧 播放耳機音效");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ 耳機音效未設定或 AudioSource 為空");
+        }
+    }
+
     void FlipPlayer(bool faceLeft) //之後看要不要整理playerController裡
     {
         Vector3 scale = player.transform.localScale;
