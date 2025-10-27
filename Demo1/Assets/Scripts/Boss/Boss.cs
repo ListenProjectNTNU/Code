@@ -39,6 +39,11 @@ public class BossController : LivingEntity
     public float groundCheckRadius = 0.15f;
     public Transform groundCheck;
 
+    [Header("Teleport Trigger & Offset")]
+    public float teleportTriggerRangeX = 10f; // ✅ X軸距離小於這個就觸發瞬移/下砸
+    public float offsetAboveHead = 10.0f;      // ✅ 瞬移後 Boss 腳底 與 玩家頭頂 的距離（公尺）
+
+
     [Header("Misc")]
     [SerializeField] float hurtStun = 0.5f;
     [SerializeField] bool disableColliderOnDeath = true;
@@ -105,7 +110,7 @@ public class BossController : LivingEntity
         }
 
         // 攻擊判定（確認 OK 後想再加上 g 也行）
-        if (ax <= attackRangeX && cd /* && g */)
+        if (ax <= teleportTriggerRangeX && cd /* && g */)
         {
             StartCoroutine(Co_DropAttack());
         }
@@ -215,7 +220,7 @@ public class BossController : LivingEntity
         float bossHalfW = bossB.extents.x;
 
         // 理想「正上方」中心 Y：玩家頭頂 + 安全距離 + Boss 半高
-        float desiredCenterY = playerTopY + headClearance + bossHalfH;
+        float desiredCenterY = playerTopY + offsetAboveHead + bossHalfH;
 
         // 往上找天花板，把 Y 限制在天花板下方
         Vector2 upOrigin = new Vector2(player.position.x, playerTopY);
