@@ -48,6 +48,12 @@ public class BossController : LivingEntity
     [SerializeField] float hurtStun = 0.5f;
     [SerializeField] bool disableColliderOnDeath = true;
 
+    [Header("Death Settings")]
+    //public bool disableColliderOnDeath = true;
+    public float destroyDelay = 5f; // 動畫結束後銷毀時間
+
+    private bool isDying = false;
+
     // runtime
     public Rigidbody2D rb { get; private set; }
     Animator anim;
@@ -64,9 +70,10 @@ public class BossController : LivingEntity
     // 保存原始剛體限制，方便恢復
     RigidbodyConstraints2D originalConstraints;
 
+
     void Awake()
     {
-        rb  = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         col = GetComponent<Collider2D>();
 
@@ -76,6 +83,11 @@ public class BossController : LivingEntity
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
         originalConstraints = rb.constraints; // 例如通常會有 FreezeRotation
+    }
+    
+    protected override void Start()
+    {
+        base.Start();
     }
 
     void Update()
@@ -301,31 +313,76 @@ public class BossController : LivingEntity
             StartCoroutine(Co_HurtStagger());
     }
 
-    protected override void OnDeath()
+     // 攔截死亡流程
+    protected override void Die()
     {
-        if (isDead) return; // 防止多次進入
+        if (isDead || isDying) return;
+        isDying = true;
         isDead = true;
 
-        Debug.Log("Boss is dying"); // 先看看有沒有印出來
+        Debug.Log("[Boss] 進入 Die() 流程");
 
+        // 停止所有動作
         CancelInvoke();
         StopAllCoroutines();
 
         if (attackHitbox) attackHitbox.enabled = false;
-
-        rb.velocity = Vector2.zero;
-        rb.isKinematic = true;
+        if (rb)
+        {
+            rb.velocity = Vector2.zero;
+            rb.isKinematic = true;
+        }
 
         if (disableColliderOnDeath && col)
             col.enabled = false;
 
-        // 播放動畫
+        // 播死亡動畫
         if (anim)
         {
             anim.SetBool("IsDying", true);
-            anim.SetTrigger("DieTrigger"); // 加個觸發器保險
+            anim.SetTrigger("DieTrigger");
         }
+
+        // 廣播死亡事件（讓其他系統知道 Boss 死亡）
+        InvokeDeathEvent();
+
+        // ✅ 由 Boss 自行處理死亡後的邏輯（不讓 LivingEntity 直接 Destroy）
+        StartCoroutine(BossDeathSequence());
     }
+
+    private IEnumerator BossDeathSequence()
+    {
+        Debug.Log("[Boss] 播放死亡動畫中...");
+
+        // 等待動畫完成
+        float timeout = 6f;
+        while (anim && anim.GetCurrentAnimatorStateInfo(0).IsName("dying") &&
+               anim.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.99f &&
+               timeout > 0)
+        {
+            timeout -= Time.deltaTime;
+            yield return null;
+        }
+
+        Debug.Log("[Boss] 死亡動畫結束，執行死亡後事件...");
+
+        // 🟣 預留：開啟傳送門
+        // OpenPortal();
+
+        // 🟣 預留：觸發進入 battle_after 對話
+        // TriggerAfterBattleDialogue();
+
+        // 最後銷毀
+        Destroy(gameObject, 1f);
+    }
+
+    // 如果其他系統手動呼叫死亡，可重用邏輯
+    protected override void OnDeath()
+    {
+        // 空著，交給 BossDeathSequence 控制銷毀
+        Debug.Log("[Boss] OnDeath() 被呼叫，但邏輯交由 BossDeathSequence 控制");
+    }
+
 
 
     IEnumerator Co_HurtStagger()

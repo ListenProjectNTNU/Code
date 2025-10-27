@@ -18,7 +18,7 @@
 
 === battle_after ===
 // 播放耳機聲
-「很好……你可以回來了。」#speaker:耳機#portrait:default#layout:left
+「很好……你可以回來了。」#speaker:耳機#portrait:default#layout:left#scene:stop_all_for_headphone
 
 「現在你心中的焦慮暫時都被消除了，可以返回現實世界了。」#speaker:耳機#portrait:default#layout:left
 

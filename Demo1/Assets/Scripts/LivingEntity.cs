@@ -62,10 +62,17 @@ public class LivingEntity : MonoBehaviour
 
         OnDeath(); // 給子類覆寫
     }
-    
+
     // ✅ 改成 protected internal，保留原有功能但允許同 Assembly 類別存取（不報CS0122）
     protected virtual void OnDeath()
     {
         Destroy(gameObject);
     }
+    
+    // LivingEntity.cs 內新增這段
+    protected void InvokeDeathEvent()
+    {
+        OnDeathEvent?.Invoke(this);
+    }
+
 }
