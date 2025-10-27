@@ -49,7 +49,7 @@ public class BossController : LivingEntity
     [SerializeField] bool disableColliderOnDeath = true;
 
     // runtime
-    Rigidbody2D rb;
+    public Rigidbody2D rb { get; private set; }
     Animator anim;
     Collider2D col;
     float nextAttackTime;
@@ -303,6 +303,11 @@ public class BossController : LivingEntity
 
     protected override void OnDeath()
     {
+        if (isDead) return; // 防止多次進入
+        isDead = true;
+
+        Debug.Log("Boss is dying"); // 先看看有沒有印出來
+
         CancelInvoke();
         StopAllCoroutines();
 
@@ -310,10 +315,18 @@ public class BossController : LivingEntity
 
         rb.velocity = Vector2.zero;
         rb.isKinematic = true;
-        if (disableColliderOnDeath && col) col.enabled = false;
 
-        anim.SetBool("IsDying", true);
+        if (disableColliderOnDeath && col)
+            col.enabled = false;
+
+        // 播放動畫
+        if (anim)
+        {
+            anim.SetBool("IsDying", true);
+            anim.SetTrigger("DieTrigger"); // 加個觸發器保險
+        }
     }
+
 
     IEnumerator Co_HurtStagger()
     {

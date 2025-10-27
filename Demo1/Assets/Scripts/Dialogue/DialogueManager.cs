@@ -106,6 +106,7 @@ public class DialogueManager : MonoBehaviour
     // ================================
     public void EnterDialogueModeFromKnot(string knotName)
     {
+        Debug.Log("Enter Dialogue Mode From Knot："+knotName);
         if (inkJSON == null)
         {
             Debug.LogError("❌ Ink JSON 未指定");
@@ -113,18 +114,30 @@ public class DialogueManager : MonoBehaviour
         }
 
         if (playerController != null)
+        {
             playerController.enabled = false;
+            Debug.Log($"playerController enabled = {playerController.enabled}");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ playerController 未指定！");
+        }
+
 
         if (currentStory == null)
+        {
             currentStory = new Story(inkJSON.text);
-
+        }
+        
         currentStory.ChoosePathString(knotName);
 
         dialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
+        Debug.Log($"dialoguePanel active = {dialoguePanel.activeSelf}");
 
         if (currentSceneController != null)
             sceneController = currentSceneController.GetComponent<ISceneController>();
+            Debug.Log("Get ISceneController");
 
         UpdateInkVariables();
         continueStory();

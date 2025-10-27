@@ -13,6 +13,12 @@ public class Scene1Controller : MonoBehaviour, ISceneController
     public AudioSource audioSource; // 指定 AudioSource
     public AudioClip headphoneClip; // 🎧 耳機音效 (請在 Inspector 指定)
 
+    void Start()
+    {
+        Debug.Log("Scene1Controller 啟動，玩家狀態：" + (player != null ? player.activeInHierarchy.ToString() : "player為null"));
+    }
+
+
     public void HandleTag(string tagValue)
     {
         switch (tagValue)
@@ -32,12 +38,20 @@ public class Scene1Controller : MonoBehaviour, ISceneController
 
             case "player_turn":
                 Debug.Log("主角轉身");
-                PlayAnimation("Flash_Red");
                 FlipPlayer(true);
                 break;
 
             case "player_turnBack":
                 FlipPlayer(false); // 主角轉回右邊
+                 PlayAnimation("Flash_Red");
+                break;
+
+            case "ClassRoom_Start":
+                PlayAnimation("ClassRoom_Start");
+                break;
+            
+            case "ClassRoom_End":
+                PlayAnimation("ClassRoom_End");
                 break;
         }
     }

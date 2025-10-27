@@ -16,10 +16,10 @@
 「我……我……這就進去！」（臉紅，吱吱嗚嗚地說）#speaker:家豪#portrait:default#layout:right#scene:player_turnBack
 
 //動畫：畫面切到滿人教室PNG  音效：人群吵雜聲
-（看向教室內，教室內，每張桌子都坐滿了人，大家有說有笑地聊著天。主角感到無地自容，視線開始因為緊張而模糊。） #speaker:家豪#portrait:default#layout:left#scene:classRoom_Start
+（看向教室內，教室內，每張桌子都坐滿了人，大家有說有笑地聊著天。主角感到無地自容，視線開始因為緊張而模糊。） #speaker:家豪#portrait:default#layout:left#scene:ClassRoom_Start
 
 //動畫閃白後回到在走廊的場景，並且身後出現學姊(啟動FOX物件) 關掉剛剛的音效
-「嘿！剛剛的新生！」（突然，學姊的聲音再次響起—— ）#speaker:學姊#portrait:default#layout:left
+「嘿！剛剛的新生！」（突然，學姊的聲音再次響起—— ）#speaker:學姊#portrait:default#layout:left#scene:ClassRoom_End
 
 //動畫閃紅
 （對上學姊燦爛的笑容，臉上的血液再次沸騰） #speaker:家豪#portrait:default#layout:left
