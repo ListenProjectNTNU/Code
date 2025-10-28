@@ -1048,6 +1048,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2014214520}
     - target: {fileID: 684712999851689412, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: dialogueTriggerCollider
+      value: 
+      objectReference: {fileID: 2014214519}
+    - target: {fileID: 684712999851689412, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
       propertyPath: onEnemiesEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1278115554}
@@ -1177,7 +1181,7 @@ MonoBehaviour:
   boss: {fileID: 1840781540}
   player: {fileID: 621703902}
   cameraController: {fileID: 1427279318}
-  battleDoor: {fileID: 0}
+  battleDoor: {fileID: 2014214518}
   audioSource: {fileID: 910141066}
   bossAwakenClip: {fileID: 8300000, guid: 7f58d97922f36da4eb76f5249dd7bbb2, type: 3}
   headphoneClip: {fileID: 8300000, guid: 298b8a87374908643bb750dba3c897a3, type: 3}
@@ -2194,6 +2198,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 58.30183, y: 121.56632}
   m_EdgeRadius: 0
+--- !u!114 &2014214518 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 684712999851689412, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+  m_PrefabInstance: {fileID: 957423056}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acf4de96604c5ca4f9cc3c260d5e3ae9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!61 &2014214519 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 4066041342388023915, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+  m_PrefabInstance: {fileID: 957423056}
+  m_PrefabAsset: {fileID: 0}
 --- !u!212 &2014214520 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 4782728039617725909, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
