@@ -48,7 +48,7 @@ public class Scene4Controller : MonoBehaviour, ISceneController
 
             case "player_turnBack":
                 FlipPlayer(false); // 主角轉回右邊
-                 PlayAnimation("Flash_Red");
+                PlayAnimation("Flash_Red");
                 break;
 
             case "ClassRoom_Start":
@@ -57,6 +57,7 @@ public class Scene4Controller : MonoBehaviour, ISceneController
             
             case "ClassRoom_End":
                 PlayAnimation("ClassRoom_End");
+                FlipPlayer(true);
                 break;
         }
     }

@@ -1107,10 +1107,10 @@ MonoBehaviour:
   onEnemiesEnd:
     m_PersistentCalls:
       m_Calls: []
+  doorSprite: {fileID: 0}
   linkedLoopingBG: {fileID: 0}
   isDialogueDoor: 1
   dialogueTriggerCollider: {fileID: 510815959}
-  sceneController: {fileID: 1136963149}
 --- !u!1 &516848595
 GameObject:
   m_ObjectHideFlags: 0
@@ -1148,6 +1148,63 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8368457379302285226, guid: ccebf93433070784bb4a00b28ef73685, type: 3}
   m_PrefabInstance: {fileID: 1691505366}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &563507586
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2374475020892128563, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 12.920093
+      objectReference: {fileID: 0}
+    - target: {fileID: 2374475020892128563, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.1755362
+      objectReference: {fileID: 0}
+    - target: {fileID: 2374475020892128563, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.786621
+      objectReference: {fileID: 0}
+    - target: {fileID: 2374475020892128563, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2374475020892128563, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2374475020892128563, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2374475020892128563, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2374475020892128563, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2374475020892128563, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2374475020892128563, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8423287562024460515, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
+      propertyPath: m_Name
+      value: Global Volume
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3738073d92fe47942bc1dc1de9876218, type: 3}
 --- !u!1 &620091813
 GameObject:
   m_ObjectHideFlags: 0
@@ -3435,17 +3492,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0f115577d4b1fa44a3e12c1d0f92a45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1136963149 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3662916400042267423, guid: ec6087b620debe04093b594023afd197, type: 3}
-  m_PrefabInstance: {fileID: 1694341890}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c198e4fdfe356a40a3c482c540efab6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1201693463
@@ -20275,6 +20321,7 @@ GameObject:
   - component: {fileID: 1427279315}
   - component: {fileID: 1427279318}
   - component: {fileID: 1427279319}
+  - component: {fileID: 1427279320}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -20369,6 +20416,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1033568822}
+  smoothSpeed: 5
 --- !u!114 &1427279319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20403,6 +20451,50 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1427279320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1427279314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 1
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    quality: 3
+    frameInfluence: 0.1
+    jitterScale: 1
+    mipBias: 0
+    varianceClampScale: 0.9
+    contrastAdaptiveSharpening: 0
 --- !u!114 &1444251419 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2445089442856330475, guid: ec6087b620debe04093b594023afd197, type: 3}
@@ -21482,6 +21574,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rabbit
       objectReference: {fileID: 0}
+    - target: {fileID: 2099502239724729690, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 27.7
+      objectReference: {fileID: 0}
     - target: {fileID: 2923893116272935182, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: attackRange
       value: 2.71
@@ -21494,9 +21590,17 @@ PrefabInstance:
       propertyPath: jumpForce
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 3404438834110319434, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 27.7
+      objectReference: {fileID: 0}
     - target: {fileID: 3555466454340382072, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: m_UiScaleMode
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5369804242689471369, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 27.7
       objectReference: {fileID: 0}
     - target: {fileID: 6026982861198479447, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -21672,10 +21776,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  doorSprite: {fileID: 0}
   linkedLoopingBG: {fileID: 0}
   isDialogueDoor: 0
   dialogueTriggerCollider: {fileID: 0}
-  sceneController: {fileID: 0}
 --- !u!4 &8694858001396172679 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7122190953397357499, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
@@ -21700,3 +21804,4 @@ SceneRoots:
   - {fileID: 727116814}
   - {fileID: 765392901}
   - {fileID: 516848596}
+  - {fileID: 563507586}

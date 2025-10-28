@@ -13,7 +13,7 @@
 
 （轉過頭，一位笑得燦爛的學姊正站在他身後） #speaker:家豪#portrait:default#layout:left#scene:fox_appear
 
-「我……我……這就進去！」（臉紅，吱吱嗚嗚地說）#speaker:家豪#portrait:default#layout:right#scene:player_turnBack
+「我……我……這就進去！」#speaker:家豪#portrait:default#layout:right#scene:player_turnBack
 
 //動畫：畫面切到滿人教室PNG  音效：人群吵雜聲
 （看向教室內，教室內，每張桌子都坐滿了人，大家有說有笑地聊著天。主角感到無地自容，視線開始因為緊張而模糊。） #speaker:家豪#portrait:default#layout:left#scene:ClassRoom_Start
@@ -27,7 +27,7 @@
 「我剛剛對了名單，你是最後一個到的人，我是你新訓期間的隊輔。」 #speaker:學姊#portrait:default#layout:left
 
 //動畫忽明忽暗+雜訊 音效：耳鳴
-（聽著學姊的話語，視線越來越模糊，開始忽明忽暗——） #speaker:家豪#portrait:default#layout:left
+（聽著學姊的話語，視線越來越模糊，開始忽明忽暗——） #speaker:家豪#portrait:default#layout:left#scene:fade_out
 
 //切換到第二場景 關掉耳鳴
 （再度睜眼時，主角已經不在教室內，眼前的學姊也變成了不可名狀的生物……） #speaker:家豪#portrait:default#layout:left

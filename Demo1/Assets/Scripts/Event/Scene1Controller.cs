@@ -1,5 +1,7 @@
 using UnityEngine;
-
+using UnityEngine.Rendering; 
+using UnityEngine.Rendering.Universal; 
+using UnityEngine.Rendering.PostProcessing;
 public class Scene1Controller : MonoBehaviour, ISceneController
 {
     public LoopingBackground loopingBG;
@@ -9,6 +11,10 @@ public class Scene1Controller : MonoBehaviour, ISceneController
     [Header("動畫 Canvas")]
     public Animator animCanva;  // 直接拖 AnimCanva 的 Animator
 
+    [Header("全域 Volume 控制")]
+    public GlobalVolumeController globalVolume; 
+
+
     [Header("Audio Settings")]
     public AudioSource audioSource; // 指定 AudioSource
     public AudioClip headphoneClip; // 🎧 耳機音效 (請在 Inspector 指定)
@@ -16,6 +22,12 @@ public class Scene1Controller : MonoBehaviour, ISceneController
     void Start()
     {
         Debug.Log("Scene1Controller 啟動，玩家狀態：" + (player != null ? player.activeInHierarchy.ToString() : "player為null"));
+        
+        // 確保 Volume 組件已經賦值
+        if (globalVolume != null)
+        {
+            Debug.Log("成功存取 Global Volume。");
+        }
     }
 
 
@@ -29,7 +41,7 @@ public class Scene1Controller : MonoBehaviour, ISceneController
                 break;
 
             case "fox_appear":
-                PlayAnimation("Flash_White");
+                globalVolume.FlashWhite();
                 senpai.SetActive(true);
                 Debug.Log("學姊出現！");
                 Debug.Log("主角轉身");
@@ -38,20 +50,27 @@ public class Scene1Controller : MonoBehaviour, ISceneController
 
             case "player_turn":
                 Debug.Log("主角轉身");
-                FlipPlayer(true);
+                
                 break;
 
             case "player_turnBack":
                 FlipPlayer(false); // 主角轉回右邊
-                 PlayAnimation("Flash_Red");
+                globalVolume?.FlashRed();
                 break;
 
             case "ClassRoom_Start":
                 PlayAnimation("ClassRoom_Start");
+                globalVolume?.ClassRoom_Start();
                 break;
             
             case "ClassRoom_End":
                 PlayAnimation("ClassRoom_End");
+                FlipPlayer(true);
+                globalVolume?.FlashRed();
+                break;
+
+            case "fade_out":
+                globalVolume?.Fade_Out();
                 break;
         }
     }
