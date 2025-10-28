@@ -528,7 +528,7 @@ MonoBehaviour:
   enemyLayers:
     serializedVersion: 2
     m_Bits: 128
-  attackDamage: 111
+  attackDamage: 20
   knockbackForce: 5
 --- !u!114 &4781995476166064621
 MonoBehaviour:
@@ -864,7 +864,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 128.6656, y: 13.725052}
+  m_AnchoredPosition: {x: 128.66559, y: 13.725037}
   m_SizeDelta: {x: 257.33118, y: 27.450104}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &662883884055599725
@@ -939,7 +939,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 128.6656, y: 13.725052}
+  m_AnchoredPosition: {x: 128.66559, y: 13.725037}
   m_SizeDelta: {x: 257.33118, y: 27.450104}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &244280253599356977
@@ -1014,7 +1014,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 128.6656, y: 13.725052}
+  m_AnchoredPosition: {x: 128.66559, y: 13.725037}
   m_SizeDelta: {x: 257.33118, y: 27.450104}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6072256959508901273
