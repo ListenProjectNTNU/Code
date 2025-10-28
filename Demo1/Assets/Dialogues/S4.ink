@@ -31,7 +31,5 @@
 
 （家豪低頭看著自己的手，手上似乎還殘留著微弱的光。）#speaker:家豪#portrait:default#layout:left
 
-（他抬起頭，望著前方的陽光。畫面逐漸過曝，耳機中傳來微弱的電子噪音。）#speaker:家豪#portrait:default#layout:left
-
 // === 結尾 ===
 -> END

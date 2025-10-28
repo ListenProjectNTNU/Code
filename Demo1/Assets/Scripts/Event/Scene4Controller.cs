@@ -15,6 +15,13 @@ public class Scene4Controller : MonoBehaviour, ISceneController
     void Start()
     {
         Debug.Log("Scene1Controller 啟動，玩家狀態：" + (player != null ? player.activeInHierarchy.ToString() : "player為null"));
+
+        // **修改點：禁用整個 Canvas 物件**
+        if (animCanva != null)
+        {
+            // 取得 Animator 所在的 GameObject 並禁用它
+            animCanva.gameObject.SetActive(false); 
+        }
     }
 
 
@@ -64,6 +71,18 @@ public class Scene4Controller : MonoBehaviour, ISceneController
         else
         {
             Debug.LogWarning("animCanva 尚未設定：" + clipName);
+        }
+    }
+    
+   public void PlayEndAnimation()
+    {
+        if(animCanva != null)
+        {
+            // **修改點：啟用整個 Canvas 物件**
+            animCanva.gameObject.SetActive(true); // 必須先啟用物件才能播放動畫
+            animCanva.Play("theEnd_Start"); 
+            
+            Debug.Log("播放動畫: theEnd_Start");
         }
     }
 
