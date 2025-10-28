@@ -6,6 +6,7 @@ public class DoorTrigger : MonoBehaviour
     // 🔹原功能：敵人清空後才可進入門
     [Header("戰鬥門用呼叫LevelLoader")]
     public UnityEvent onEnemiesEnd;
+    public SpriteRenderer doorSprite; // 👈 指向門的SpriteRenderer
 
     // 🔹新增：可選的 LoopingBackground（非戰鬥型門使用）
     [Header("可選：連動的 LoopingBackground（非戰鬥門用）")]
@@ -20,6 +21,10 @@ public class DoorTrigger : MonoBehaviour
 
     private void Start()
     {
+        // 預設先關閉門顯示
+        if (doorSprite != null)
+            doorSprite.enabled = false;
+        
         // 🧠 自動尋找場景中的 ISceneController 實例（例如 S1C、S2C、S3C）
         if (sceneController == null)
         {
@@ -28,6 +33,16 @@ public class DoorTrigger : MonoBehaviour
                 Debug.Log("✅ 自動找到場景控制器：" + sceneController.GetType().Name);
             else
                 Debug.LogWarning("⚠️ 場景中找不到任何 ISceneController 實作，對話門將無法運作。");
+        }
+    }
+
+    // ✅ 由 SceneController 主動呼叫這個方法
+    public void ActivateDoor()
+    {
+        if (doorSprite != null)
+        {
+            doorSprite.enabled = true;
+            Debug.Log("🚪 門已啟動並顯示。");
         }
     }
 

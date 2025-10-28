@@ -1041,23 +1041,75 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 684712999851689412, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 684712999851689412, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: doorSprite
+      value: 
+      objectReference: {fileID: 2014214520}
     - target: {fileID: 684712999851689412, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
       propertyPath: onEnemiesEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1278115554}
+    - target: {fileID: 4066041342388023915, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_Size.y
+      value: 11.454805
+      objectReference: {fileID: 0}
+    - target: {fileID: 4066041342388023915, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4066041342388023915, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.20442295
+      objectReference: {fileID: 0}
+    - target: {fileID: 4066041342388023915, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 15.360001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4066041342388023915, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 11.9475
+      objectReference: {fileID: 0}
+    - target: {fileID: 4782728039617725909, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 3143c8e243955e146a82e26f770ee653, type: 3}
+    - target: {fileID: 4782728039617725909, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4782728039617725909, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4782728039617725909, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_SortingLayer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4782728039617725909, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4782728039617725909, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1609922355
+      objectReference: {fileID: 0}
     - target: {fileID: 6969858734063014392, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
       propertyPath: targetSceneName
       value: ReFirstScene
       objectReference: {fileID: 0}
     - target: {fileID: 7122190953397357499, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7122190953397357499, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 38
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7122190953397357499, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -9.9
+      value: -4.5
       objectReference: {fileID: 0}
     - target: {fileID: 7122190953397357499, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1125,8 +1177,10 @@ MonoBehaviour:
   boss: {fileID: 1840781540}
   player: {fileID: 621703902}
   cameraController: {fileID: 1427279318}
+  battleDoor: {fileID: 0}
   audioSource: {fileID: 910141066}
   bossAwakenClip: {fileID: 8300000, guid: 7f58d97922f36da4eb76f5249dd7bbb2, type: 3}
+  headphoneClip: {fileID: 8300000, guid: 298b8a87374908643bb750dba3c897a3, type: 3}
   inkJSON: {fileID: 4900000, guid: a03e21827e781474e9c9b3cd0e590be1, type: 3}
   knotBattleBefore: battle_before
   knotBattleAfter: battle_after
@@ -1926,7 +1980,7 @@ GameObject:
   - component: {fileID: 1840781542}
   m_Layer: 7
   m_Name: boss
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2067,6 +2121,7 @@ MonoBehaviour:
   offsetAboveHead: 2
   hurtStun: 0.5
   disableColliderOnDeath: 1
+  destroyDelay: 5
 --- !u!50 &1840781541
 Rigidbody2D:
   serializedVersion: 4
@@ -2139,6 +2194,11 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 58.30183, y: 121.56632}
   m_EdgeRadius: 0
+--- !u!212 &2014214520 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 4782728039617725909, guid: 99f80e5c6637ea14291abb6ded2d5a55, type: 3}
+  m_PrefabInstance: {fileID: 957423056}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2037464812 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4397298383811543057, guid: 3a3f9ac3aa5c5de4bab8768391ac7ee1, type: 3}

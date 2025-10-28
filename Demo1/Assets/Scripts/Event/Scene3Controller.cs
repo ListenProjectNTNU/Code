@@ -6,6 +6,7 @@ public class Scene3Controller : MonoBehaviour, ISceneController
     public BossController boss;
     public Transform player;
     public CameraController cameraController; // 指定 Inspector
+    [SerializeField] private DoorTrigger battleDoor;
 
     [Header("Audio")]
     public AudioSource audioSource;
@@ -70,6 +71,7 @@ public class Scene3Controller : MonoBehaviour, ISceneController
                 break;
             case "stop_all_for_headphone":
                 StopAllAudioForHeadphone();
+                CheckBattleEnd();
                 break;
         }
     }
@@ -106,7 +108,7 @@ public class Scene3Controller : MonoBehaviour, ISceneController
             Debug.LogWarning("⚠️ 耳機音效未設定或 AudioSource 為空");
         }
     }
-    
+
     // 可以在未來 trigger 傳送門時呼叫
     public void TriggerPortalDialogue()
     {
@@ -114,5 +116,9 @@ public class Scene3Controller : MonoBehaviour, ISceneController
         {
             //dialogueManager.EnterDialogueModeFromKnot(knotBeforePortal);
         }
+    }
+    private void CheckBattleEnd()
+    {
+        battleDoor.ActivateDoor(); // ✅ 直接開啟門
     }
 }
