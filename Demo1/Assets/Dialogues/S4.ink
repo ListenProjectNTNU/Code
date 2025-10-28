@@ -5,23 +5,23 @@
 「喂？你怎麼站著不動？趕快進教室吧～」#speaker:學姊#portrait:default#layout:left#scene:"player_turn"
 
 
-（家豪緩緩摘下耳機，看著前方的人群。）#speaker:家豪#portrait:default#layout:left
+（家豪緩緩摘下耳機，看著學姊。）#speaker:家豪#portrait:default#layout:left#scene:SetBlur
 
 // === 選項 ===
 
 *[「嗯……我馬上來。」]#speaker:家豪#portrait:default#layout:left
 
-「好啦，別再發呆了～」#speaker:學姊#portrait:default#layout:left
+「好啦，別再發呆了～」#speaker:學姊#portrait:default#layout:left#scene:ResetBlur
 ->After_Questions
 
 *[「剛剛……有點恍神。」]#speaker:家豪#portrait:default#layout:left
 
-「哈，第一天就緊張成這樣？」#speaker:學姊#portrait:default#layout:left
+「哈，第一天就緊張成這樣？」#speaker:學姊#portrait:default#layout:left#scene:ResetBlur
 ->After_Questions
 
 *[「……妳有聽到剛剛的聲音嗎？」]#speaker:家豪#portrait:default#layout:left
 
-「聲音？你該不會在開玩笑吧？」#speaker:學姊#portrait:default#layout:left
+「聲音？你該不會在開玩笑吧？」#speaker:學姊#portrait:default#layout:left#scene:ResetBlur
 ->After_Questions
 
  === After_Questions ===

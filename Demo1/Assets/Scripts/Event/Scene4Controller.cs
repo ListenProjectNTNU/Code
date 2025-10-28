@@ -8,6 +8,9 @@ public class Scene4Controller : MonoBehaviour, ISceneController
     [Header("動畫 Canvas")]
     public Animator animCanva;  // 直接拖 AnimCanva 的 Animator
 
+     [Header("全域 Volume 控制")]
+    public GlobalVolumeController globalVolume; 
+
     [Header("Audio Settings")]
     public AudioSource audioSource; // 指定 AudioSource
     public AudioClip headphoneClip; // 🎧 耳機音效 (請在 Inspector 指定)
@@ -15,6 +18,7 @@ public class Scene4Controller : MonoBehaviour, ISceneController
     void Start()
     {
         Debug.Log("Scene1Controller 啟動，玩家狀態：" + (player != null ? player.activeInHierarchy.ToString() : "player為null"));
+        globalVolume.ResetVignette();
 
         // **修改點：禁用整個 Canvas 物件**
         if (animCanva != null)
@@ -51,13 +55,12 @@ public class Scene4Controller : MonoBehaviour, ISceneController
                 PlayAnimation("Flash_Red");
                 break;
 
-            case "ClassRoom_Start":
-                PlayAnimation("ClassRoom_Start");
+            case "SetBlur":
+                globalVolume.SetBlur();
                 break;
-            
-            case "ClassRoom_End":
-                PlayAnimation("ClassRoom_End");
-                FlipPlayer(true);
+
+            case "ResetBlur":
+                globalVolume.ResetBlur();
                 break;
         }
     }

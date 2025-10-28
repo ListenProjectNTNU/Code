@@ -12,6 +12,7 @@ public class GlobalVolumeController : MonoBehaviour
     private PaniniProjection panini;
     private DepthOfField depthOfField;
     private FilmGrain filmGrain;
+    private Vignette vignette;
 
     void Awake()
     {
@@ -21,6 +22,7 @@ public class GlobalVolumeController : MonoBehaviour
         volume.profile.TryGet(out colorAdjustments);
         volume.profile.TryGet(out depthOfField);
         volume.profile.TryGet(out filmGrain);
+        volume.profile.TryGet(out vignette);
 
 
 
@@ -31,6 +33,60 @@ public class GlobalVolumeController : MonoBehaviour
         else
         {
             Debug.LogWarning("⚠️ 無法取得 Bloom 組件，請確認 Volume Profile 內有加入 Bloom");
+        }
+    }
+
+    public void SetVignette()
+    {
+        if (vignette != null)
+        {
+            vignette.intensity.value = 0.4f;
+            Debug.Log("🎯 SetVignette(): Vignette 強度設定為 0.4");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ 尚未抓到 Vignette 組件！");
+        }
+    }
+
+    // 🌤️ 回到一般場景時重置暗角
+    public void ResetVignette()
+    {
+        if (vignette != null)
+        {
+            vignette.intensity.value = 0f;
+            Debug.Log("🌤️ ResetVignette(): Vignette 強度歸零");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ 尚未抓到 Vignette 組件！");
+        }
+    }
+
+    public void SetBlur()
+    {
+        if (depthOfField != null)
+        {
+            depthOfField.focalLength.value = 128f;
+            Debug.Log("🎯 SetBlur(): focalLength 強度設定為 128");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ 尚未抓到 depthOfField 組件！");
+        }
+    }
+
+    // 🌤️ 回到一般場景時重置暗角
+    public void ResetBlur()
+    {
+        if (depthOfField != null)
+        {
+            depthOfField.focalLength.value = 0f;
+            Debug.Log("🌤️ ResetBlur(): focalLength 強度設定為 128");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ 尚未抓到 depthOfField 組件！");
         }
     }
 
@@ -109,6 +165,34 @@ public class GlobalVolumeController : MonoBehaviour
 
         StopAllCoroutines(); // 避免與其他特效重疊
         StartCoroutine(Fade_OutRoutine());
+    }
+
+public void Fade_In()
+    {
+        if (!volume.profile.TryGet(out chroma))
+        {
+            Debug.LogWarning("⚠️ Volume 中沒有 ChromaticAberration 組件，Fade_Out 無效");
+            return;
+        }
+
+        if (!volume.profile.TryGet(out panini))
+        {
+            Debug.LogWarning("⚠️ Volume 中沒有 PaniniProjection 組件，Fade_Out 無效");
+            return;
+        }
+        if (!volume.profile.TryGet(out depthOfField))
+        {
+            Debug.LogWarning("⚠️ Volume 中沒有 depthOfField 組件，Fade_Out 無效");
+            return;
+        }
+        if (!volume.profile.TryGet(out filmGrain))
+        {
+            Debug.LogWarning("⚠️ Volume 中沒有 filmGrain 組件，Fade_Out 無效");
+            return;
+        }
+
+        StopAllCoroutines(); // 避免與其他特效重疊
+        StartCoroutine(Fade_InRoutine());
     }
     private IEnumerator FlashWhiteRoutine()
     {
@@ -298,4 +382,56 @@ public class GlobalVolumeController : MonoBehaviour
             yield return null;
         }
     }
+
+    IEnumerator Fade_InRoutine()
+    {
+        // --- 取得初始值 ---
+        float chromaStart = chroma.intensity.value;
+        float dofStart = depthOfField.focalLength.value;
+        float grainIntensityStart = filmGrain.intensity.value;
+        float grainResponseStart = filmGrain.response.value;
+        float paniniDistanceStart = panini.distance.value;
+
+        // --- 目標值 ---
+        float chromaTarget = 0f;
+        float dofTarget = 0f;
+        float grainIntensityTarget = 0f;
+        float grainResponseTarget = 1f;
+        float paniniTarget = 0f;
+
+        // --- 時間設定 ---
+        float chromaDuration = 3f; // Chromatic Aberration 花3秒
+        float othersDuration = 2f; // 其他花2秒
+        float t = 0f;
+
+        while (t < chromaDuration)
+        {
+            t += Time.deltaTime;
+            float lerpChroma = Mathf.Clamp01(t / chromaDuration);
+            float lerpOthers = Mathf.Clamp01(t / othersDuration);
+
+            // Chromatic Aberration 從 1 → 0
+            chroma.intensity.value = Mathf.Lerp(chromaStart, chromaTarget, lerpChroma);
+
+            // Depth of Field 從 126 → 0
+            depthOfField.focalLength.value = Mathf.Lerp(dofStart, dofTarget, lerpOthers);
+
+            // Film Grain 從 (1,0) → (0,1)
+            filmGrain.intensity.value = Mathf.Lerp(grainIntensityStart, grainIntensityTarget, lerpOthers);
+            filmGrain.response.value = Mathf.Lerp(grainResponseStart, grainResponseTarget, lerpOthers);
+
+            // Panini Projection 從 0 → 0.5
+            panini.distance.value = Mathf.Lerp(paniniDistanceStart, paniniTarget, lerpOthers);
+
+            yield return null;
+        }
+
+        // --- 確保最後值準確 ---
+        chroma.intensity.value = chromaTarget;
+        depthOfField.focalLength.value = dofTarget;
+        filmGrain.intensity.value = grainIntensityTarget;
+        filmGrain.response.value = grainResponseTarget;
+        panini.distance.value = paniniTarget;
+    }
+
 }

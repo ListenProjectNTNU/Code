@@ -30,8 +30,12 @@ public class Scene2Controller : MonoBehaviour, ISceneController
 
     private enemy_cow monsterScript;
 
+    [Header("全域 Volume 控制")]
+    public GlobalVolumeController globalVolume; 
+
     private void Start()
     {
+        globalVolume.SetVignette();
         // 🔹 取得怪物腳本，初始化 SC 控制
         monsterScript = monster.GetComponent<enemy_cow>();
         if (monsterScript != null)
@@ -72,6 +76,9 @@ public class Scene2Controller : MonoBehaviour, ISceneController
     {
         switch (tagValue)
         {
+            case "Fade_In":
+                globalVolume.Fade_In();
+                break;
             case "monster_whisper":
                 PlaySceneAudio(tagValue);
                 break;

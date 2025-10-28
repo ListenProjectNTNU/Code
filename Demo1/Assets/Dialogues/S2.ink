@@ -3,7 +3,7 @@
 // ====================================
 
 === battle_before ===
-「！！！！！！」 #speaker:家豪#portrait:default#layout:left
+「！！！！！！」 #speaker:家豪#portrait:default#layout:left#scene:Fade_In
 
 （怪物嘴裡發出細小的呢喃聲，令人不適。） #speaker:家豪#portrait:default#layout:left#scene:monster_whisper
 

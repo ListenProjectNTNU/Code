@@ -39,6 +39,8 @@ public class DialogueManager : MonoBehaviour
     [Header("Ink JSON")]
     public TextAsset inkJSON;
 
+    private GlobalVolumeController globalVolumeController;
+
     private void Awake()
     {
         if (instance != null)
@@ -128,7 +130,7 @@ public class DialogueManager : MonoBehaviour
         {
             currentStory = new Story(inkJSON.text);
         }
-        
+
         currentStory.ChoosePathString(knotName);
 
         dialogueIsPlaying = true;
@@ -255,5 +257,6 @@ public class DialogueManager : MonoBehaviour
     {
         currentStory.ChooseChoiceIndex(choiceIndex);
         continueStory();
+        globalVolumeController.SetBlur();
     }
 }

@@ -22,6 +22,7 @@ public class Scene1Controller : MonoBehaviour, ISceneController
     void Start()
     {
         Debug.Log("Scene1Controller 啟動，玩家狀態：" + (player != null ? player.activeInHierarchy.ToString() : "player為null"));
+        globalVolume.ResetVignette();
         
         // 確保 Volume 組件已經賦值
         if (globalVolume != null)

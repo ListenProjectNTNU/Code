@@ -21,10 +21,15 @@ public class Scene3Controller : MonoBehaviour, ISceneController
 
     private DialogueManager dialogueManager;
 
+     [Header("全域 Volume 控制")]
+    public GlobalVolumeController globalVolume; 
+
     private void Start()
     {
         dialogueManager = DialogueManager.GetInstance();
         if (dialogueManager == null) return;
+
+        globalVolume.SetVignette();
 
         if (boss != null)
         {
