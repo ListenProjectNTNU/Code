@@ -3,96 +3,134 @@ using UnityEngine;
 
 public class enemy_cow : LivingEntity, IDataPersistence
 {
+    [Header("Patrol")]
     [SerializeField] private Transform leftPoint;
-    [SerializeField] private Transform rightPoint;  
+    [SerializeField] private Transform rightPoint;
+    [SerializeField] private float fallbackPatrolHalfWidth = 2f; // 若沒指定巡邏點，給預設寬度
+    private float leftCap;
+    private float rightCap;
+
+    [Header("IDs & Layers")]
     [SerializeField] private string enemyID = "cow1";
-    private Quaternion fixedRotation;
     public LayerMask ground;
-    public float edgeCheckDistance = 1f;
-    
+
+    [Header("Combat")]
+    public Transform player;                 // ← 可能未指派，已做自動抓取與防護
+    public Vector3 attackOffset;
+    public LayerMask attackMask;
+    public float attackRange = 3f;
+    public float attackCooldown = 10f;       // 建議 ≥ 攻擊動畫時長
+    private float nextAttackTime = 0f;
+
+    [Header("Chase")]
+    public float chaseRange = 6f;
+    public float stopChaseRange = 10f;
+
+    [Header("SC Control")]
+    public bool isActive = true;             // 非自由模式控制用
+    public bool controlledBySC = false;      // 是否由 SceneController 控制
+    private bool canMove = true;             // SC 控制的移動開關
+
+    [Header("Misc")]
+    public GameObject hitbox;
+
+    private Quaternion fixedRotation;
     private bool facingLeft = true;
     private Collider2D coll;
     private Rigidbody2D rb;
     private Animator anim;
-    public GameObject hitbox;
+    private Vector3 originalScale;
 
     private enum State { idle, attack, hurt, dying, run };
     private State state = State.idle;
-    private Vector3 originalScale;
-    private float leftCap;
-    private float rightCap;
 
-    public Transform player;  
-    public Vector3 attackOffset;
-    public LayerMask attackMask;
-    public float attackRange = 3f;  
-    public float attackCooldown = 10f;   // ⚡ 建議設 ≥ 攻擊動畫時長
-    private float nextAttackTime = 0f;  
-    public float chaseRange = 6f;
-    public float stopChaseRange = 10f;
     private bool isChasing = false;
-
-    // ⚡ 攻擊鎖定
     private bool isAttacking = false;
     private bool hasDealtDamage = false;
 
-    [Header("非自由模式控制用")]
-    public bool isActive = true;
-
-    // 🔹 新增：SceneController 控制相關
-    [Header("SceneController 控制")]
-    public bool controlledBySC = false; // 是否由 SC 控制
-    private bool canMove = true;         // SC 控制的移動開關
-
     [Header("Loot")]
-    private bool lootDropped = false; // ✅ 防止重複掉落
+    private bool lootDropped = false; // 防止重複掉落
 
-    // 🔹 SC 控制用介面
+    // ───────────── 新增：Awake 先嘗試抓 Player，避免一開始未指派 ─────────────
+    private void Awake()
+    {
+        if (!player)
+        {
+            var go = GameObject.FindGameObjectWithTag("Player");
+            if (go) player = go.transform;
+        }
+    }
+
     public void SetCanMove(bool value)
     {
         canMove = value;
         if (!canMove)
         {
-            rb.velocity = Vector2.zero;
-            anim.SetInteger("state", (int)State.idle);
+            if (rb) rb.velocity = Vector2.zero;
+            if (anim) anim.SetInteger("state", (int)State.idle);
         }
     }
 
     protected override void Start()
     {
         base.Start(); // LivingEntity 初始化血量
+
         fixedRotation = transform.rotation;
         coll = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         originalScale = transform.localScale;
-        leftCap = leftPoint.position.x;
-        rightCap = rightPoint.position.x;
+
+        // ───────────── 安全計算巡邏邊界 ─────────────
+        if (leftPoint && rightPoint)
+        {
+            leftCap = leftPoint.position.x;
+            rightCap = rightPoint.position.x;
+        }
+        else
+        {
+            // 若沒指定，給個以自身為中心的預設巡邏範圍
+            leftCap = transform.position.x - Mathf.Abs(fallbackPatrolHalfWidth);
+            rightCap = transform.position.x + Mathf.Abs(fallbackPatrolHalfWidth);
+            Debug.LogWarning($"[enemy_cow] 未指定 leftPoint/rightPoint，使用預設巡邏範圍 [{leftCap:F2}, {rightCap:F2}]。");
+        }
+
         if (hitbox != null) hitbox.SetActive(false);
     }
 
     private void Update()
     {
+        // 固定轉向避免受物理/動畫影響
         transform.rotation = fixedRotation;
         if (isDead) return;
 
         anim.SetInteger("state", (int)state);
-        AnimationState(); // ✅ 始終呼叫 AnimationState，讓巡邏、移動判斷正常
+        AnimationState(); // 讓巡邏、移動判斷正常
 
-        // 🔹 SC 控制：若由 SC 控制且暫停移動，就不做追擊攻擊判斷
+        // SC 控制：若暫停移動，就不做追擊攻擊判斷
         if (controlledBySC && !canMove) return;
 
-        // 以下只在 SC 控制的敵人上運作
         if (!isActive) return;
+
+        // ───────────── 重要：player 空值防護 ─────────────
+        if (!player)
+        {
+            // 再嘗試一次以防場景剛生成
+            var go = GameObject.FindGameObjectWithTag("Player");
+            if (go) player = go.transform;
+
+            if (!player) return; // 找不到就先不要做後續邏輯
+        }
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
         CheckAttack(distanceToPlayer);
     }
 
-    // 🔹 將攻擊與追擊判斷拆出
     private void CheckAttack(float distanceToPlayer)
     {
-        if (state != State.attack) // 正在攻擊時不改 isChasing
+        if (!player) return; // 雙重保險
+
+        if (state != State.attack)
         {
             if (distanceToPlayer <= chaseRange)
                 isChasing = true;
@@ -101,17 +139,17 @@ public class enemy_cow : LivingEntity, IDataPersistence
         }
         else
         {
-            // 🔥 如果正在攻擊但玩家已經離開範圍，強制回 Idle
+            // 正在攻擊但玩家離開範圍 → 中斷
             if (distanceToPlayer > chaseRange)
             {
                 isAttacking = false;
                 state = State.idle;
-                anim.ResetTrigger("attack"); // 避免動畫繼續播
-                Debug.Log("[Update] 玩家離開範圍 → 中斷攻擊，回到 Idle");
+                anim.ResetTrigger("attack");
+                // Debug.Log("[enemy_cow] 玩家離開範圍 → 中斷攻擊");
             }
         }
 
-        // 攻擊判斷
+        // 攻擊啟動條件
         if (isChasing && !isAttacking && distanceToPlayer <= attackRange &&
             Time.time >= nextAttackTime && state != State.attack)
         {
@@ -121,54 +159,47 @@ public class enemy_cow : LivingEntity, IDataPersistence
 
     private void Attack()
     {
-        if (isAttacking) return; // 🚫 避免連續攻擊
+        if (isAttacking) return;
 
-        isAttacking = true; 
-        hasDealtDamage = false; // ✅ 新一輪攻擊，重置傷害狀態
+        isAttacking = true;
+        hasDealtDamage = false;
         state = State.attack;
         anim.SetTrigger("attack");
-        Debug.Log("[Attack] 設定 trigger → attack");
 
         nextAttackTime = Time.time + attackCooldown;
+
+        if (!player) return; // 安全：若此刻玩家被刪除/未找到就不做偵測
 
         Vector3 pos = transform.position;
         pos += transform.right * attackOffset.x;
         pos += transform.up * attackOffset.y;
 
         Collider2D colInfo = Physics2D.OverlapCircle(pos, attackRange, attackMask);
-        if (colInfo != null && !hasDealtDamage) // ✅ 加鎖
+        if (colInfo != null && !hasDealtDamage)
         {
-            Debug.Log($"[Attack] 檢測到物件: {colInfo.name}");
-            LivingEntity target = colInfo.GetComponent<LivingEntity>();
+            var target = colInfo.GetComponent<LivingEntity>();
             if (target != null)
             {
                 target.TakeDamage(20);
-                hasDealtDamage = true; // ✅ 這次攻擊已經生效
-                Debug.Log("[Attack] 成功對玩家造成傷害！");
+                hasDealtDamage = true;
             }
-        }
-        else if (colInfo == null)
-        {
-            Debug.Log("[Attack] 攻擊範圍內沒有檢測到任何目標");
         }
     }
 
-    // 🔥 在攻擊動畫最後一幀加 Animation Event 呼叫這個
+    // 在攻擊動畫最後一幀加 Animation Event 呼叫這個
     public void OnAttackAnimationEnd()
     {
-        isAttacking = false; // ✅ 解鎖，允許下一次攻擊
+        isAttacking = false;
         state = isChasing ? State.run : State.idle;
-        Debug.Log("[Attack] 攻擊動畫結束 → 回到 " + state);
     }
 
     private void Move()
     {
-        float moveSpeed = 2f;
+        const float moveSpeed = 2f;
 
-        // 🔹 SC 控制判斷：若受 SC 控制且暫停移動，直接 return
         if (controlledBySC && !canMove) return;
 
-        if (isChasing) // SC 控制：追擊玩家
+        if (isChasing && player) // 追擊
         {
             state = State.run;
             Vector2 direction = (player.position - transform.position).normalized;
@@ -179,9 +210,8 @@ public class enemy_cow : LivingEntity, IDataPersistence
             else
                 transform.localScale = new Vector3(Mathf.Abs(originalScale.x), originalScale.y);
         }
-        else // 巡邏邏輯
+        else // 巡邏
         {
-            // 🔹 先檢查是否到達巡邏邊界
             if (facingLeft)
             {
                 if (transform.position.x > leftCap)
@@ -191,7 +221,7 @@ public class enemy_cow : LivingEntity, IDataPersistence
                 }
                 else
                 {
-                    facingLeft = false; // 反向
+                    facingLeft = false;
                 }
             }
             else
@@ -203,7 +233,7 @@ public class enemy_cow : LivingEntity, IDataPersistence
                 }
                 else
                 {
-                    facingLeft = true; // 反向
+                    facingLeft = true;
                 }
             }
         }
@@ -214,17 +244,14 @@ public class enemy_cow : LivingEntity, IDataPersistence
         if (state == State.hurt || state == State.dying || state == State.attack)
             return;
 
-        Move(); 
-        
-        if (isChasing)
-            state = State.run;
-        else
-            state = State.idle;
+        Move();
+
+        state = isChasing ? State.run : State.idle;
     }
 
     public override void TakeDamage(float damage)
     {
-        base.TakeDamage(damage); 
+        base.TakeDamage(damage);
 
         if (!isDead)
         {
@@ -239,79 +266,68 @@ public class enemy_cow : LivingEntity, IDataPersistence
 
     public void SetState(int s)
     {
-        state = (State)s;  
+        state = (State)s;
         if (anim != null)
-            anim.SetInteger("state", (int)state); 
+            anim.SetInteger("state", (int)state);
     }
 
     protected override void Die()
     {
-        if (isDead) return;   // ✅ 保險：再檢查一次
+        if (isDead) return;
         isDead = true;
 
         anim.ResetTrigger("attack");
         anim.SetTrigger("die");
         state = State.dying;
 
-        rb.velocity = Vector2.zero;
-        rb.simulated = false;
-        coll.enabled = false;
+        if (rb)
+        {
+            rb.velocity = Vector2.zero;
+            rb.simulated = false;
+        }
+
+        if (coll) coll.enabled = false;
         if (hitbox) hitbox.SetActive(false);
 
-        base.Die(); // ✅ 通知 LivingEntity & 廣播事件
+        base.Die(); // 廣播事件
         StartCoroutine(DeathSequence());
     }
 
     private IEnumerator DeathSequence()
     {
-        // 等進入動畫狀態
-        Debug.Log("DeathSequence()");
-        OnDeathAnimationEnd();
-        yield return null;
-        float timeout = 5f; // ⏱️ 最長等待 5 秒避免死循環
-
-        while (!anim.GetCurrentAnimatorStateInfo(0).IsName("dying") && timeout > 0f)
+        // 等待動畫（給個保險 timeout）
+        float timeout = 5f;
+        while (anim && !anim.GetCurrentAnimatorStateInfo(0).IsName("dying") && timeout > 0f)
         {
             timeout -= Time.deltaTime;
             yield return null;
         }
 
-        // 播放完動畫
-        while (anim.GetCurrentAnimatorStateInfo(0).IsName("dying") &&
-            anim.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.99f &&
-            timeout > 0f)
+        while (anim &&
+               anim.GetCurrentAnimatorStateInfo(0).IsName("dying") &&
+               anim.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.99f &&
+               timeout > 0f)
         {
             timeout -= Time.deltaTime;
             yield return null;
         }
 
-        //這裡的程式不會被執行到
-        Debug.Log("OnDeathAnimationEnd()");
         OnDeathAnimationEnd();
-        DropLootAndDestroy();
     }
 
     public void OnDeathAnimationEnd()
     {
-        Debug.Log("OnDeathAnimationEnd()");
         DropLootAndDestroy();
     }
 
     private void DropLootAndDestroy()
     {
-        if (lootDropped) return; // ✅ 防止重複
+        if (lootDropped) return;
         lootDropped = true;
 
         var loot = GetComponent<LootBag>();
         if (loot != null)
-        {
             loot.InstantiateLoot(transform.position);
-            Debug.Log($"[enemy_cow] 掉落物已生成於 {transform.position}");
-        }
-        else
-        {
-            Debug.LogWarning("[enemy_cow] 沒找到 LootBag 元件，無法掉落物品。");
-        }
 
         Destroy(gameObject);
     }
@@ -351,7 +367,7 @@ public class enemy_cow : LivingEntity, IDataPersistence
         currentHealth = hp;
 
         if (currentHealth <= 0)
-            Destroy(gameObject); 
+            Destroy(gameObject);
     }
 
     public void SaveData(ref GameData data)
@@ -359,9 +375,11 @@ public class enemy_cow : LivingEntity, IDataPersistence
         if (healthBar == null) return;
         data.SetHP(enemyID, currentHealth > 0 ? currentHealth : 0);
     }
+
+    // 給動畫事件呼叫
     public void EnableHitbox()
     {
-        hasDealtDamage = false; // ✅ 每次出手前重置
+        hasDealtDamage = false;
         if (hitbox != null)
             hitbox.SetActive(true);
     }

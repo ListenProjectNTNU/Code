@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-//using Ink.Parsed;
 using Ink.Runtime;
 using TMPro;
 using UnityEngine;
@@ -44,57 +43,51 @@ public class DialogueManager : MonoBehaviour
     private void Awake()
     {
         if (instance != null)
-        {
             Debug.LogWarning("Found more than one Dialogue Manager in the scene");
-        }
         instance = this;
     }
 
-    public static DialogueManager GetInstance()
-    {
-        return instance;
-    }
+    public static DialogueManager GetInstance() => instance;
 
     private void Start()
     {
-        playerController = FindObjectOfType<PlayerController>();
+        // 先從 public player 抓，再退回全域搜尋（避免多個 Player / 時序問題）
+        if (player != null) playerController = player.GetComponent<PlayerController>();
+        if (playerController == null) playerController = FindObjectOfType<PlayerController>();
+
+        globalVolumeController = FindObjectOfType<GlobalVolumeController>();
 
         dialogueIsPlaying = false;
-        dialoguePanel.SetActive(false);
+        if (dialoguePanel) dialoguePanel.SetActive(false);
 
         choicesText = new TextMeshProUGUI[choices.Length];
         int index = 0;
         foreach (GameObject choice in choices)
         {
-            choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
+            if (choice != null)
+                choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
             index++;
         }
     }
 
     private void Update()
     {
-        if (!dialogueIsPlaying)
-            return;
+        if (!dialogueIsPlaying) return;
 
         if (Input.GetButtonDown("Submit"))
-        {
             continueStory();
-        }
     }
 
-    // ================================
-    // 原本的從 JSON 進入對話模式
-    // ================================
+    // 從 JSON 進入對話
     public void EnterDialogueMode(TextAsset inkJSON)
     {
-        if (playerController != null)
-            playerController.enabled = false;
-            
-
+        // 可能在切場前後，先判空
+        EnsurePlayerController();
+        if (playerController != null) playerController.enabled = false;
 
         currentStory = new Story(inkJSON.text);
         dialogueIsPlaying = true;
-        dialoguePanel.SetActive(true);
+        if (dialoguePanel) dialoguePanel.SetActive(true);
 
         if (currentSceneController != null)
             sceneController = currentSceneController.GetComponent<ISceneController>();
@@ -103,43 +96,41 @@ public class DialogueManager : MonoBehaviour
         continueStory();
     }
 
-    // ================================
-    // 新增：從指定 knot 進入對話模式
-    // ================================
+    // 從指定 knot 進入對話
     public void EnterDialogueModeFromKnot(string knotName)
     {
-        Debug.Log("Enter Dialogue Mode From Knot："+knotName);
+        Debug.Log("Enter Dialogue Mode From Knot：" + knotName);
         if (inkJSON == null)
         {
             Debug.LogError("❌ Ink JSON 未指定");
             return;
         }
 
+        EnsurePlayerController();
         if (playerController != null)
         {
             playerController.enabled = false;
-            Debug.Log($"playerController enabled = {playerController.enabled}");
+            // Debug.Log($"playerController enabled = {playerController.enabled}");
         }
         else
         {
-            Debug.LogWarning("⚠️ playerController 未指定！");
+            Debug.LogWarning("⚠️ playerController 找不到（可能正在切場/銷毀中），以對話為主繼續。");
         }
-
 
         if (currentStory == null)
-        {
             currentStory = new Story(inkJSON.text);
-        }
 
         currentStory.ChoosePathString(knotName);
 
         dialogueIsPlaying = true;
-        dialoguePanel.SetActive(true);
-        Debug.Log($"dialoguePanel active = {dialoguePanel.activeSelf}");
+        if (dialoguePanel) dialoguePanel.SetActive(true);
+        // Debug.Log($"dialoguePanel active = {dialoguePanel?.activeSelf}");
 
         if (currentSceneController != null)
+        {
             sceneController = currentSceneController.GetComponent<ISceneController>();
-            Debug.Log("Get ISceneController");
+            // Debug.Log("Get ISceneController");
+        }
 
         UpdateInkVariables();
         continueStory();
@@ -147,29 +138,43 @@ public class DialogueManager : MonoBehaviour
 
     private void UpdateInkVariables()
     {
-        InkVariableUpdater inkUpdater = FindObjectOfType<InkVariableUpdater>();
+        var inkUpdater = FindObjectOfType<InkVariableUpdater>();
         if (inkUpdater != null)
         {
             inkUpdater.SetCurrentStory(currentStory);
             inkUpdater.ApplyTempVariables();
-            inkUpdater.ApplyInventoryVariables(new List<string>(PlayerInventory.Instance.CollectedItems));
+            var inv = PlayerInventory.Instance;
+            if (inv != null)
+                inkUpdater.ApplyInventoryVariables(new List<string>(inv.CollectedItems));
         }
     }
 
+    // 🔒 安全結束對話：判空＋必要時延遲一幀回補 PlayerController
     private void ExitDialogueMode()
     {
         Debug.Log("ExitDialogueMode");
         dialogueIsPlaying = false;
-        dialoguePanel.SetActive(false);
-        dialogueText.text = "";
-        playerController.enabled = true;
-        Animator playerAnim = player.GetComponent<Animator>();
-        playerAnim.Play("Move");
-        
+
+        if (dialoguePanel) dialoguePanel.SetActive(false);
+        if (dialogueText) dialogueText.text = "";
+
+        // 可能此刻 Player 已被銷毀（切場中），先嘗試回補；回補不到就略過啟用
+        EnsurePlayerController();
+        if (playerController != null)
+            playerController.enabled = true;
+        else
+            Debug.LogWarning("⚠️ ExitDialogueMode 時找不到 PlayerController，略過啟用玩家。");
+
+        if (player != null)
+        {
+            var playerAnim = player.GetComponent<Animator>();
+            if (playerAnim) playerAnim.Play("Move");
+        }
     }
 
     private void continueStory()
     {
+        // 先顯示選項（如果有）
         if (currentStory.currentChoices.Count > 0)
         {
             DisplayChoices();
@@ -178,7 +183,9 @@ public class DialogueManager : MonoBehaviour
 
         if (currentStory.canContinue)
         {
-            dialogueText.text = currentStory.Continue();
+            if (dialogueText != null)
+                dialogueText.text = currentStory.Continue();
+
             HandleTags(currentStory.currentTags);
             DisplayChoices();
         }
@@ -193,7 +200,7 @@ public class DialogueManager : MonoBehaviour
     {
         foreach (string tag in currentTags)
         {
-            string[] splitTag = tag.Split(":");
+            string[] splitTag = tag.Split(':');
             if (splitTag.Length != 2)
             {
                 Debug.LogError("Tag could not be appropriately parsed: " + tag);
@@ -206,14 +213,19 @@ public class DialogueManager : MonoBehaviour
             switch (tagKey)
             {
                 case SPEAKER_TAG:
-                    displayNameText.text = tagValue;
+                    if (displayNameText) displayNameText.text = tagValue;
                     break;
+
                 case PORTRAIT_TAG:
-                    if (portraitAnimator != null && portraitAnimator.HasState(0, Animator.StringToHash(tagValue)))
+                    if (portraitAnimator != null &&
+                        portraitAnimator.HasState(0, Animator.StringToHash(tagValue)))
                         portraitAnimator.Play(tagValue);
                     break;
+
                 case LAYOUT_TAG:
+                    // 若你有版面切換，這裡補上
                     break;
+
                 case "scene":
                     if (sceneController != null)
                         sceneController.HandleTag(tagValue);
@@ -227,22 +239,23 @@ public class DialogueManager : MonoBehaviour
         List<Choice> currentChoices = currentStory.currentChoices;
 
         if (currentChoices.Count > choices.Length)
-        {
-            Debug.LogError("More Choices were given than the UI can support. Number of choices given"
-                + currentChoices.Count);
-        }
+            Debug.LogError($"More Choices than UI supports: {currentChoices.Count}");
 
         int index = 0;
         foreach (Choice choice in currentChoices)
         {
-            choices[index].gameObject.SetActive(true);
-            choicesText[index].text = choice.text;
+            if (index < choices.Length && choices[index] != null)
+            {
+                choices[index].SetActive(true);
+                if (choicesText[index] != null)
+                    choicesText[index].text = choice.text;
+            }
             index++;
         }
 
         for (int i = index; i < choices.Length; i++)
         {
-            choices[i].gameObject.SetActive(false);
+            if (choices[i] != null) choices[i].SetActive(false);
         }
     }
 
@@ -250,13 +263,30 @@ public class DialogueManager : MonoBehaviour
     {
         EventSystem.current.SetSelectedGameObject(null);
         yield return new WaitForEndOfFrame();
-        EventSystem.current.SetSelectedGameObject(choices[0].gameObject);
+        if (choices != null && choices.Length > 0 && choices[0] != null)
+            EventSystem.current.SetSelectedGameObject(choices[0]);
     }
 
     public void MakeChoice(int choiceIndex)
     {
         currentStory.ChooseChoiceIndex(choiceIndex);
         continueStory();
-        globalVolumeController.SetBlur();
+        if (globalVolumeController != null)
+            globalVolumeController.SetBlur();
+    }
+
+    // —— 小工具：確保 playerController 可用（被銷毀就重新抓）——
+    private void EnsurePlayerController()
+    {
+        // 已經有而且沒被銷毀，直接用
+        if (playerController != null) return;
+
+        // 先從 player 物件試著補
+        if (player != null)
+            playerController = player.GetComponent<PlayerController>();
+
+        // 還是沒有，就全場景找一次
+        if (playerController == null)
+            playerController = FindObjectOfType<PlayerController>();
     }
 }

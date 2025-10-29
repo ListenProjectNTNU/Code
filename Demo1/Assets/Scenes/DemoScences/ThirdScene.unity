@@ -1188,6 +1188,7 @@ MonoBehaviour:
   inkJSON: {fileID: 4900000, guid: a03e21827e781474e9c9b3cd0e590be1, type: 3}
   knotBattleBefore: battle_before
   knotBattleAfter: battle_after
+  globalVolume: {fileID: 0}
 --- !u!114 &1057814206 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7502905990469188656, guid: ec6087b620debe04093b594023afd197, type: 3}
@@ -1485,7 +1486,7 @@ Transform:
   m_GameObject: {fileID: 1427279314}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -19.73772, y: -6.38931, z: -10}
+  m_LocalPosition: {x: -15.926733, y: -6.38628, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
