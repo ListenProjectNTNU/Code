@@ -17,14 +17,17 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/DemoScences/ThirdScene.unity
     guid: be2b2ddd945b8c04d93900769446be87
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DemoScences/Tutorial.unity
     guid: db88ea5af457ceb41844195a57ed664b
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DemoScences/ReFirstScene.unity
     guid: 1b5d27d0d14c4c042ad667981321facb
   - enabled: 1
     path: Assets/Scenes/DemoScences/MainMenu.unity
     guid: 73cf02b9debd83c41830d2ff688fc23e
+  - enabled: 1
+    path: Assets/Scenes/DemoScences/FourthScene.unity
+    guid: f82de7d9968fab149abda48a8beb7fea
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 2d457d742b0240f40ae587ba80ce0376, type: 2}

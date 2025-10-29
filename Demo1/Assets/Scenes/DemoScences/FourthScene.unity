@@ -16360,6 +16360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9f16f870ab0b79469c182c542389ccd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inkJSON: {fileID: 4900000, guid: 1e9db6e51fc32bc46a5cb68c2a158a71, type: 3}
   senpai: {fileID: 1710628992}
   player: {fileID: 1678532887}
   animCanva: {fileID: 56170833}

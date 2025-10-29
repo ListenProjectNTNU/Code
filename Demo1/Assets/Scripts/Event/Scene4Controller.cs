@@ -1,7 +1,11 @@
 using UnityEngine;
 
 public class Scene4Controller : MonoBehaviour, ISceneController
+
 {
+    [Header("Ink JSON（起始對話檔）")]
+    public TextAsset inkJSON;
+
     public GameObject senpai; // 學姊物件
     public GameObject player; // 主角物件
 
@@ -26,6 +30,22 @@ public class Scene4Controller : MonoBehaviour, ISceneController
             // 取得 Animator 所在的 GameObject 並禁用它
             animCanva.gameObject.SetActive(false); 
         }
+        // 確保 DialogueManager 存在
+        if (DialogueManager.GetInstance() == null)
+        {
+            Debug.LogError("❌ DialogueManager 尚未在場景中建立！");
+            return;
+        }
+
+        if (inkJSON == null)
+        {
+            Debug.LogError("❌ 尚未指定 Ink JSON 檔案！");
+            return;
+        }
+
+        // 停用玩家控制，並進入對話
+        Debug.Log("🎬 遊戲開始，自動進入對話");
+        DialogueManager.GetInstance().EnterDialogueMode(inkJSON);
     }
 
 
