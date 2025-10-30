@@ -455,7 +455,7 @@ Animator:
   m_GameObject: {fileID: 2918784421876243179}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b4e82a16773ff06448f0538292740ee8, type: 2}
+  m_Controller: {fileID: 9100000, guid: 96dd16f17632dfa4db2474cdfe88341c, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -499,12 +499,11 @@ MonoBehaviour:
   healthBar: {fileID: 2161786921408713922}
   leftPoint: {fileID: 85746091062491581}
   rightPoint: {fileID: 2915411613450337864}
+  fallbackPatrolHalfWidth: 2
   enemyID: enemy
   ground:
     serializedVersion: 2
     m_Bits: 64
-  edgeCheckDistance: 1
-  hitbox: {fileID: 2451310809598310590}
   player: {fileID: 0}
   attackOffset: {x: 0.57, y: 0, z: 0}
   attackMask:
@@ -514,6 +513,9 @@ MonoBehaviour:
   attackCooldown: 1.33
   chaseRange: 8.29
   stopChaseRange: 12.2
+  isActive: 1
+  controlledBySC: 0
+  hitbox: {fileID: 2451310809598310590}
 --- !u!114 &3924592054354686114
 MonoBehaviour:
   m_ObjectHideFlags: 0
