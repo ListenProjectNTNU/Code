@@ -9,6 +9,9 @@ using UnityEngine.SceneManagement;
 public class PlayerController : LivingEntity, IDataPersistence
 {
 
+    public static PlayerController Instance { get; private set; }
+    public static event Action<PlayerController> OnPlayerReady;
+
     private Rigidbody2D rb;
     public Animator anim;
     private Collider2D coll;
@@ -104,10 +107,19 @@ public class PlayerController : LivingEntity, IDataPersistence
         }
     }
 
-    private void Awake() {
+    private void Awake()
+    {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
+        
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            OnPlayerReady?.Invoke(this);
+        }
+        else Destroy(gameObject);
     }
 
     //重生
@@ -191,9 +203,18 @@ public class PlayerController : LivingEntity, IDataPersistence
 
     public void SaveData(ref GameData data)
     {
+        if (data == null)
+        {
+            Debug.LogError("❌ GameData 為 null，無法儲存！");
+            return;
+        }
+
         data.playerPosition = this.transform.position;
 
-        data.SetHP(playerID, healthBar.currenthp);
+        if (healthBar != null)
+            data.SetHP(playerID, healthBar.currenthp);
+        else
+            Debug.LogWarning("⚠️ healthBar 尚未初始化，略過血量儲存。");
 
         data.speed = speed;
         data.attackDamage = attackDamage;
