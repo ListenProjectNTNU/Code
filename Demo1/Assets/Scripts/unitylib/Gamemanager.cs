@@ -14,12 +14,17 @@ public class GameManager : MonoBehaviour
     [Header("Scene Spawn")]
     public string NextSpawnId = "default"; // 轉場時記住要落地的 spawnId
 
-    private void Awake()
+    void Awake()
     {
+        // 單例去重
         if (I != null && I != this) { Destroy(gameObject); return; }
+
         I = this;
-        instance = this;
-        DontDestroyOnLoad(gameObject);
+
+        // 必須是根物件：若有父物件，先脫離
+        if (transform.parent != null) transform.SetParent(null);
+
+        DontDestroyOnLoad(gameObject);  // 這時才會被搬到 "DontDestroyOnLoad" 區域
     }
 
     /// <summary>
