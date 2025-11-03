@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public class Scene2Controller : MonoBehaviour, ISceneController
 {
     public Transform monster;
-    public Transform player;
+    public PlayerController pc;       // ← 玩家 PlayerController
+    public string animatorLayerName = "Base Layer";  // 欲啟用的 Animator Layer
 
     [Header("Monster Approach Anim")]
     public float moveDistance = 2f;
@@ -39,6 +40,12 @@ public class Scene2Controller : MonoBehaviour, ISceneController
     void Start()
     {
         if (globalVolume) globalVolume.SetVignette();
+
+        // 如果玩家已經存在，直接抓
+        if (pc == null && PlayerController.Instance != null)
+        {
+            HandlePlayerReady(PlayerController.Instance);
+        }
         
         // 取得怪物腳本與 Animator（盡早快取）
         if (monster)
@@ -64,19 +71,22 @@ public class Scene2Controller : MonoBehaviour, ISceneController
             Debug.LogWarning("[Scene2Controller] monster 未指定。");
         }
 
-        if (player)
+        // 設定玩家使用指定的 Animator Layer
+        if (pc != null)
         {
-            player.TryGetComponent(out playerAnim);
-            var pc = player.GetComponent<PlayerController>();
-            if (pc)
-            {
-                pc.enabled = false;
-                pc.FaceLeft();
-            }
+            pc.ActiveLayerName = animatorLayerName;
         }
         else
         {
-            Debug.LogWarning("[Scene2Controller] player 未指定。");
+            Debug.LogWarning("PlayerController 未指定，也找不到 Instance！");
+        }
+
+        // 快取玩家 Animator
+        if (pc != null)
+        {
+            pc.TryGetComponent(out playerAnim);
+            pc.enabled = false;
+            pc.FaceLeft();
         }
 
         dialogueManager = DialogueManager.GetInstance();
@@ -91,6 +101,11 @@ public class Scene2Controller : MonoBehaviour, ISceneController
         }
     }
 
+    void OnEnable()
+    {
+        PlayerController.OnPlayerReady += HandlePlayerReady;
+    }
+
     void OnDisable()
     {
         // 解除訂閱，避免關卡切換殘留
@@ -99,6 +114,21 @@ public class Scene2Controller : MonoBehaviour, ISceneController
             var le = monster.GetComponent<LivingEntity>();
             if (le != null) le.OnDeathEvent -= HandleMonsterDeath;
         }
+
+        PlayerController.OnPlayerReady -= HandlePlayerReady;
+    }
+
+    private void HandlePlayerReady(PlayerController player)
+    {
+        // 🔹 同步 PlayerController
+        pc = player;
+
+        // 快取 Animator
+        if (player.TryGetComponent(out Animator anim))
+            playerAnim = anim;
+
+        pc.enabled = false;
+        pc.FaceLeft();
     }
 
     public void HandleTag(string tagValue)
@@ -114,7 +144,7 @@ public class Scene2Controller : MonoBehaviour, ISceneController
                 break;
 
             case "monster_approach":
-                if (!isRunningEvent && monster && player)
+                if (!isRunningEvent && monster && pc != null)
                     approachRoutine = StartCoroutine(MonsterApproachEvent());
                 break;
 
@@ -170,11 +200,11 @@ public class Scene2Controller : MonoBehaviour, ISceneController
         try
         {
             // —— 任何時間點都可能被刪除，先檢查 —— 
-            if (!monster || !player) yield break;
+            if (!monster || pc == null) yield break;
 
             // 快取起始位置（避免多次取值）
             Vector3 monsterStart = monster.position;
-            Vector3 playerStart  = player.position;
+            Vector3 playerStart  = pc.transform.position;
 
             float monsterStartX  = monsterStart.x;
             float monsterTargetX = monsterTargetPoint ? monsterTargetPoint.position.x : monsterStart.x + moveDistance;
@@ -192,7 +222,7 @@ public class Scene2Controller : MonoBehaviour, ISceneController
             while (elapsed < duration)
             {
                 // 每一輪都檢查是否還存在
-                if (!monster || !player) yield break;
+                if (!monster || pc == null) yield break;
 
                 elapsed += interval;
                 float t = Mathf.Clamp01(elapsed / duration);
@@ -202,14 +232,14 @@ public class Scene2Controller : MonoBehaviour, ISceneController
 
                 // 設定位置前再判一次
                 if (monster) monster.position = new Vector3(newMonsterX, monsterStart.y, monsterStart.z);
-                if (player)  player.position  = new Vector3(newPlayerX,  playerStart.y,  playerStart.z);
+                if (pc != null) pc.transform.position  = new Vector3(newPlayerX, playerStart.y, playerStart.z);
 
                 yield return new WaitForSeconds(interval);
             }
 
             // 最終落位（仍需判空）
             if (monster) monster.position = new Vector3(monsterTargetX, monsterStart.y, monsterStart.z);
-            if (player)  player.position  = new Vector3(playerTargetX,  playerStart.y,  playerStart.z);
+            if (pc != null) pc.transform.position  = new Vector3(playerTargetX, playerStart.y, playerStart.z);
 
             if (monsterAnim) monsterAnim.Play("idle");
             if (playerAnim)  playerAnim.Play("idle");
