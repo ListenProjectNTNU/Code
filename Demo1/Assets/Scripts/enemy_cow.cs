@@ -100,56 +100,52 @@ public class enemy_cow : LivingEntity, IDataPersistence
 
     private void Update()
     {
-        // 固定轉向避免受物理/動畫影響
         transform.rotation = fixedRotation;
         if (isDead) return;
 
-        anim.SetInteger("state", (int)state);
-        AnimationState(); // 讓巡邏、移動判斷正常
-
-        // SC 控制：若暫停移動，就不做追擊攻擊判斷
+        if (!isActive) return;
         if (controlledBySC && !canMove) return;
 
-        if (!isActive) return;
-
-        // ───────────── 重要：player 空值防護 ─────────────
+        // 1) 取得玩家與距離（必要時重新抓）
         if (!player)
         {
-            // 再嘗試一次以防場景剛生成
             var go = GameObject.FindGameObjectWithTag("Player");
             if (go) player = go.transform;
-
-            if (!player) return; // 找不到就先不要做後續邏輯
+            if (!player) return;
         }
-
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+
+        // 2) 先更新「追擊/攻擊」邏輯（可能會改 isChasing / isAttacking / state）
         CheckAttack(distanceToPlayer);
+
+        // 3) 最後才決定本幀的移動與 state（依 isChasing）
+        AnimationState();
+
+        // 4) 同步 Animator 參數
+        anim.SetInteger("state", (int)state);
     }
 
     private void CheckAttack(float distanceToPlayer)
     {
-        if (!player) return; // 雙重保險
+        if (!player) return;
 
-        if (state != State.attack)
+        // 追擊狀態改成「黏性」
+        if (distanceToPlayer <= chaseRange)            isChasing = true;
+        else if (distanceToPlayer >= stopChaseRange)   isChasing = false;
+
+        // 攻擊期間若玩家跑出追擊範圍，才中斷
+        if (state == State.attack)
         {
-            if (distanceToPlayer <= chaseRange)
-                isChasing = true;
-            else if (distanceToPlayer >= stopChaseRange)
-                isChasing = false;
-        }
-        else
-        {
-            // 正在攻擊但玩家離開範圍 → 中斷
             if (distanceToPlayer > chaseRange)
             {
                 isAttacking = false;
                 state = State.idle;
                 anim.ResetTrigger("attack");
-                // Debug.Log("[enemy_cow] 玩家離開範圍 → 中斷攻擊");
             }
+            return; // 攻擊中不用再判斷開新攻擊
         }
 
-        // 攻擊啟動條件
+        // 啟動攻擊
         if (isChasing && !isAttacking && distanceToPlayer <= attackRange &&
             Time.time >= nextAttackTime && state != State.attack)
         {
@@ -190,9 +186,39 @@ public class enemy_cow : LivingEntity, IDataPersistence
     public void OnAttackAnimationEnd()
     {
         isAttacking = false;
+
+        if (player)
+        {
+            float d = Vector2.Distance(transform.position, player.position);
+            isChasing = d <= stopChaseRange; // 還在可追距離內就繼續追
+        }
+
         state = isChasing ? State.run : State.idle;
     }
+    
+    public void OnHurtAnimationEnd()
+    {
+        if (isDead) return;
 
+        // 黏性追擊：離開受傷時，只要沒超出 stopChaseRange 就繼續追
+        if (player)
+        {
+            float d = Vector2.Distance(transform.position, player.position);
+            isChasing = d <= stopChaseRange;
+        }
+
+        state = isChasing ? State.run : State.idle;
+
+        // 若需要，立刻給一次速度脈衝，避免靜止一幀看起來像發呆
+        if (isChasing && rb)
+        {
+            float dir = Mathf.Sign(player.position.x - transform.position.x);
+            const float moveSpeed = 2f;
+            rb.velocity = new Vector2(dir * moveSpeed, rb.velocity.y);
+            // 面向玩家
+            transform.localScale = new Vector3(Mathf.Abs(originalScale.x) * (dir < 0 ? -1 : 1), originalScale.y);
+        }
+    }
     private void Move()
     {
         const float moveSpeed = 2f;
@@ -252,18 +278,18 @@ public class enemy_cow : LivingEntity, IDataPersistence
     public override void TakeDamage(float damage)
     {
         base.TakeDamage(damage);
-
         if (!isDead)
         {
-            state = State.hurt;
-            Invoke(nameof(ResetToIdle), 0.5f);
+            state = State.hurt;                 // 內部邏輯還是可保留
+            if (rb) rb.velocity = new Vector2(0, rb.velocity.y); // 受傷瞬間停住
+            anim.ResetTrigger("attack");        // 受傷打斷攻擊
+            anim.SetTrigger("hurt");            // 進入受傷動畫 ← 這是關鍵
         }
         if (currentHealth <= 0)
         {
             anim.SetTrigger("die");
         }
     }
-
     public void SetState(int s)
     {
         state = (State)s;
