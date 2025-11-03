@@ -9,9 +9,10 @@ using UnityEngine.SceneManagement;
 public class PlayerController : LivingEntity, IDataPersistence
 {
     // ─────────────────────────────────────────────────────────
-    // Singleton + DDOL
+    // Singleton + 事件 + DDOL
     // ─────────────────────────────────────────────────────────
     public static PlayerController Instance { get; private set; }
+    public static event System.Action<PlayerController> OnPlayerReady;
 
     private Rigidbody2D rb;
     public Animator anim;
@@ -59,10 +60,9 @@ public class PlayerController : LivingEntity, IDataPersistence
     // ─────────────────────────────────────────────────────────
     // Unity lifecycle
     // ─────────────────────────────────────────────────────────
-
     private void Awake()
     {
-        // ★ 單例防重複
+        // 單例防重複
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -70,10 +70,10 @@ public class PlayerController : LivingEntity, IDataPersistence
         }
         Instance = this;
 
-        // ★ 常駐跨場景
+        // 常駐跨場景
         DontDestroyOnLoad(gameObject);
 
-        // ★ 確保 Tag = Player（prefab 上也請先設好）
+        // 保險：Tag = Player
         if (tag != "Player") tag = "Player";
 
         // 基本元件
@@ -94,20 +94,22 @@ public class PlayerController : LivingEntity, IDataPersistence
 
     private void OnSceneLoaded(Scene s, LoadSceneMode m)
     {
-        // ★ 進入新場景後「下一幀」才定位與重綁（讓 SpawnPoint/GameManager/相機先就緒）
+        // 切到新場景後，等到下一幀 + 幀末再定位，最後廣播 OnPlayerReady
         StartCoroutine(RebindAfterSceneLoad());
     }
 
     private IEnumerator RebindAfterSceneLoad()
     {
-        yield return null; // 等一幀
+        // 等 1 幀：讓場景物件（SpawnPoint/相機/管理器）出現
+        yield return null;
+        // 再等到幀末：避免其他 OnEnable/Start 還在跑造成競態
+        yield return new WaitForEndOfFrame();
 
-        // 優先用 GameManager.NextSpawnId 定位；失敗就保持現狀或落回存檔
+        // 先用 GameManager.NextSpawnId 定位；找不到就保留現狀（之後如 LoadData 覆蓋）
         TryMoveToSpawnPoint();
 
-        // （可選）如果你有相機要跟隨，可在這裡用 Tag/Find 來重綁
-        // var cam = FindObjectOfType<CameraController>();
-        // if (cam) cam.SetTarget(transform);
+        // 廣播「玩家就緒」給相機/場景控制器
+        OnPlayerReady?.Invoke(this);
     }
 
     // ─────────────────────────────────────────────────────────
@@ -172,7 +174,7 @@ public class PlayerController : LivingEntity, IDataPersistence
         Debug.Log("玩家死亡 → 顯示死亡選單，不 Destroy 玩家物件");
     }
 
-    // 重生（同場景復活）
+    // 同場景復活
     public void RevivePlayer()
     {
         if (anim == null) anim = GetComponent<Animator>();
@@ -189,7 +191,7 @@ public class PlayerController : LivingEntity, IDataPersistence
 
         if (deathMenu) deathMenu.SetActive(false);
 
-        // 若你有資料管理器要同步 UI/狀態，可用你現成的流程
+        // 若你有資料管理器要同步 UI/狀態，可用現成流程
         if (DataPersistenceManager.instance != null)
             DataPersistenceManager.instance.LoadSceneAndUpdate(SceneManager.GetActiveScene().name);
         else
@@ -222,9 +224,12 @@ public class PlayerController : LivingEntity, IDataPersistence
     // ─────────────────────────────────────────────────────────
     public void LoadData(GameData data)
     {
+        // 對齊到目前場景，避免用到舊的 sceneName
+        data.sceneName = SceneManager.GetActiveScene().name;
+
         if (!TryMoveToSpawnPoint())
         {
-            string sceneName = SceneManager.GetActiveScene().name;
+            string sceneName = data.sceneName;
             if (data.TryGetPlayerPosition(sceneName, out var savedPosition))
             {
                 transform.position = savedPosition;
@@ -241,13 +246,17 @@ public class PlayerController : LivingEntity, IDataPersistence
         attackseg  = data.attackSeg;
         defenceseg = data.defenceSeg;
         speedseg   = data.speedSeg;
+
+        // 讀檔可能改變了位置 → 再廣播一次，讓相機/SC 跟到最終位置
+        OnPlayerReady?.Invoke(this);
     }
 
     public void SaveData(ref GameData data)
     {
         string sceneName = SceneManager.GetActiveScene().name;
+        data.sceneName = sceneName;
+
         data.SetPlayerPosition(sceneName, transform.position);
-        data.sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
         if (data.sceneName == sceneName)
             data.playerPosition = transform.position;
