@@ -57,6 +57,10 @@ public class PlayerController : LivingEntity, IDataPersistence
     [Tooltip("設定當前要啟用 (權重為 1) 的 Layer 名稱。")]
     [SerializeField] private string activeLayerName = "Base Layer";
 
+    [Header("Arena Mode")]
+    [Tooltip("在獨立競技場場景打勾，將關閉劇情/存檔/切場相關行為")]
+    public bool arenaMode = false;
+
     // ─────────────────────────────────────────────────────────
     // Unity lifecycle
     // ─────────────────────────────────────────────────────────
@@ -71,7 +75,8 @@ public class PlayerController : LivingEntity, IDataPersistence
         Instance = this;
 
         // 常駐跨場景
-        DontDestroyOnLoad(gameObject);
+        if (!arenaMode)
+            DontDestroyOnLoad(gameObject);
 
         // 保險：Tag = Player
         if (tag != "Player") tag = "Player";
@@ -89,17 +94,21 @@ public class PlayerController : LivingEntity, IDataPersistence
         UpdateAnimatorLayerWeight();
     }
 
-    private void OnEnable()  { SceneManager.sceneLoaded += OnSceneLoaded; }
-    private void OnDisable() { SceneManager.sceneLoaded -= OnSceneLoaded; }
+    private void OnEnable()  { if (!arenaMode)
+            SceneManager.sceneLoaded += OnSceneLoaded; }
+    private void OnDisable() { if (!arenaMode)
+            SceneManager.sceneLoaded -= OnSceneLoaded; }
 
     private void OnSceneLoaded(Scene s, LoadSceneMode m)
     {
         // 切到新場景後，等到下一幀 + 幀末再定位，最後廣播 OnPlayerReady
+        if (arenaMode) return;
         StartCoroutine(RebindAfterSceneLoad());
     }
 
     private IEnumerator RebindAfterSceneLoad()
     {
+        if (arenaMode) yield break;
         // 等 1 幀：讓場景物件（SpawnPoint/相機/管理器）出現
         yield return null;
         // 再等到幀末：避免其他 OnEnable/Start 還在跑造成競態
@@ -169,7 +178,17 @@ public class PlayerController : LivingEntity, IDataPersistence
         rb.velocity = Vector2.zero;
         this.enabled = false;
 
-        if (deathMenu != null) deathMenu.SetActive(true);
+        if (arenaMode)
+        {
+            // 交給競技場管理器結算與顯示 UI
+            var arena = FindObjectOfType<ArenaManager>();
+            if (arena != null) arena.OnPlayerDeath();
+            // 不顯示原本的 deathMenu
+        }
+        else
+        {
+            if (deathMenu != null) deathMenu.SetActive(true);
+        }
 
         Debug.Log("玩家死亡 → 顯示死亡選單，不 Destroy 玩家物件");
     }
@@ -177,6 +196,14 @@ public class PlayerController : LivingEntity, IDataPersistence
     // 同場景復活
     public void RevivePlayer()
     {
+        if (arenaMode)
+        {
+            // 競技場不提供原地復活；若需要可讓 ArenaManager 控制重開
+            var arena = FindObjectOfType<ArenaManager>();
+            if (arena != null) arena.Restart();
+            return;
+        }
+        
         if (anim == null) anim = GetComponent<Animator>();
 
         Debug.Log("RevivePlayer() 被執行！");
@@ -224,6 +251,7 @@ public class PlayerController : LivingEntity, IDataPersistence
     // ─────────────────────────────────────────────────────────
     public void LoadData(GameData data)
     {
+        if (arenaMode) return;
         // 對齊到目前場景，避免用到舊的 sceneName
         data.sceneName = SceneManager.GetActiveScene().name;
 
@@ -253,6 +281,7 @@ public class PlayerController : LivingEntity, IDataPersistence
 
     public void SaveData(ref GameData data)
     {
+        if (arenaMode) return;
         string sceneName = SceneManager.GetActiveScene().name;
         data.sceneName = sceneName;
 
@@ -277,6 +306,7 @@ public class PlayerController : LivingEntity, IDataPersistence
     // ─────────────────────────────────────────────────────────
     bool TryMoveToSpawnPoint()
     {
+        if (arenaMode) return false;
         var gm = GameManager.instance ?? GameManager.I;
         if (gm == null) return false;
 
