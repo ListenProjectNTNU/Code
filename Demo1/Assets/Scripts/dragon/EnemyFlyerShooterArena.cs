@@ -105,7 +105,6 @@ public class EnemyFlyerShooterArena : LivingEntity
     {
         if (!isActive || isDead) { rb.velocity = Vector2.zero; return; }
         if (!player) return;
-
         // 面向處理
         if (facePlayer)
         {

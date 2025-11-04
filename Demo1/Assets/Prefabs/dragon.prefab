@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1398495267347102311
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3971325999883557162}
+  m_Layer: 0
+  m_Name: right
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3971325999883557162
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1398495267347102311}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.01680397, w: 0.99985886}
+  m_LocalPosition: {x: 110.592125, y: -3.0373237, z: 7.257125}
+  m_LocalScale: {x: 3.1550746, y: 3.1550746, z: 3.1550746}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6057151369117354620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1417186549529688920
 GameObject:
   m_ObjectHideFlags: 0
@@ -282,7 +313,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 103834746319391902}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: shootpoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -393,7 +424,7 @@ GameObject:
   - component: {fileID: 6256808203105980932}
   - component: {fileID: 3669977880741738409}
   - component: {fileID: 6354267680290405434}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: dragon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -415,6 +446,8 @@ Transform:
   m_Children:
   - {fileID: 103834746319391902}
   - {fileID: 5687475520331393624}
+  - {fileID: 3971325999883557162}
+  - {fileID: 5131066596742654055}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -23.876}
 --- !u!212 &1162086348515859212
@@ -516,7 +549,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &3669977880741738409
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -577,23 +610,23 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   isDead: 0
-  healthBar: {fileID: 0}
+  healthBar: {fileID: 142699103929388724}
   player: {fileID: 0}
   shootPoint: {fileID: 103834746319391902}
   projectilePrefab: {fileID: 9021560513744426172, guid: 1f6fd8843dec8b0449bcbb52bc253e45, type: 3}
-  detectRange: 12
-  shootRange: 10
+  detectRange: 12.9
+  shootRange: 11.93
   losBlockMask:
     serializedVersion: 2
     m_Bits: 0
   attackCooldown: 1.3
   projectileSpeed: 10
   shotsBeforeLand: 2
-  leftPoint: {fileID: 0}
-  rightPoint: {fileID: 0}
+  leftPoint: {fileID: 5131066596742654055}
+  rightPoint: {fileID: 3971325999883557162}
   fallbackPatrolHalfWidth: 4
   cruiseSpeed: 3.5
-  baseAltitude: 5
+  baseAltitude: 4.5
   sinAmp: 0.6
   sinFreq: 1.2
   perlinAmp: 0.3
@@ -613,3 +646,34 @@ MonoBehaviour:
   requireLineOfSight: 1
   facePlayer: 1
   isActive: 1
+--- !u!1 &7371825057718775737
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5131066596742654055}
+  m_Layer: 0
+  m_Name: left
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5131066596742654055
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7371825057718775737}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.01680397, w: 0.99985886}
+  m_LocalPosition: {x: -98.8705, y: -10.395602, z: 7.257125}
+  m_LocalScale: {x: 3.1550746, y: 3.1550746, z: 3.1550746}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6057151369117354620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
