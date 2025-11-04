@@ -137,7 +137,6 @@ public class PlayerController : LivingEntity, IDataPersistence
         {
             if (string.IsNullOrWhiteSpace(s)) continue;
             int l = LayerMask.NameToLayer(s);
-            if (l < 0) Debug.LogWarning($"[Dash] Harm layer '{s}' not found.");
             list.Add(l);
         }
         _harmLayers = list.ToArray();

@@ -184,54 +184,57 @@ public class EnemyFlyerShooterArena : LivingEntity
 
     void DoDescend()
     {
-        // 決定落點（向下 Raycast）
+        // 找地面
         if (landingPoint == Vector2.zero)
         {
             Vector2 origin = transform.position;
             var hit = Physics2D.Raycast(origin, Vector2.down, 30f, groundMask);
-            if (hit.collider) landingPoint = hit.point + Vector2.up * landOffset;
-            else landingPoint = new Vector2(transform.position.x, transform.position.y - 3f);
+            if (hit.collider)
+            {
+                landingPoint = hit.point + Vector2.up * landOffset;
+                Debug.Log($"[Flyer] 找到地面 {landingPoint}");
+            }
+            else
+            {
+                landingPoint = new Vector2(transform.position.x, transform.position.y - 3f);
+                Debug.LogWarning("[Flyer] 找不到地面，使用預設降落點");
+            }
         }
 
-        // 下降（水平速度漸停）
+        // 慢慢往下掉
         Vector2 v = new Vector2(Mathf.Lerp(rb.velocity.x, 0f, Time.deltaTime * 4f), -descendSpeed);
-        // 接近落點就直接貼上
-        if ((landingPoint.y - transform.position.y) >= -0.05f)
+        rb.velocity = v;
+
+        // 檢查是否到達地面
+        if (transform.position.y <= landingPoint.y + 0.05f)
         {
             transform.position = landingPoint;
             rb.velocity = Vector2.zero;
-            groundIdleUntil = Time.time + groundIdleDuration;
-            takeoffAt = groundIdleUntil + takeoffDelay;
+            Debug.Log("[Flyer] 已降落，進入 GroundIdle 狀態");
+
+            // 🧠 明確設定降落後 2 秒起飛
+            takeoffAt = Time.time + 2f; 
             state = State.GroundIdle;
-            return;
         }
-        rb.velocity = v;
     }
+
 
     void DoGroundIdle()
     {
         rb.velocity = Vector2.zero;
 
         if (anim != null)
-            anim.Play("idle");
+            anim.Play("idle"); // 地面時保持 idle 動畫
 
-        // 保證 takeoffAt 被設定
-        if (takeoffAt <= 0f)
-        {
-            takeoffAt = Time.time + groundIdleDuration + takeoffDelay;
-            Debug.LogWarning($"[Flyer] takeoffAt 未設定，自動補：{takeoffAt:F2}");
-        }
-
-        Debug.Log($"[Flyer] GroundIdle... Time={Time.time:F2}, takeoffAt={takeoffAt:F2}");
-
-        // 時間到 → 起飛
+        // 到時間就起飛
         if (Time.time >= takeoffAt)
         {
-            Debug.Log("[Flyer] 🛫 起飛條件成立，切換到 Takeoff 狀態！");
+            Debug.Log("[Flyer] ⏰ 等待完畢，開始起飛！");
             landingPoint = Vector2.zero;
             state = State.Takeoff;
         }
     }
+
 
 
     void DoTakeoff()
@@ -239,8 +242,11 @@ public class EnemyFlyerShooterArena : LivingEntity
         if (anim != null)
             anim.Play("idle"); // 起飛時保持 idle 動畫
 
-        float targetY = baseAltitude;
-        float vy = Mathf.Clamp((targetY - transform.position.y) * 6f, 2f, ascendSpeed);
+        // 目標高度 = 降落點 + 基礎高度（避免永遠達不到）
+        float targetY = landingPoint.y + baseAltitude;
+
+        // 線性上升速度，越低上升越快
+        float vy = Mathf.Lerp(rb.velocity.y, ascendSpeed, Time.deltaTime * 2f);
         rb.velocity = new Vector2(
             Mathf.Lerp(rb.velocity.x, horizDir * cruiseSpeed, Time.deltaTime * 2f),
             vy
@@ -248,16 +254,18 @@ public class EnemyFlyerShooterArena : LivingEntity
 
         Debug.Log($"[Flyer] Takeoff... Y={transform.position.y:F2}, targetY={targetY}");
 
-        // 高度達成 → 回巡航
-        if (transform.position.y >= targetY - 0.1f)
+        // 🔥 改用絕對距離判定（更保險）
+        if (Mathf.Abs(transform.position.y - targetY) <= 0.2f)
         {
             Debug.Log("[Flyer] 🌀 回到 AirPatrol 狀態！");
             rb.velocity = new Vector2(horizDir * cruiseSpeed, 0f);
             shotCount = 0;
             nextShootTime = Time.time + 0.4f;
             state = State.AirPatrol;
+            landingPoint = Vector2.zero; // 重設落點
         }
     }
+
 
 
     void Face(float dirX)
