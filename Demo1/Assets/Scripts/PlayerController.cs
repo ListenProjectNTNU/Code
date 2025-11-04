@@ -61,6 +61,20 @@ public class PlayerController : LivingEntity, IDataPersistence
     [Tooltip("在獨立競技場場景打勾，將關閉劇情/存檔/切場相關行為")]
     public bool arenaMode = false;
 
+    [Header("Dash Settings")]
+    [SerializeField] private KeyCode dashKey = KeyCode.LeftShift;
+    [SerializeField] private float dashSpeed = 14f;        // 衝刺速度
+    [SerializeField] private float dashDuration = 0.18f;   // 衝刺時間
+    [SerializeField] private float dashCooldown = 0.9f;    // 冷卻時間
+    [SerializeField] private string playerPhysicsLayer = "Player";
+    [SerializeField] private string[] harmPhysicsLayers = new string[] {"Enemy"};
+
+    private bool isDashing = false;
+    private float lastDashTime = -999f;
+    private int _playerLayer;
+    private int[] _harmLayers;
+    private float _origGravity;
+
     // ─────────────────────────────────────────────────────────
     // Unity lifecycle
     // ─────────────────────────────────────────────────────────
@@ -74,7 +88,7 @@ public class PlayerController : LivingEntity, IDataPersistence
         }
         Instance = this;
 
-        // 常駐跨場景
+        // 常駐跨場景（競技場模式不常駐）
         if (!arenaMode)
             DontDestroyOnLoad(gameObject);
 
@@ -85,15 +99,20 @@ public class PlayerController : LivingEntity, IDataPersistence
         rb   = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
+
+        InitDashLayerCache();
     }
 
     protected override void Start()
     {
         base.Start();
-        // 確保初始 Layer 權重
-        UpdateAnimatorLayerWeight();
-    }
 
+        // 確保初始 Layer 權重（你原有的動畫權重設定）
+        UpdateAnimatorLayerWeight();
+
+        // NEW: 若需要，確保 i-frame 關閉在預設狀態（避免從其他場景殘留）
+        ToggleIFrames(false);
+    }
     private void OnEnable()  { if (!arenaMode)
             SceneManager.sceneLoaded += OnSceneLoaded; }
     private void OnDisable() { if (!arenaMode)
@@ -106,6 +125,24 @@ public class PlayerController : LivingEntity, IDataPersistence
         StartCoroutine(RebindAfterSceneLoad());
     }
 
+    // ★ Dash：圖層快取初始化
+    private void InitDashLayerCache()
+    {
+        _playerLayer = LayerMask.NameToLayer(playerPhysicsLayer);
+        if (_playerLayer < 0)
+            Debug.LogWarning($"[Dash] Player layer '{playerPhysicsLayer}' not found. Check Project Settings > Tags and Layers.");
+
+        var list = new List<int>();
+        foreach (var s in harmPhysicsLayers)
+        {
+            if (string.IsNullOrWhiteSpace(s)) continue;
+            int l = LayerMask.NameToLayer(s);
+            if (l < 0) Debug.LogWarning($"[Dash] Harm layer '{s}' not found.");
+            list.Add(l);
+        }
+        _harmLayers = list.ToArray();
+    }
+    
     private IEnumerator RebindAfterSceneLoad()
     {
         if (arenaMode) yield break;
@@ -128,24 +165,39 @@ public class PlayerController : LivingEntity, IDataPersistence
     {
         if (!enabled) return;
 
-        Movement();
-        AnimationState();
-        anim.SetInteger("state", (int)state);
-
-        if (transform.position.y < -10)
-        {
-            ResetPlayerPosition();
-        }
-
+        // 死亡終止（你原本的流程）
         if (PlayerUtils.CheckDeath(healthBar))
         {
             state = State.dying;
             anim.SetInteger("state", (int)State.dying);
             Debug.Log("Player is dead!");
-            rb.velocity = Vector2.zero;
+            if (rb) rb.velocity = Vector2.zero;
             this.enabled = false;
             if (deathMenu) deathMenu.SetActive(true);
+            return;
         }
+
+        // NEW: Dash 輸入（不影響現有鍵位）
+        if (Input.GetKeyDown(dashKey))
+            TryDash();
+
+        // 若正在衝刺，讓協程主導位移；避免一般移動/動畫把 dash 抵銷
+        if (!isDashing)
+        {
+            Movement();            // 你原本的移動
+            AnimationState();      // 你原本的動畫狀態機
+            anim.SetInteger("state", (int)state);
+        }
+        else
+        {
+            // 衝刺中可選擇固定一個狀態或不動作；這裡維持現狀，不強制覆蓋 state
+            // 若想要固定，可開啟下一行：
+            // anim.SetInteger("state", (int)State.idle);
+        }
+
+        // 墜落防呆
+        if (transform.position.y < -10f)
+            ResetPlayerPosition();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -238,6 +290,7 @@ public class PlayerController : LivingEntity, IDataPersistence
 
     public override void TakeDamage(float damage)
     {
+        if (isDashing || isDead) return;
         base.TakeDamage(damage);
 
         if (!isDead)
@@ -404,6 +457,50 @@ public class PlayerController : LivingEntity, IDataPersistence
         else if (state == State.dying)
         {
             state = State.dying;
+        }
+    }
+
+    private void TryDash()
+    {
+        if (isDashing) return;
+        if (Time.time < lastDashTime + dashCooldown) return;
+
+        StartCoroutine(DoDash());
+    }
+
+    // ➎ 執行衝刺協程
+    private IEnumerator DoDash()
+    {
+        isDashing = true;
+        lastDashTime = Time.time;
+
+        ToggleIFrames(true);  // 開啟無敵
+
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        _origGravity = rb.gravityScale;
+        rb.gravityScale = 0f;  // 關重力避免下墜
+
+        float dir = transform.localScale.x >= 0 ? 1f : -1f;
+        rb.velocity = new Vector2(dashSpeed * dir, 0f);
+
+        // 期間不要移動或攻擊
+        yield return new WaitForSeconds(dashDuration);
+
+        // 恢復
+        rb.gravityScale = _origGravity;
+        rb.velocity = Vector2.zero;
+        ToggleIFrames(false);
+        isDashing = false;
+    }
+
+    // ➏ 無敵開關
+    private void ToggleIFrames(bool on)
+    {
+        if (_playerLayer < 0) return;
+        for (int i = 0; i < _harmLayers.Length; i++)
+        {
+            if (_harmLayers[i] < 0) continue;
+            Physics2D.IgnoreLayerCollision(_playerLayer, _harmLayers[i], on);
         }
     }
 
