@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class AutoStartDialogue : MonoBehaviour
 {
@@ -7,7 +8,13 @@ public class AutoStartDialogue : MonoBehaviour
 
     private void Start()
     {
-        // 確保 DialogueManager 存在
+        // 若是競技場場景，直接略過
+        if (SceneManager.GetActiveScene().name == "BATTLE")
+        {
+            Debug.Log("🏟️ 競技場場景，跳過 AutoStartDialogue");
+            return;
+        }
+
         if (DialogueManager.GetInstance() == null)
         {
             Debug.LogError("❌ DialogueManager 尚未在場景中建立！");
@@ -20,7 +27,6 @@ public class AutoStartDialogue : MonoBehaviour
             return;
         }
 
-        // 停用玩家控制，並進入對話
         Debug.Log("🎬 遊戲開始，自動進入對話");
         DialogueManager.GetInstance().EnterDialogueMode(inkJSON);
     }
