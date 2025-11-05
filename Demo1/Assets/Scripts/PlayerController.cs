@@ -556,6 +556,7 @@ public class PlayerController : LivingEntity, IDataPersistence
         transform.localScale = s;
     }
 
+
     // ─────────────────────────────────────────────────────────
     //（可選）切場輔助：存檔 + 指定下一出生點 + 切場
     // ─────────────────────────────────────────────────────────

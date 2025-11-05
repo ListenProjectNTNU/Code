@@ -54,6 +54,19 @@ public class Death : LivingEntity
     public float accel = 14f;
     public float decel = 18f;
 
+    [Header("Special (Cast)")]
+    public Transform specialPoint;           // ★生成點（可放在敵人身上，或空物件）
+    public GameObject remoteHandPrefab;      // ★手臂 Prefab（下方有腳本）
+    public float specialCooldown = 5.0f;     // ★冷卻
+    public float specialMinDistance = 3.0f;  // ★太近不施放
+    public float specialMaxDistance = 10.0f; // ★太遠不施放（可用 loseAggroRange 也行）
+    public bool  lockOnDuringCast = false;   // ★施法過程是否鎖定 specialPoint 跟著玩家
+
+    private float nextSpecialTime = 0f;      // ★
+    private bool  inSpecial = false;         // ★
+    public float specialPostCastDelay = 1.0f;   // Cast 動畫結束後，等待幾秒才生成手臂
+    private SpecialPointFollower spFollower;   // special_point 的跟隨器
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -87,6 +100,8 @@ public class Death : LivingEntity
             leftCap  = transform.position.x - fallbackPatrolHalfWidth;
             rightCap = transform.position.x + fallbackPatrolHalfWidth;
         }
+        if (specialPoint)
+        spFollower = specialPoint.GetComponent<SpecialPointFollower>();
     }
 
     private void Update()
@@ -96,9 +111,19 @@ public class Death : LivingEntity
 
         float dist = Vector2.Distance(transform.position, target.position);
 
-        // 黏性追擊
+        // ✅ 先更新仇恨狀態（放最前面！）
         if (!hasAggro && dist <= detectRange) hasAggro = true;
-        if ( hasAggro && dist >= loseAggroRange) hasAggro = false;
+        if (hasAggro && dist >= loseAggroRange) hasAggro = false;
+
+        // ★特殊攻擊優先（進入施法距離 + 冷卻好 + 正在仇恨）
+        if (!inAttackAnim && !inSpecial && hasAggro &&
+            Time.time >= nextSpecialTime &&
+            dist >= specialMinDistance && dist <= specialMaxDistance &&
+            remoteHandPrefab != null)
+        {
+            StartSpecial();
+            return;
+        }
 
         // 攻擊期間：鎖腳並面向玩家
         if (inAttackAnim)
@@ -109,7 +134,7 @@ public class Death : LivingEntity
             return;
         }
 
-        // 先攻擊，後位移
+        // 近戰或移動邏輯
         if (Time.time >= nextMeleeTime && dist <= Mathf.Max(meleeRange, minStopDist + 0.05f))
         {
             StartMelee();
@@ -123,6 +148,7 @@ public class Death : LivingEntity
             Patrol();
         }
     }
+
 
     // ───────────────────────── Movement / Facing ─────────────────────────
     private void FaceTo(float dxTowardTarget)
@@ -212,6 +238,97 @@ public class Death : LivingEntity
     {
         inAttackAnim = false;
     }
+
+    // ★進入施法動畫
+    private void StartSpecial()
+    {
+        if (Time.time < nextSpecialTime) return;
+        if (!target) return;
+
+        inAttackAnim = true;   // ← 鎖住移動（Update 會把 vx 設 0）
+        inSpecial    = true;
+
+        nextSpecialTime = Time.time + specialCooldown; // 進入冷卻（關鍵！）
+
+        rb.velocity = new Vector2(0, rb.velocity.y);
+        anim.SetFloat("Speed", 0);
+        anim.ResetTrigger("attack");
+        anim.SetTrigger("cast");
+        FaceTo(target.position.x - transform.position.x);
+
+        // 施法期間讓 special_point 追蹤玩家（可關閉 lockOnDuringCast）
+        if (lockOnDuringCast && spFollower)
+        {
+            spFollower.Bind(target);
+            spFollower.StartFollow();
+        }
+    }
+
+    // ★（可選）施法期間鎖定 specialPoint 追蹤玩家
+    private System.Collections.IEnumerator SpecialLockOnRoutine(float duration)
+    {
+        float t = 0f;
+        while (t < duration && inSpecial && target && specialPoint)
+        {
+            specialPoint.position = target.position; // 讓手臂生成點黏著玩家
+            t += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    public void Anim_SpecialSpawnHand()
+    {
+        // ★ 保險：確保至少有 CD
+        if (Time.time + 0.1f > nextSpecialTime)
+            nextSpecialTime = Time.time + specialCooldown;
+
+        if (!remoteHandPrefab) return;
+
+        Vector3 spawnPos = specialPoint ? specialPoint.position
+                        : (target ? target.position : transform.position);
+
+        var go = Instantiate(remoteHandPrefab, spawnPos, Quaternion.identity);
+        if (go.TryGetComponent<RemoteVoidArm>(out var arm))
+            arm.Init(playerMask, meleeDamage);
+}
+
+    // ★動畫事件：Cast 結束，解鎖腳，回到 AI
+    public void Anim_SpecialEnd()
+    {
+        StartCoroutine(SpawnArmAfterDelay(specialPostCastDelay));
+    }
+
+    private System.Collections.IEnumerator SpawnArmAfterDelay(float delay)
+    {
+        float t = 0f;
+        while (t < delay)
+        {
+            // 持續鎖腳，不能移動
+            rb.velocity = new Vector2(0, rb.velocity.y);
+            anim.SetFloat("Speed", 0);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        // 生成點：若有 special_point 用它；否則用玩家位置
+        Vector3 spawnPos = specialPoint ? specialPoint.position
+                            : (target ? target.position : transform.position);
+
+        if (remoteHandPrefab)
+        {
+            var go = Instantiate(remoteHandPrefab, spawnPos, Quaternion.identity);
+            if (go.TryGetComponent<RemoteVoidArm>(out var arm))
+                arm.Init(playerMask, meleeDamage); // 或改為 specialDamage
+        }
+
+        // 關閉跟隨
+        if (spFollower) spFollower.StopFollow();
+
+        // 解鎖：回到 AI 流程
+        inSpecial    = false;
+        inAttackAnim = false;
+    }
+
 
     // ───────────────────────── Hurt / Die ─────────────────────────
     public void PlayHurt()

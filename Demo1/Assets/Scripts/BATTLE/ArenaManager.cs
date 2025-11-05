@@ -279,6 +279,7 @@ public class ArenaManager : MonoBehaviour
     // UI Button
     public void Restart()
     {
+        Time.timeScale = 1f; // 防止之前暫停或面板把時間卡在 0
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

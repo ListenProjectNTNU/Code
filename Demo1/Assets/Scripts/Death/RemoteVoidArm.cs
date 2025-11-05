@@ -1,58 +1,52 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Animator), typeof(Collider2D))]
 public class RemoteVoidArm : MonoBehaviour
 {
-    private Animator anim;
-    private Collider2D hitbox;
+    [Header("Hitbox")]
+    public Collider2D hitbox;                 // 可不填，會在 Awake 自動抓
+    public LayerMask playerMask;
+    public int damage = 15;
+    public float lifeTime = 1.2f;             // 手臂存活時間（等於動畫長度）
+    public bool destroyOnAnimEvent = true;    // 若動畫尾會呼叫 Anim_HandEnd，就把它打勾
 
-    private LayerMask playerMask;
-    private int damage;
-    private GameObject target;
     private bool hasHit = false;
-
-    public void Init(LayerMask playerMask, int damage, GameObject target)
-    {
-        this.playerMask = playerMask;
-        this.damage = damage;
-        this.target = target;
-    }
+    private Animator anim;
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
-        hitbox = GetComponent<Collider2D>();
-        hitbox.isTrigger = true; // 很重要！
+        if (!hitbox) hitbox = GetComponent<Collider2D>();
+        if (hitbox) hitbox.isTrigger = true;
     }
 
-    // 動畫事件：命中幀（只打一次）
-    public void Hand_Hit()
+    private void OnEnable()
+    {
+        if (!destroyOnAnimEvent)
+            Destroy(gameObject, lifeTime);
+    }
+
+    public void Init(LayerMask mask, int dmg)
+    {
+        playerMask = mask;
+        damage = dmg;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (hasHit) return;
-        hasHit = true;
 
-        var filter = new ContactFilter2D
-        {
-            useLayerMask = true,
-            layerMask = playerMask,
-            useTriggers = true
-        };
+        // 檢查 Layer 是否在 playerMask 裡
+        if ((playerMask.value & (1 << other.gameObject.layer)) == 0) return;
 
-        var results = new Collider2D[8];
-        int count = hitbox.OverlapCollider(filter, results);
-        for (int i = 0; i < count; i++)
+        if (other.TryGetComponent<LivingEntity>(out var le))
         {
-            var c = results[i];
-            if (!c) continue;
-            if (c.TryGetComponent<LivingEntity>(out var le))
-                le.TakeDamage(damage);
+            le.TakeDamage(damage);
+            hasHit = true;
         }
-
-        // TODO: 在這裡可加相機震動/音效等
     }
 
-    // 動畫事件：最後一幀
-    public void Hand_End()
+    // 動畫事件：尾端呼叫
+    public void Anim_HandEnd()
     {
         Destroy(gameObject);
     }
