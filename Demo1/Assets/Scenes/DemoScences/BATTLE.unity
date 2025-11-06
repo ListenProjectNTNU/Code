@@ -331,6 +331,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3669977880741738409, guid: b1e26a18e05c8a14e9104ee996acc3e6, type: 3}
+      propertyPath: m_Size.x
+      value: 6.332535
+      objectReference: {fileID: 0}
+    - target: {fileID: 3669977880741738409, guid: b1e26a18e05c8a14e9104ee996acc3e6, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.16862833
+      objectReference: {fileID: 0}
     - target: {fileID: 6057151369117354620, guid: b1e26a18e05c8a14e9104ee996acc3e6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -25.677868
@@ -419,6 +427,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 429871080984878579, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
+      propertyPath: m_Size.x
+      value: 16.567688
+      objectReference: {fileID: 0}
+    - target: {fileID: 429871080984878579, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
+      propertyPath: m_Size.y
+      value: 64.037186
+      objectReference: {fileID: 0}
+    - target: {fileID: 429871080984878579, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
+      propertyPath: m_Offset.x
+      value: -2.7107372
+      objectReference: {fileID: 0}
+    - target: {fileID: 429871080984878579, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
+      propertyPath: m_Offset.y
+      value: 1.7314072
+      objectReference: {fileID: 0}
     - target: {fileID: 1376125773283568411, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
       propertyPath: m_Name
       value: rabbit_Arena
