@@ -23,6 +23,7 @@ public class DataPersistenceManager : MonoBehaviour
     List<IDataPersistence> objs;
     bool alreadySwitched;
     bool skipNextSave = false;
+    bool arenaSceneActive = false;
 
     void Awake()
     {
@@ -40,17 +41,20 @@ public class DataPersistenceManager : MonoBehaviour
     void Loaded(Scene sc, LoadSceneMode m)
     {
         objs = FindAll();
+        arenaSceneActive = ShouldDisablePersistence(sc);
+        if (arenaSceneActive) return;
         if (sc.name != "MainMenu") LoadGame();   // MainMenu 由 UI 決定
     }
     void Unloaded(Scene sc)
     {
+        if (arenaSceneActive) return;
         if (skipNextSave) {        // ★ 只跳過第一次
             skipNextSave = false;  //   之後恢復正常
             return;
         }
         SaveGame();
     }
-    void OnApplicationQuit(){ SaveGame(); }
+    void OnApplicationQuit(){ if (!arenaSceneActive) SaveGame(); }
 
     /* ───── 公開 API ───── */
     public void ChangeSelectedProfileId(string id){ selectedProfileId=id; PlayerPrefs.SetString(PREF_LAST,id); }
@@ -68,6 +72,7 @@ public class DataPersistenceManager : MonoBehaviour
     /* ───── Load / Save ───── */
     public void LoadGame()
     {
+        if (arenaSceneActive) return;
         gameData = dataHandler.Load(selectedProfileId);
 
         if (gameData == null)
@@ -97,6 +102,7 @@ public class DataPersistenceManager : MonoBehaviour
 
     public void SaveGame(bool overwriteScene = true)
     {
+        if (arenaSceneActive) return;
         if (gameData == null) return;
 
         if (overwriteScene)
@@ -108,7 +114,7 @@ public class DataPersistenceManager : MonoBehaviour
 
     public void LoadSceneAndUpdate(string sceneName)
     {
-        if (gameData != null)
+        if (!arenaSceneActive && gameData != null)
         {
             gameData.sceneName = sceneName;
             SaveGame(false);
@@ -120,4 +126,17 @@ public class DataPersistenceManager : MonoBehaviour
     /* ───── utils ───── */
     List<IDataPersistence> FindAll() =>
         FindObjectsOfType<MonoBehaviour>().OfType<IDataPersistence>().ToList();
+
+    bool ShouldDisablePersistence(Scene sc)
+    {
+        // 競技場場景：存在 ArenaManager 或任何 PlayerController 啟用 arenaMode
+        if (FindObjectOfType<ArenaManager>() != null) return true;
+
+        var players = FindObjectsOfType<PlayerController>();
+        foreach (var p in players)
+            if (p != null && p.arenaMode)
+                return true;
+
+        return false;
+    }
 }

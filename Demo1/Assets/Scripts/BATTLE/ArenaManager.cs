@@ -273,20 +273,23 @@ public class ArenaManager : MonoBehaviour
 
         if (finalScoreText != null) finalScoreText.text = $"Final Score: {score}";
         if (bestScoreText  != null) bestScoreText.text  = $"Best: {best}";
-        if (gameOverPanel  != null) gameOverPanel.SetActive(true);
+        Time.timeScale = 1f;                 // 防止暫停卡住
+        if (gameOverPanel) gameOverPanel.SetActive(true);
     }
 
     // UI Button
     public void Restart()
     {
-        Time.timeScale = 1f; // 防止之前暫停或面板把時間卡在 0
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Time.timeScale = 1f;                 // 一律復原
+        Scene current = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(current.buildIndex);  // 直接重載整場
     }
 
     // UI Button
-    public void ExitToMenu(string menuSceneName = "MainMenu")
+    public void ExitToMenu(string menuSceneName)
     {
-        SceneManager.LoadScene(menuSceneName);
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
     }
 
     // —— 內部類：自動移除已毀物件的追蹤 —— //

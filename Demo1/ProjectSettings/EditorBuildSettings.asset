@@ -24,6 +24,9 @@ EditorBuildSettings:
     path: Assets/Scenes/DemoScences/ReFirstScene.unity
     guid: 1b5d27d0d14c4c042ad667981321facb
   - enabled: 1
+    path: Assets/Scenes/DemoScences/BATTLE.unity
+    guid: 6d3594ceb42f65b41bf37b9b11470c8c
+  - enabled: 1
     path: Assets/Scenes/DemoScences/MainMenu.unity
     guid: 73cf02b9debd83c41830d2ff688fc23e
   - enabled: 1

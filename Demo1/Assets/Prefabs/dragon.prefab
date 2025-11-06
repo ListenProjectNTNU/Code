@@ -439,7 +439,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6671779312051646865}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.20685306, w: 0.97837204}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 66.16667, y: 79.66668, z: 0}
   m_LocalScale: {x: 0.31694973, y: 0.31694973, z: 0.31694973}
   m_ConstrainProportionsScale: 0
@@ -449,7 +449,7 @@ Transform:
   - {fileID: 3971325999883557162}
   - {fileID: 5131066596742654055}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -23.876}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1162086348515859212
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -626,7 +626,7 @@ MonoBehaviour:
   rightPoint: {fileID: 3971325999883557162}
   fallbackPatrolHalfWidth: 4
   cruiseSpeed: 3.5
-  baseAltitude: 4.5
+  baseAltitude: 10
   sinAmp: 0.6
   sinFreq: 1.2
   perlinAmp: 0.3
@@ -638,7 +638,6 @@ MonoBehaviour:
   descendSpeed: 6
   ascendSpeed: 6
   groundIdleDuration: 2.2
-  takeoffDelay: 0.3
   landOffset: 0.2
   flyAttackTrigger: flyattack
   hurtTrigger: hurt
@@ -646,6 +645,8 @@ MonoBehaviour:
   requireLineOfSight: 1
   facePlayer: 1
   isActive: 1
+  ceilingMargin: 0.25
+  maxTakeoffTime: 3
 --- !u!1 &7371825057718775737
 GameObject:
   m_ObjectHideFlags: 0
