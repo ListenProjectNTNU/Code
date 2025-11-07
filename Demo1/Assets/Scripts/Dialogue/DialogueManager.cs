@@ -51,9 +51,7 @@ public class DialogueManager : MonoBehaviour
 
     private void Start()
     {
-        // 先從 public player 抓，再退回全域搜尋（避免多個 Player / 時序問題）
-        if (player != null) playerController = player.GetComponent<PlayerController>();
-        if (playerController == null) playerController = FindObjectOfType<PlayerController>();
+        EnsurePlayerController();
 
         globalVolumeController = FindObjectOfType<GlobalVolumeController>();
 
@@ -281,12 +279,23 @@ public class DialogueManager : MonoBehaviour
         // 已經有而且沒被銷毀，直接用
         if (playerController != null) return;
 
-        // 先從 player 物件試著補
-        if (player != null)
-            playerController = player.GetComponent<PlayerController>();
+        // 優先找有 DontDestroyOnLoad 標記的 Player
+        var allPlayers = FindObjectsOfType<PlayerController>(true);
+        foreach (var p in allPlayers)
+        {
+            if (p.gameObject.scene.name == "DontDestroyOnLoad")
+            {
+                playerController = p;
+                player = p.gameObject;
+                return;
+            }
+        }
 
-        // 還是沒有，就全場景找一次
-        if (playerController == null)
-            playerController = FindObjectOfType<PlayerController>();
+        // 如果找不到 DDOL，就退而求其次（目前場景裡的 Player）
+        playerController = FindObjectOfType<PlayerController>();
+        if (playerController != null)
+        {
+            player = playerController.gameObject;
+        }    
     }
 }
