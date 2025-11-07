@@ -83,6 +83,12 @@ public class DialogueManager : MonoBehaviour
         EnsurePlayerController();
         if (playerController != null) playerController.enabled = false;
 
+        if (player != null)
+        {
+            var playerAnim = player.GetComponent<Animator>();
+            if (playerAnim) playerAnim.Play("Move");
+        }
+
         currentStory = new Story(inkJSON.text);
         dialogueIsPlaying = true;
         if (dialoguePanel) dialoguePanel.SetActive(true);

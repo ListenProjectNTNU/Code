@@ -70,6 +70,38 @@ public class Scene3Controller : MonoBehaviour, ISceneController
         {
             if (player) cameraController.SetTarget(player);
         }
+
+        // 🧩 確保 Player 的剛體狀態正確，防止跨場後物理異常
+        if (player)
+        {
+            var rb = player.GetComponent<Rigidbody2D>();
+            if (rb)
+            {
+                rb.velocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                rb.bodyType = RigidbodyType2D.Dynamic;
+                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+                Debug.Log("[Scene3Controller] Player Rigidbody 已重設。");
+            }
+        }
+
+        // 🧩 若 Boss 存在，將其設為 Kinematic 以免被玩家推走
+        if (boss && boss.rb)
+        {
+            boss.rb.bodyType = RigidbodyType2D.Kinematic;
+            boss.rb.simulated = true;
+            boss.rb.gravityScale = 0;
+            Debug.Log("[Scene3Controller] Boss Rigidbody 設為 Kinematic。");
+        }
+
+        // 🧩 層碰撞忽略設定（避免 Player 與 Boss 互推）
+        int playerLayer = LayerMask.NameToLayer("Player");
+        int bossLayer   = LayerMask.NameToLayer("Enemy");
+        if (playerLayer >= 0 && bossLayer >= 0)
+        {
+            Physics2D.IgnoreLayerCollision(playerLayer, bossLayer, true);
+            Debug.Log("[Scene3Controller] 已忽略 Player 與 Enemy 層碰撞。");
+        }
     }
 
     private void Start()

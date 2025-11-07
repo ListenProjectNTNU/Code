@@ -2139,7 +2139,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3123781270002784855, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: activeLayerName
-      value: FirstSceneAn
+      value: Base Layer
       objectReference: {fileID: 0}
     - target: {fileID: 3123781270002784855, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
       propertyPath: AnimatorLayerNames.Array.size
@@ -2225,7 +2225,8 @@ PrefabInstance:
       propertyPath: m_BodyType
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 509470911736704199, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
     m_RemovedGameObjects:
     - {fileID: 56346770930078841, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}
     - {fileID: 2977903723551449368, guid: 5d801452a74d1a64386731a12ffaaa3e, type: 3}

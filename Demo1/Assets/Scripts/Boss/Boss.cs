@@ -77,7 +77,8 @@ public class BossController : LivingEntity
         anim = GetComponent<Animator>();
         col = GetComponent<Collider2D>();
 
-        if (!player) player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        EnsurePlayer();  // 🟣 改這裡：用動態補抓，不再用單次 FindGameObjectWithTag
+
         if (attackHitbox) attackHitbox.gameObject.SetActive(false);
 
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -92,6 +93,12 @@ public class BossController : LivingEntity
 
     void Update()
     {
+        // 🟣 每隔幾幀自動補抓（防止玩家切場後 Boss 還沒抓到 Player）
+        if (player == null)
+        {
+            EnsurePlayer();
+        }
+
         if (isDead) return;
 
         // 偵錯
@@ -102,8 +109,8 @@ public class BossController : LivingEntity
         if (Time.frameCount % 20 == 0)
             //Debug.Log($"[BossDebug] ax={ax:F2} grounded={g} cd={cd} isAttacking={isAttacking}");
 
-        // Animator 參數
-        anim.SetFloat("SpeedX", Mathf.Abs(rb.velocity.x));
+            // Animator 參數
+            anim.SetFloat("SpeedX", Mathf.Abs(rb.velocity.x));
         int moveDir = rb.velocity.x > 0.05f ? 1 : (rb.velocity.x < -0.05f ? -1 : (transform.localScale.x >= 0 ? 1 : -1));
         anim.SetInteger("MoveDir", moveDir);
 
@@ -125,6 +132,32 @@ public class BossController : LivingEntity
         if (ax <= teleportTriggerRangeX && cd /* && g */)
         {
             StartCoroutine(Co_DropAttack());
+        }
+    }
+    
+    private void EnsurePlayer()
+    {
+        // 已有的就跳過
+        if (player != null) return;
+
+        // 優先找 DDOL 場景中的玩家
+        var allPlayers = FindObjectsOfType<PlayerController>(true);
+        foreach (var p in allPlayers)
+        {
+            if (p.gameObject.scene.name == "DontDestroyOnLoad")
+            {
+                player = p.transform;
+                Debug.Log($"[Boss] ✅ 捕捉到 DDOL 玩家：{player.name}");
+                return;
+            }
+        }
+
+        // 找不到就退回傳統方法
+        var obj = GameObject.FindGameObjectWithTag("Player");
+        if (obj)
+        {
+            player = obj.transform;
+            Debug.Log($"[Boss] ✅ 從場景中捕捉到玩家：{player.name}");
         }
     }
 
