@@ -23,7 +23,7 @@ public class Scene1Controller : MonoBehaviour, ISceneController
     {
         Debug.Log("Scene1Controller 啟動，玩家狀態：" + (player != null ? player.activeInHierarchy.ToString() : "player為null"));
         globalVolume.ResetVignette();
-        
+
         // 確保 Volume 組件已經賦值
         if (globalVolume != null)
         {
@@ -36,6 +36,10 @@ public class Scene1Controller : MonoBehaviour, ISceneController
     {
         switch (tagValue)
         {
+            case "start":
+                PlayPlayerAnimation("walk");
+                break;
+
             case "corridor_withDoor":
                 loopingBG.SwitchToNextBGOpen();
                 AudioHeadphone();
@@ -51,7 +55,7 @@ public class Scene1Controller : MonoBehaviour, ISceneController
 
             case "player_turn":
                 Debug.Log("主角轉身");
-                
+
                 break;
 
             case "player_turnBack":
@@ -63,7 +67,7 @@ public class Scene1Controller : MonoBehaviour, ISceneController
                 PlayAnimation("ClassRoom_Start");
                 globalVolume?.ClassRoom_Start();
                 break;
-            
+
             case "ClassRoom_End":
                 PlayAnimation("ClassRoom_End");
                 FlipPlayer(true);
@@ -75,6 +79,33 @@ public class Scene1Controller : MonoBehaviour, ISceneController
                 break;
         }
     }
+
+    private void PlayPlayerAnimation(string animName)
+    {
+        if (player == null)
+        {
+            Debug.LogWarning("⚠️ player 為 null，無法播放動畫：" + animName);
+            return;
+        }
+
+        Animator anim = player.GetComponent<Animator>();
+        if (anim != null)
+        {
+            anim.Play(animName, 0, 0f);
+            Debug.Log("🎬 播放玩家動畫：" + animName);
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ 找不到玩家的 Animator 組件");
+        }
+    }
+    
+    public void playIdle()
+    {
+        PlayPlayerAnimation("idle");
+    }
+
+
     // 🔹 統一播放動畫函式
     private void PlayAnimation(string clipName)
     {

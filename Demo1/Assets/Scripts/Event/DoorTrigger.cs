@@ -60,6 +60,18 @@ public class DoorTrigger : MonoBehaviour
             {
                 bg.OnDoorTriggered();
             }
+            
+            // ✅ 尋找 Scene1Controller 實例
+            Scene1Controller controller = FindObjectOfType<Scene1Controller>();
+            if (controller != null)
+            {
+                controller.playIdle();
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ 找不到 Scene1Controller，無法播放 idle 動畫");
+            }
+
             return;
         }
 

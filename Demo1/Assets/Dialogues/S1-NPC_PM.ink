@@ -1,5 +1,5 @@
 //動畫 走在沒有開門的走廊png loop裡
-（估計大學也跟高中一樣吧？只要繼續當個邊緣人就不會受到傷害。）#speaker:家豪#portrait:default#layout:right
+（估計大學也跟高中一樣吧？只要繼續當個邊緣人就不會受到傷害。）#speaker:家豪#portrait:default#layout:right#scene:start
 
 （不想參加新生訓練的家豪，被媽媽強行拎到大學門口，邊說著：「大學是新的開始，要體驗人生！」 ）#speaker:家豪#portrait:default#layout:left
 //動畫 打破沒有開門的走廊png loop 下一張走廊png有開門
