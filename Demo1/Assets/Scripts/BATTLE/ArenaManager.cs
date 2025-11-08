@@ -239,14 +239,14 @@ public class ArenaManager : MonoBehaviour
     public void OnWaveCleared()
     {
         // 這裡用 wave（已開啟的波數）判定更直觀：第 3、6、9 ... 波清空後升級
-        if (upgradeMenu != null && wave > 0 && wave % 3 == 0)
+        if (upgradeMenu != null && wave > 0 && wave % 3 == 1)
         {
             PauseGame();
             upgradeMenu.ShowThreeRandom();
         }
     }
 
-    public void PauseGame()
+        public void PauseGame()
     {
         Time.timeScale = 0f;            // 暫停
         AudioListener.pause = true;     // 可選：暫停音效
