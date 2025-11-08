@@ -193,7 +193,7 @@ MonoBehaviour:
   bossPrefab: {fileID: 1506926163622650895, guid: 8cf56fcff03b04c4bb95048abda66471, type: 3}
   enemiesParent: {fileID: 658613095}
   bossesParent: {fileID: 1073392263}
-  waveInterval: 60
+  waveInterval: 5
   baseEnemyCount: 1
   enemyCountPerWave: 0
   bossEveryNWaves: 3
@@ -209,6 +209,7 @@ MonoBehaviour:
   waveStartClip: {fileID: 0}
   bossIncomingClip: {fileID: 0}
   gameOverClip: {fileID: 0}
+  upgradeMenu: {fileID: 0}
 --- !u!4 &95409660
 Transform:
   m_ObjectHideFlags: 0
@@ -249,7 +250,7 @@ Transform:
   m_GameObject: {fileID: 298093629}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -29.57, y: -11.7, z: -0.021891458}
+  m_LocalPosition: {x: -29.89, y: -7.88, z: -0.021891458}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -379,9 +380,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6354267680290405434, guid: b1e26a18e05c8a14e9104ee996acc3e6, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 2147366873}
     - target: {fileID: 6671779312051646865, guid: b1e26a18e05c8a14e9104ee996acc3e6, type: 3}
       propertyPath: m_Name
       value: dragon
+      objectReference: {fileID: 0}
+    - target: {fileID: 6671779312051646865, guid: b1e26a18e05c8a14e9104ee996acc3e6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -451,6 +460,14 @@ PrefabInstance:
       propertyPath: arenaMode
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3123781270002784855, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4781995476166064621, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6026982861198479447, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
       propertyPath: m_LocalPosition.x
       value: -20.393362
@@ -492,6 +509,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8369100859208720126, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8369100859208720126, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
       propertyPath: playerController
       value: 
       objectReference: {fileID: 0}
@@ -500,7 +521,7 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1376125773283568411, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
-      insertIndex: -1
+      insertIndex: 3
       addedObject: {fileID: 2147366864}
   m_SourcePrefab: {fileID: 100100000, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}
 --- !u!1 &797106749
@@ -1074,7 +1095,7 @@ Transform:
   m_GameObject: {fileID: 1311871401}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.42, y: -12.6, z: -0.021891458}
+  m_LocalPosition: {x: -13.42, y: -7.88, z: -0.021891458}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1263,7 +1284,7 @@ Transform:
   m_GameObject: {fileID: 1427279314}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.676306, y: -6.38128, z: -10}
+  m_LocalPosition: {x: -18.909405, y: -6.38865, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2429,10 +2450,15 @@ MonoBehaviour:
   currentHealth: 0
   isDead: 0
   healthBar: {fileID: 2116058762}
-  ground:
+  anim: {fileID: 0}
+  wallLayer:
     serializedVersion: 2
     m_Bits: 64
-  wallLayer:
+  attackseg: 0
+  defenceseg: 0
+  speedseg: 0
+  playerID: player
+  ground:
     serializedVersion: 2
     m_Bits: 64
   jumpForce: 7
@@ -2440,12 +2466,11 @@ MonoBehaviour:
   speed: 5
   attackDamage: 20
   defence: 15
-  attackseg: 0
-  defenceseg: 0
-  speedseg: 0
+  deathMenu: {fileID: 0}
   AnimatorLayerNames:
   - Base Layer
   activeLayerName: Base Layer
+  arenaMode: 1
   dashKey: 304
   dashSpeed: 25
   dashDuration: 0.18
@@ -2453,8 +2478,6 @@ MonoBehaviour:
   playerPhysicsLayer: Player
   harmPhysicsLayers:
   - Enemy
-  ignoreEnemyBodyCollision: 1
-  enemyBodyLayer: Enemy
 --- !u!4 &2147366873 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6026982861198479447, guid: 88a45af7e9bfbc84ea51829e9b40c1de, type: 3}

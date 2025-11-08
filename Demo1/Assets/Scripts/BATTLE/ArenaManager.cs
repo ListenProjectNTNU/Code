@@ -7,15 +7,10 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// 競技場波次控制：
 /// - 每 waveInterval 秒生成一波
-/// - 每 5 波生成 Boss
-/// - 每過一波加分，遇到 5 的倍數額外加分
-/// - 玩家死亡後結算
-///
-/// 用法：
-/// 1) 場景放一個空物件加上本腳本
-/// 2) 設定 spawnPoints / enemyPrefabs / bossPrefab / UI 引用
-/// 3)（可選）準備 EnemiesParent、BossesParent 做生成整理
-/// 4) 玩家物件掛上 ArenaPlayerAdapter（會自動啟用 arenaMode）
+/// - 每 bossEveryNWaves 波生成 Boss
+/// - requireClearToProceed=true 時，清空敵人後才進下一波
+/// - 每 3 波清怪後跳出升級面板（可在 OnWaveCleared() 調整）
+/// - 玩家死亡後結算（外部呼叫 OnPlayerDeath）
 /// </summary>
 public class ArenaManager : MonoBehaviour
 {
@@ -71,8 +66,11 @@ public class ArenaManager : MonoBehaviour
     public AudioClip bossIncomingClip;
     public AudioClip gameOverClip;
 
+    [Header("Upgrade (可選)")]
+    public UpgradeMenu upgradeMenu;
+
     // Runtime
-    private int wave = 0;
+    private int wave = 0;     // 已開啟的波數
     private int score = 0;
     private bool running = false;
     private Coroutine loopCo;
@@ -86,6 +84,7 @@ public class ArenaManager : MonoBehaviour
 
     private void Start()
     {
+        
         // 基本檢查
         if ((spawnPoints == null || spawnPoints.Length == 0) ||
             (enemyPrefabs == null || enemyPrefabs.Length == 0) ||
@@ -114,8 +113,12 @@ public class ArenaManager : MonoBehaviour
 
             if (requireClearToProceed)
             {
-                // 等待場上「全部敵人 + Boss」清空
+                // 等到場上敵人 + Boss 清空
                 yield return StartCoroutine(WaitUntilCleared());
+
+                // 清空後（代表「這一波完成」）→ 觸發升級/暫停等
+                OnWaveCleared();
+
                 // 小緩衝
                 yield return new WaitForSeconds(1f);
             }
@@ -134,7 +137,7 @@ public class ArenaManager : MonoBehaviour
 
         bool isBossWave = (bossEveryNWaves > 0 && wave % bossEveryNWaves == 0);
 
-        // 計分
+        // 計分（按你的原設計：開波就加）
         score += scorePerWave;
         if (isBossWave) score += bonusPerBossWave;
         UpdateScoreUI();
@@ -177,7 +180,6 @@ public class ArenaManager : MonoBehaviour
             TrackAlive(inst, isBoss:false);
 
             // （可選）告知敵人「這是第幾波，用於自調難度」
-            // 例如：敵人腳本可實作 void OnArenaScale(int wave) 來提升攻擊或血量。
             inst.SendMessage("OnArenaScale", wave, SendMessageOptions.DontRequireReceiver);
         }
     }
@@ -230,6 +232,32 @@ public class ArenaManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 一波清空後的回調：在 requireClearToProceed 模式下由 MainLoop 呼叫。
+    /// 預設：每 3 波清空跳一次升級面板。
+    /// </summary>
+    public void OnWaveCleared()
+    {
+        // 這裡用 wave（已開啟的波數）判定更直觀：第 3、6、9 ... 波清空後升級
+        if (upgradeMenu != null && wave > 0 && wave % 3 == 0)
+        {
+            PauseGame();
+            upgradeMenu.ShowThreeRandom();
+        }
+    }
+
+    public void PauseGame()
+    {
+        Time.timeScale = 0f;            // 暫停
+        AudioListener.pause = true;     // 可選：暫停音效
+    }
+
+    public void ResumeGame()
+    {
+        AudioListener.pause = false;
+        Time.timeScale = 1f;
+    }
+
     private void PruneDeadRefs()
     {
         aliveEnemies.RemoveAll(e => e == null);
@@ -273,7 +301,11 @@ public class ArenaManager : MonoBehaviour
 
         if (finalScoreText != null) finalScoreText.text = $"Final Score: {score}";
         if (bestScoreText  != null) bestScoreText.text  = $"Best: {best}";
-        Time.timeScale = 1f;                 // 防止暫停卡住
+
+        // 確保不在暫停狀態
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+
         if (gameOverPanel) gameOverPanel.SetActive(true);
     }
 
@@ -281,6 +313,7 @@ public class ArenaManager : MonoBehaviour
     public void Restart()
     {
         Time.timeScale = 1f;                 // 一律復原
+        AudioListener.pause = false;
         Scene current = SceneManager.GetActiveScene();
         SceneManager.LoadScene(current.buildIndex);  // 直接重載整場
     }
@@ -289,7 +322,9 @@ public class ArenaManager : MonoBehaviour
     public void ExitToMenu(string menuSceneName)
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu");
+        AudioListener.pause = false;
+        if (string.IsNullOrEmpty(menuSceneName)) menuSceneName = "MainMenu";
+        SceneManager.LoadScene(menuSceneName);
     }
 
     // —— 內部類：自動移除已毀物件的追蹤 —— //

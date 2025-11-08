@@ -1,195 +1,370 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(Animator), typeof(Collider2D))]
 public class ArenaPlayerController : LivingEntity
 {
+    // ─────────────────────────────────────────────────────────
+    // Singleton + 事件 + DDOL
+    // ─────────────────────────────────────────────────────────
     public static ArenaPlayerController Instance { get; private set; }
+    public static event System.Action<ArenaPlayerController> OnPlayerReady;
 
     private Rigidbody2D rb;
-    private Animator anim;
+    public Animator anim;
     private Collider2D coll;
-
-    [Header("Layers")]
-    public LayerMask ground;
     public LayerMask wallLayer;
 
-    [Header("角色數值")]
-    public float jumpForce = 3f;
-    public float hurtForce = 3f;
-    public int   speed     = 5;
-    public int   attackDamage = 20;
-    public int   defence      = 15;
+    // ☆ 這三個舊欄位保留，但實際計算一律走 PlayerBuffs
+    public int attackseg = 0;
+    public int defenceseg = 0;
+    public int speedseg = 0;
 
-    public int attackseg = 0, defenceseg = 0, speedseg = 0;
-    public int curdefence => defence + defenceseg * 10;
-    public int curattack  => attackDamage + attackseg * 10;
-    public int curspeed   => speed + speedseg * 20;
+    [SerializeField] private string playerID = "player";
 
-    [Header("Animator Layer Control")]
-    public string[] AnimatorLayerNames = { "Base Layer" };
-    [SerializeField] private string activeLayerName = "Base Layer";
-
+    // FSM
     public enum State { idle, jump, fall, hurt, dying };
     private State state = State.idle;
 
-    // ───────── Dash ─────────
+    // Inspector variable
+    public LayerMask ground;
+
+    [Header("角色數值（基礎值，Buff 會在此基礎上加成）")]
+    public float jumpForce = 3f;
+    public float hurtForce = 3f;
+
+    public int speed = 5;
+    public int attackDamage = 20;
+    public int defence = 15;
+
+    // ★ 有效數值：先用 PlayerBuffs，退而求其次用舊 seg 欄位
+    public int curdefence => buffs ? buffs.CurDefence(defence) : defence + defenceseg * 10;
+    public int curattack  => buffs ? buffs.CurAttack(attackDamage) : attackDamage + attackseg * 10;
+    public int curspeed   => buffs ? buffs.CurSpeed(speed) : speed + speedseg * 20;
+
+    [Header("UI")]
+    public GameObject deathMenu;
+
+    // ==========================================================
+    // Animator Layer 管理
+    // ==========================================================
+    [Header("Animator Layer Control")]
+    [Tooltip("請輸入 Animator Controller 中所有 Layer 的名稱 (如 Base Layer, CutsceneAnimation)。")]
+    public string[] AnimatorLayerNames = { "Base Layer" }; // 預設 Base Layer
+
+    [Tooltip("設定當前要啟用 (權重為 1) 的 Layer 名稱。")]
+    [SerializeField] private string activeLayerName = "Base Layer";
+
+    [Header("Arena Mode")]
+    [Tooltip("在獨立競技場場景打勾，將關閉劇情/存檔/切場相關行為")]
+    public bool arenaMode = false;
+
     [Header("Dash Settings")]
     [SerializeField] private KeyCode dashKey = KeyCode.LeftShift;
-    [SerializeField] private float dashSpeed = 14f;
-    [SerializeField] private float dashDuration = 0.18f;
-    [SerializeField] private float dashCooldown = 0.9f;
-
-    [Tooltip("Player 的 Physics2D Layer 名稱")]
+    [SerializeField] private float dashSpeed = 14f;        // 衝刺速度
+    [SerializeField] private float dashDuration = 0.18f;   // 衝刺時間（基礎）
+    [SerializeField] private float dashCooldown = 0.9f;    // 冷卻時間（基礎）
     [SerializeField] private string playerPhysicsLayer = "Player";
-    [Tooltip("會對玩家造成傷害的 Layer（i-frame 時忽略）")]
-    [SerializeField] private string[] harmPhysicsLayers = new string[] { "Enemy", "EnemyProjectile" };
+    [SerializeField] private string[] harmPhysicsLayers = new string[] { "Enemy" };
 
-    [Header("碰撞選項")]
-    [Tooltip("若勾選：永遠忽略 Player 與 Enemy 的『身體碰撞』（建議用 Trigger 當攻擊判定）。")]
-    public bool ignoreEnemyBodyCollision = false;
-    [SerializeField] private string enemyBodyLayer = "Enemy"; // 與 harm 可相同
-
-    private bool  isDashing = false;
+    private bool isDashing = false;
     private float lastDashTime = -999f;
-    private int   _playerLayer;
+    private int _playerLayer;
     private int[] _harmLayers;
-    private int   _enemyBodyLayer = -1;
-    private float _origGravity = 1f;
-    private Coroutine dashCo;
+    private float _origGravity;
 
+    // ★ Buff 引用
+    private PlayerBuffs buffs;
+
+    // ─────────────────────────────────────────────────────────
+    // Unity lifecycle
+    // ─────────────────────────────────────────────────────────
     private void Awake()
     {
-        if (Instance != null && Instance != this) Destroy(Instance.gameObject);
+        // 單例防重複
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
 
+        // 常駐跨場景（競技場模式不常駐）
+        if (!arenaMode)
+            DontDestroyOnLoad(gameObject);
+
+        // 保險：Tag = Player
+        if (tag != "Player") tag = "Player";
+
+        // 基本元件
         rb   = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
 
-        if (tag != "Player") tag = "Player";
+        InitDashLayerCache();
 
-        // ★ 防止把別人撞到旋轉／自己也不被扭：凍結 Z 旋轉
-        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
-
-        InitPhysicsLayerCache();
-
-        // 可選：直接忽略 Player↔Enemy 之間的「實體碰撞」（保留 Trigger）
-        if (ignoreEnemyBodyCollision && _playerLayer >= 0 && _enemyBodyLayer >= 0)
-            Physics2D.IgnoreLayerCollision(_playerLayer, _enemyBodyLayer, true);
+        // ★ Buff 取得（沒有就自動加上）
+        buffs = GetComponent<PlayerBuffs>();
+        if (!buffs) buffs = gameObject.AddComponent<PlayerBuffs>();
     }
 
     protected override void Start()
     {
         base.Start();
+
+        // 確保初始 Layer 權重
         UpdateAnimatorLayerWeight();
+
+        // 開場確保 i-frame 關閉（避免殘留）
         ToggleIFrames(false);
-        _origGravity = rb.gravityScale; // 記下初始重力
-        if (_origGravity <= 0f) _origGravity = 1f; // 安全值
     }
 
-    private void Update()
+    private void OnEnable()
+    {
+        if (!arenaMode)
+            SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    private void OnDisable()
+    {
+        if (!arenaMode)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene s, LoadSceneMode m)
+    {
+        if (arenaMode) return;
+        StartCoroutine(RebindAfterSceneLoad());
+    }
+
+    // Dash：圖層快取初始化
+    private void InitDashLayerCache()
+    {
+        _playerLayer = LayerMask.NameToLayer(playerPhysicsLayer);
+        if (_playerLayer < 0)
+            Debug.LogWarning($"[Dash] Player layer '{playerPhysicsLayer}' not found. Check Project Settings > Tags and Layers.");
+
+        var list = new List<int>();
+        foreach (var s in harmPhysicsLayers)
+        {
+            if (string.IsNullOrWhiteSpace(s)) continue;
+            int l = LayerMask.NameToLayer(s);
+            list.Add(l);
+        }
+        _harmLayers = list.ToArray();
+    }
+
+    private IEnumerator RebindAfterSceneLoad()
+    {
+        if (arenaMode) yield break;
+        yield return null;
+        yield return new WaitForEndOfFrame();
+
+        TryMoveToSpawnPoint();
+        OnPlayerReady?.Invoke(this);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Update / 互動
+    // ─────────────────────────────────────────────────────────
+    void Update()
     {
         if (!enabled) return;
 
-        // Dash 輸入
-        if (Input.GetKeyDown(dashKey)) TryDash();
+        // 死亡終止
+        if (PlayerUtils.CheckDeath(healthBar))
+        {
+            state = State.dying;
+            anim.SetInteger("state", (int)State.dying);
+            Debug.Log("Player is dead!");
+            if (rb) rb.velocity = Vector2.zero;
+            this.enabled = false;
+            if (deathMenu) deathMenu.SetActive(true);
+            return;
+        }
 
-        // Dash 期間由協程控制位移；否則進行一般移動
+        // Dash 輸入
+        if (Input.GetKeyDown(dashKey))
+            TryDash();
+
         if (!isDashing)
         {
             Movement();
             AnimationState();
             anim.SetInteger("state", (int)state);
         }
-
-        // ★ Dash 安全超時保險（避免因例外未回復重力而上飄）
-        if (isDashing && Time.time > lastDashTime + dashDuration + 0.2f)
-        {
-            EndDashSafely();
-        }
-
-        // 掉出場景防呆
-        if (transform.position.y < -20f)
-        {
-            Debug.Log("玩家掉落過低，重置位置並扣血！");
-            transform.position = Vector3.zero;
-            base.TakeDamage(9999);
-        }
-    }
-
-    private void OnDisable()
-    {
-        // 腳本被停用時一定收尾 Dash
-        EndDashSafely();
-    }
-
-    private void OnDestroy()
-    {
-        // 物件銷毀時也要保險收尾
-        EndDashSafely();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("trap"))
+        if (collision.CompareTag("Collectable"))
+        {
+            LootItem lootItem = collision.GetComponent<LootItem>();
+            if (lootItem != null)
+            {
+                PlayerInventory.Instance.AddItem(lootItem.lootData);
+                Destroy(collision.gameObject);
+            }
+        }
+        else if (collision.CompareTag("trap"))
         {
             anim.SetTrigger("hurt");
-            PlayerUtils.ApplyKnockback(rb, hurtForce, collision.transform, transform);
+            // ★ 受擊退力吃 Buff 衰減
+            float kb = hurtForce * (buffs ? buffs.knockbackTakenMultiplier : 1f);
+            PlayerUtils.ApplyKnockback(rb, kb, collision.transform, transform);
         }
     }
 
-    // ───────── 戰鬥 / 受傷 / 死亡 ─────────
-    public override void TakeDamage(float damage)
-    {
-        if (isDashing || isDead) return;
-        base.TakeDamage(damage);
-        if (!isDead) anim.SetTrigger("hurt");
-    }
-
+    // ─────────────────────────────────────────────────────────
+    // 死亡 / 復活
+    // ─────────────────────────────────────────────────────────
     protected override void Die()
     {
         if (isDead) return;
         isDead = true;
 
-        EndDashSafely();
         anim.SetTrigger("die");
-        if (rb) rb.velocity = Vector2.zero;
+        rb.velocity = Vector2.zero;
         this.enabled = false;
 
-        var arena = FindObjectOfType<ArenaManager>();
-        if (arena != null) arena.OnPlayerDeath();
-        Debug.Log("【Arena】玩家死亡 → 交由 ArenaManager 結算/顯示 UI");
+        if (arenaMode)
+        {
+            var arena = FindObjectOfType<ArenaManager>();
+            if (arena != null) arena.OnPlayerDeath();
+        }
+        else
+        {
+            if (deathMenu != null) deathMenu.SetActive(true);
+        }
+
+        Debug.Log("玩家死亡 → 顯示死亡選單，不 Destroy 玩家物件");
     }
 
-    // ───────── 移動 / 跳躍 / 動畫 ─────────
+    public void RevivePlayer()
+    {
+        if (arenaMode)
+        {
+            var arena = FindObjectOfType<ArenaManager>();
+            if (arena != null) arena.Restart();
+            return;
+        }
+
+        if (anim == null) anim = GetComponent<Animator>();
+
+        Debug.Log("RevivePlayer() 被執行！");
+
+        healthBar.SetHealth(healthBar.maxHP);
+        transform.position = Vector3.zero;
+        state = State.idle;
+        anim.SetInteger("state", (int)state);
+        rb.velocity = Vector2.zero;
+
+        this.enabled = true;
+
+        if (deathMenu) deathMenu.SetActive(false);
+
+        if (DataPersistenceManager.instance != null)
+            DataPersistenceManager.instance.LoadSceneAndUpdate(SceneManager.GetActiveScene().name);
+        else
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    // ★ 受傷：一次性護盾 + 減傷乘數
+    public override void TakeDamage(float damage)
+    {
+        if (isDashing || isDead) return;
+
+        // 單次護盾（來自 Buff）
+        if (buffs && buffs.oneTimeShield)
+        {
+            buffs.oneTimeShield = false;
+            anim.SetTrigger("hurt"); // 視覺回饋但不扣血
+            return;
+        }
+
+        float mul = (buffs ? Mathf.Max(0.01f, buffs.damageTakenMultiplier) : 1f);
+        base.TakeDamage(damage * mul);
+
+        if (!isDead)
+        {
+            anim.SetTrigger("hurt");
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // 出生點 / 場景定位
+    // ─────────────────────────────────────────────────────────
+    bool TryMoveToSpawnPoint()
+    {
+        if (arenaMode) return false;
+        var gm = GameManager.instance ?? GameManager.I;
+        if (gm == null) return false;
+
+        gm.player = gameObject;
+
+        string nextSpawnId = string.IsNullOrEmpty(gm.NextSpawnId) ? "default" : gm.NextSpawnId;
+        PlayerSpawnPoint fallback = null;
+
+        foreach (var point in FindObjectsOfType<PlayerSpawnPoint>())
+        {
+            if (point.spawnId == nextSpawnId)
+            {
+                transform.position = point.transform.position;
+                gm.NextSpawnId = "default";
+                return true;
+            }
+
+            if (fallback == null && point.spawnId == "default")
+                fallback = point;
+        }
+
+        if (fallback != null)
+        {
+            transform.position = fallback.transform.position;
+            gm.NextSpawnId = "default";
+            return true;
+        }
+
+        return false;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // 移動 / 動畫
+    // ─────────────────────────────────────────────────────────
     public void Movement()
     {
-        float h = Input.GetAxis("Horizontal");
-        Vector3 s = transform.localScale;
+        float hDirection = Input.GetAxis("Horizontal");
+        Vector3 scale = transform.localScale;
 
-        bool hittingLeft  = Physics2D.Raycast(transform.position, Vector2.left,  0.6f, wallLayer);
-        bool hittingRight = Physics2D.Raycast(transform.position, Vector2.right, 0.6f, wallLayer);
-        bool intoLeft  = h < 0 && hittingLeft;
-        bool intoRight = h > 0 && hittingRight;
+        bool touchingWallLeft  = Physics2D.Raycast(transform.position, Vector2.left,  0.6f, wallLayer);
+        bool touchingWallRight = Physics2D.Raycast(transform.position, Vector2.right, 0.6f, wallLayer);
 
-        if (intoLeft || intoRight)
+        bool movingIntoLeftWall  = hDirection < 0 && touchingWallLeft;
+        bool movingIntoRightWall = hDirection > 0 && touchingWallRight;
+
+        if (movingIntoLeftWall || movingIntoRightWall)
+        {
             rb.velocity = new Vector2(0, rb.velocity.y);
-
-        if (h < 0)
-        {
-            rb.velocity = new Vector2(-curspeed, rb.velocity.y);
-            s.x = -Mathf.Abs(s.x);
-            transform.localScale = s;
         }
-        else if (h > 0)
+
+        // ★ 速度吃 Buff 乘數
+        float moveMul = (buffs ? Mathf.Max(0.1f, buffs.moveSpeedMultiplier) : 1f);
+        float effectiveSpeed = curspeed * moveMul;
+
+        if (hDirection < 0)
         {
-            rb.velocity = new Vector2(curspeed, rb.velocity.y);
-            s.x =  Mathf.Abs(s.x);
-            transform.localScale = s;
+            rb.velocity = new Vector2(-effectiveSpeed, rb.velocity.y);
+            scale.x = -Mathf.Abs(scale.x);
+            transform.localScale = scale;
+        }
+        else if (hDirection > 0)
+        {
+            rb.velocity = new Vector2(effectiveSpeed, rb.velocity.y);
+            scale.x =  Mathf.Abs(scale.x);
+            transform.localScale = scale;
         }
         else
         {
@@ -197,15 +372,19 @@ public class ArenaPlayerController : LivingEntity
         }
 
         if (Input.GetButtonDown("Jump") && coll.IsTouchingLayers(ground))
-            Jump();
+        {
+            jump();
+        }
 
-        float moveSpeed = Mathf.Abs(rb.velocity.x) / Mathf.Max(1f, curspeed);
+        float moveSpeed = Mathf.Abs(rb.velocity.x) / Mathf.Max(1f, effectiveSpeed);
         anim.SetFloat("speed", moveSpeed);
     }
 
-    public void Jump()
+    public void jump()
     {
-        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        // ★ 跳躍力吃 Buff 加值
+        float jBonus = (buffs ? buffs.jumpForceBonus : 0f);
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce + jBonus);
         state = State.jump;
     }
 
@@ -213,11 +392,13 @@ public class ArenaPlayerController : LivingEntity
     {
         if (state == State.jump)
         {
-            if (rb.velocity.y < .1f) state = State.fall;
+            if (rb.velocity.y < .1f)
+                state = State.fall;
         }
         else if (state == State.fall)
         {
-            if (coll.IsTouchingLayers(ground)) state = State.idle;
+            if (coll.IsTouchingLayers(ground))
+                state = State.idle;
         }
         else if (state == State.dying)
         {
@@ -225,79 +406,44 @@ public class ArenaPlayerController : LivingEntity
         }
     }
 
-    // ───────── Dash（含 i-frame）─────────
     private void TryDash()
     {
         if (isDashing) return;
-        if (Time.time < lastDashTime + dashCooldown) return;
-        dashCo = StartCoroutine(DoDash());
+
+        // ★ 冷卻吃 Buff 乘數（下限避免 0）
+        float cdMul = buffs ? Mathf.Max(0.2f, buffs.dashCooldownMultiplier) : 1f;
+        if (Time.time < lastDashTime + (dashCooldown * cdMul)) return;
+
+        StartCoroutine(DoDash());
     }
 
+    // 執行衝刺協程
     private IEnumerator DoDash()
     {
         isDashing = true;
         lastDashTime = Time.time;
 
-        ToggleIFrames(true);
+        ToggleIFrames(true);  // 開啟無敵
 
-        _origGravity = Mathf.Max(0.01f, rb.gravityScale);
-        rb.gravityScale = 0f;
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        _origGravity = rb.gravityScale;
+        rb.gravityScale = 0f;  // 關重力避免下墜
 
         float dir = transform.localScale.x >= 0 ? 1f : -1f;
         rb.velocity = new Vector2(dashSpeed * dir, 0f);
 
-        yield return new WaitForSeconds(dashDuration);
+        // ★ 時長吃 Buff 加秒
+        float extra = buffs ? Mathf.Max(0f, buffs.dashDurationBonus) : 0f;
+        yield return new WaitForSeconds(dashDuration + extra);
 
-        EndDashSafely(); // 正常收尾
-    }
-
-    private void EndDashSafely()
-    {
-        if (!isDashing)
-        {
-            // 仍確保重力正確
-            if (rb != null && rb.gravityScale <= 0f) rb.gravityScale = Mathf.Max(1f, _origGravity);
-            return;
-        }
-
-        isDashing = false;
-
-        if (dashCo != null)
-        {
-            StopCoroutine(dashCo);
-            dashCo = null;
-        }
-
-        if (rb != null)
-        {
-            rb.gravityScale = Mathf.Max(1f, _origGravity);
-            // 不強制歸零速度，避免空中硬煞導致怪異；若需要可打開下一行
-            // rb.velocity = new Vector2(rb.velocity.x * 0.6f, rb.velocity.y);
-        }
-
+        // 恢復
+        rb.gravityScale = _origGravity;
+        rb.velocity = Vector2.zero;
         ToggleIFrames(false);
+        isDashing = false;
     }
 
-    // ───────── Physics Layer / i-frames ─────────
-    private void InitPhysicsLayerCache()
-    {
-        _playerLayer = LayerMask.NameToLayer(playerPhysicsLayer);
-        if (_playerLayer < 0)
-            Debug.LogWarning($"[Dash] Player layer '{playerPhysicsLayer}' not found. 請到 Project Settings > Tags and Layers。");
-
-        var list = new List<int>();
-        foreach (var s in harmPhysicsLayers)
-        {
-            if (string.IsNullOrWhiteSpace(s)) continue;
-            int l = LayerMask.NameToLayer(s);
-            if (l >= 0) list.Add(l);
-        }
-        _harmLayers = list.ToArray();
-
-        if (!string.IsNullOrEmpty(enemyBodyLayer))
-            _enemyBodyLayer = LayerMask.NameToLayer(enemyBodyLayer);
-    }
-
+    // 無敵開關（Dash / 受擊 i-frame 共用）
     private void ToggleIFrames(bool on)
     {
         if (_playerLayer < 0) return;
@@ -308,7 +454,7 @@ public class ArenaPlayerController : LivingEntity
         }
     }
 
-    // ───────── Animator Layer ─────────
+    // 公開屬性：切換 Animator Layer
     public string ActiveLayerName
     {
         get => activeLayerName;
@@ -322,6 +468,9 @@ public class ArenaPlayerController : LivingEntity
         }
     }
 
+    /// <summary>
+    /// 根據 ActiveLayerName 的值，設定該 Layer 權重為 1，其餘為 0。
+    /// </summary>
     public void UpdateAnimatorLayerWeight()
     {
         if (anim == null)
@@ -343,10 +492,14 @@ public class ArenaPlayerController : LivingEntity
         for (int i = 0; i < anim.layerCount; i++)
         {
             string layerName = anim.GetLayerName(i);
-            anim.SetLayerWeight(i, layerName == ActiveLayerName ? 1f : 0f);
+            if (layerName == ActiveLayerName)
+                anim.SetLayerWeight(i, 1f);
+            else
+                anim.SetLayerWeight(i, 0f);
         }
     }
 
+    // 給動畫模式用的主角轉向
     public void FaceLeft()
     {
         Vector3 s = transform.localScale;
