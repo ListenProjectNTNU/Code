@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+//using Microsoft.Unity.VisualStudio.Editor;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -45,6 +46,16 @@ public class DialogueManager : MonoBehaviour
         if (instance != null)
             Debug.LogWarning("Found more than one Dialogue Manager in the scene");
         instance = this;
+
+        TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts/LXGW_WenKai_Mono_TC/LXGW_WenKai_Mono_TC-Regular SDF");
+        if (font != null)
+        {
+            Debug.Log("✅ Font Loaded Successfully!");
+        }
+        else
+        {
+            Debug.LogError("❌ Font Not Found in Build!");
+        }
     }
 
     public static DialogueManager GetInstance() => instance;
@@ -66,6 +77,15 @@ public class DialogueManager : MonoBehaviour
                 choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
             index++;
         }
+
+        Debug.Log($"PlayerController: {(playerController ? playerController.name : "NULL")}");
+        Debug.Log($"DialoguePanel: {(dialoguePanel ? dialoguePanel.name : "NULL")}");
+        Debug.Log($"PlayerController: {(dialogueText ? dialogueText.name : "NULL")}");
+        Debug.Log($"PlayerController: {(displayNameText ? displayNameText.name : "NULL")}");
+        Debug.Log($"InkJSON: {(inkJSON ? inkJSON.name : "NULL")}");
+        Debug.Log($"dialogueText: {dialogueText} | font: {dialogueText.font}");
+        Debug.Log($"displayNameText: {displayNameText} | font: {displayNameText.font}");
+
     }
 
     private void Update()
@@ -83,18 +103,32 @@ public class DialogueManager : MonoBehaviour
         EnsurePlayerController();
         if (playerController != null) playerController.enabled = false;
 
+        if (inkJSON == null)
+        {
+            Debug.LogError("❌ Ink JSON 未指定");
+            return;
+        }
+
         if (player != null)
         {
             var playerAnim = player.GetComponent<Animator>();
             if (playerAnim) playerAnim.Play("Move");
         }
 
+        Debug.Log("DM：EnterDialogueMode() 被呼叫！");
+
         currentStory = new Story(inkJSON.text);
         dialogueIsPlaying = true;
-        if (dialoguePanel) dialoguePanel.SetActive(true);
+        if (dialoguePanel)
+        {
+            dialoguePanel.SetActive(true);
+        }
 
         if (currentSceneController != null)
             sceneController = currentSceneController.GetComponent<ISceneController>();
+
+        Debug.Log($"dialoguePanel active = {dialoguePanel?.activeSelf}");
+        Debug.Log($"Text color alpha = {dialogueText.color.a}");
 
         UpdateInkVariables();
         continueStory();
@@ -178,6 +212,8 @@ public class DialogueManager : MonoBehaviour
 
     private void continueStory()
     {
+        Debug.Log($"DM:canContinue = {currentStory.canContinue}, choices = {currentStory.currentChoices.Count}");
+        
         // 先顯示選項（如果有）
         if (currentStory.currentChoices.Count > 0)
         {
