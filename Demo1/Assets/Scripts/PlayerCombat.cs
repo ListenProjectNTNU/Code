@@ -10,21 +10,38 @@ public class PlayerCombat : MonoBehaviour
     public Transform attackPoint;
     public float attackRange = 0.5f;
     public LayerMask enemyLayers;
+
+    // 這個當作「後備值」（找不到玩家時用），平時會被玩家的最終攻擊覆蓋
     public int attackDamage = 30;
+
     public float knockbackForce = 5f;
 
     // 內部狀態
     private readonly HashSet<GameObject> hitEnemiesThisAttack = new HashSet<GameObject>();
-    private bool inAttackWindow = false;   // 由動畫事件開關
-    private bool inputLocked = false;      // 攻擊期間鎖輸入（動畫事件結束時解除）
+    private bool inAttackWindow = false;
+    private bool inputLocked = false;
 
-    // 非配置：避免 GC 的暫存陣列（依你的最多同時命中數量調整）
     private static readonly Collider2D[] _hits = new Collider2D[16];
 
-    // 預先算好的 Trigger Hash（效能小優化）
     private static readonly int KickHash  = Animator.StringToHash("kick");
     private static readonly int Kick2Hash = Animator.StringToHash("kick2");
     private static readonly int PunchHash = Animator.StringToHash("punch");
+
+    // 🔹 快取玩家與（可選）Buff
+    private ArenaPlayerController player;
+    private PlayerBuffs buffs;
+
+    private void Awake()
+    {
+        player = ArenaPlayerController.Instance;
+        if (player) buffs = player.GetComponent<PlayerBuffs>();
+    }
+    private void Start()
+    {
+        // 在這時抓，一定能拿到 Instance
+        player = ArenaPlayerController.Instance;
+        if (player) buffs = player.GetComponent<PlayerBuffs>();
+    }
 
     void Update()
     {
@@ -35,8 +52,7 @@ public class PlayerCombat : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.R)) animator.SetTrigger(PunchHash);
     }
 
-    // ===== 動畫事件用：在打擊前 2~3 幀呼叫 =====
-    // 開啟本次攻擊的「可命中窗口」，並清空已命中名單
+    // 動畫事件：開啟可命中窗口
     public void OpenHit()
     {
         inAttackWindow = true;
@@ -44,8 +60,7 @@ public class PlayerCombat : MonoBehaviour
         hitEnemiesThisAttack.Clear();
     }
 
-    // ===== 動畫事件用：剛好在武器/腳掌接觸畫面那一幀呼叫 =====
-    // 單次取樣做傷害（想做多段 hit 可在動畫放多個 DoHit 事件）
+    // 動畫事件：真正命中那一幀
     public void DoHit()
     {
         if (!inAttackWindow || attackPoint == null) return;
@@ -53,6 +68,15 @@ public class PlayerCombat : MonoBehaviour
         int count = Physics2D.OverlapCircleNonAlloc(
             attackPoint.position, attackRange, _hits, enemyLayers
         );
+
+        // ⬇️ 這裡「一次」讀出本次出手要用的最終攻擊力
+        //    player.curattack 已經把 buff/seg 都算進去了
+        int finalAttack =
+            (player != null) ? player.curattack : attackDamage;
+
+        // （可選）若你在 PlayerBuffs 另外做了攻擊乘數/暴擊，也可在這裡一起處理
+        // float atkMul = (buffs ? Mathf.Max(0.01f, buffs.attackMultiplier) : 1f);
+        // finalAttack = Mathf.RoundToInt(finalAttack * atkMul);
 
         for (int i = 0; i < count; i++)
         {
@@ -63,29 +87,32 @@ public class PlayerCombat : MonoBehaviour
             if (hitEnemiesThisAttack.Contains(go)) continue;
             hitEnemiesThisAttack.Add(go);
 
-            // 傷害
             var target = go.GetComponent<LivingEntity>();
             if (target != null)
-                target.TakeDamage(attackDamage);
+            {
+                target.TakeDamage(finalAttack);
+                // Debug.Log($"[MELEE] deal {finalAttack} to {target.name}");
+            }
 
-            // 擊退
+            // 擊退（可選把「給出去的擊退」也吃 buff 乘數）
             var rb = go.GetComponent<Rigidbody2D>();
             if (rb != null)
             {
+                float kb = knockbackForce;
+                // if (buffs) kb *= buffs.knockbackDealtMultiplier;
                 Vector2 dir = (go.transform.position - transform.position).normalized;
-                rb.AddForce(dir * knockbackForce, ForceMode2D.Impulse);
+                rb.AddForce(dir * kb, ForceMode2D.Impulse);
             }
 
             _hits[i] = null; // 清掉引用，保險
         }
     }
 
-    // ===== 動畫事件用：在打擊窗口結束時呼叫 =====
+    // 動畫事件：關閉可命中窗口
     public void CloseHit()
     {
         inAttackWindow = false;
         inputLocked = false;
-        // 可選：hitEnemiesThisAttack.Clear(); // 下次 OpenHit 也會清
     }
 
     private void OnDrawGizmosSelected()
