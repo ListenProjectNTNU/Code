@@ -131,6 +131,8 @@ public class ArenaPlayerController : LivingEntity
     {
         // 物件銷毀時也要保險收尾
         EndDashSafely();
+        if (Instance == this)
+            Instance = null;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
