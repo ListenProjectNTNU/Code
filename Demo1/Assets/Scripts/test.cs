@@ -1,29 +1,43 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class PlayerAttackHitbox : MonoBehaviour
+public class UIRaycastProbe : MonoBehaviour
 {
-    public float damage = 10f;
-    public LayerMask hittableLayers; // 設成可打到 Enemy/Boss 的 Layer
+    private PointerEventData _ped;
+    private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
-    void OnTriggerEnter2D(Collider2D other)
+    void Awake()
     {
-        Debug.Log($"[Hitbox] Enter -> {other.name} (layer {LayerMask.LayerToName(other.gameObject.layer)})");
-
-        // 檢查 LayerMask
-        if (((1 << other.gameObject.layer) & hittableLayers.value) == 0) return;
-
-        // 找對方的 LivingEntity（BossController 有繼承）
-        var target = other.GetComponentInParent<LivingEntity>() ?? other.GetComponent<LivingEntity>();
-        if (target != null)
-        {
-            Debug.Log($"[Hitbox] Deal {damage} to {target.name}");
-            target.TakeDamage(damage); // float 版本
-        }
+        if (EventSystem.current == null)
+            Debug.LogError("❌ 場景沒有 EventSystem！");
     }
 
-    void OnTriggerStay2D(Collider2D other)
+    void Update()
     {
-        // 假如沒看到 Enter，就看有沒有 Stay 在刷
-        // Debug.Log($"[Hitbox] Stay -> {other.name}");
+        if (Input.GetMouseButtonDown(0))
+        {
+            _results.Clear();
+            _ped = new PointerEventData(EventSystem.current)
+            {
+                position = Input.mousePosition
+            };
+            EventSystem.current.RaycastAll(_ped, _results);
+
+            if (_results.Count == 0)
+            {
+                Debug.Log("🧪 此處沒有任何可點擊 UI。");
+                return;
+            }
+
+            Debug.Log($"🧪 Raycast 命中 {_results.Count} 個 UI（最上面列在最前）:");
+            for (int i = 0; i < _results.Count; i++)
+            {
+                var r = _results[i];
+                var canvas = r.gameObject.GetComponentInParent<Canvas>();
+                var order = canvas ? canvas.sortingOrder : 0;
+                Debug.Log($"[{i}] {r.gameObject.name}  (CanvasOrder={order})  module={r.module}");
+            }
+        }
     }
 }
