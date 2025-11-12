@@ -432,7 +432,8 @@ public class ArenaPlayerController : LivingEntity
         rb.gravityScale = 0f;  // 關重力避免下墜
 
         float dir = transform.localScale.x >= 0 ? 1f : -1f;
-        rb.velocity = new Vector2(dashSpeed * dir, 0f);
+        float distMul = (buffs ? Mathf.Max(0.1f, buffs.dashDistanceMultiplier) : 1f);
+        rb.velocity = new Vector2(dashSpeed * distMul * dir, 0f);
 
         // ★ 時長吃 Buff 加秒
         float extra = buffs ? Mathf.Max(0f, buffs.dashDurationBonus) : 0f;

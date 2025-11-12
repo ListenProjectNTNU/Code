@@ -17,6 +17,7 @@ public class PlayerBuffs : MonoBehaviour
     public float jumpForceBonus        = 0f;   // 直接加跳躍力
     public float regenPerSecond        = 0f;   // 每秒回血
     public float knockbackTakenMultiplier = 1f;// <1 更穩
+    public float dashDistanceMultiplier = 1f;
 
     // ── 一次性護盾 ──
     [HideInInspector] public bool oneTimeShield = false;

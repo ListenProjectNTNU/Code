@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cbb57a69514c88d4bae1dc639de4a58d, type: 3}
-  m_Name: Buff_Speed
+  m_Name: jump
   m_EditorClassIdentifier: 
-  title: "\u9748\u5DE7\u6B65\u4F10"
-  description: +10 % speed
+  title: 
+  description: "\u8DF3\u8E8D\u529B +1.0"
   icon: {fileID: 0}
-  effect: 4
+  effect: 7
   intValue: 0
-  floatValue: 20
+  floatValue: 1.5

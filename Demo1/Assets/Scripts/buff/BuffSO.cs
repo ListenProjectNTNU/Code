@@ -6,7 +6,8 @@ public enum BuffEffectType
     DamageTakenMultiplier, MoveSpeedMultiplier,
     DashCooldownMultiplier, DashDurationBonusSeconds,
     JumpForceBonus, RegenPerSecondAdd,
-    KnockbackTakenMultiplier, OneTimeShield, InstantHeal
+    KnockbackTakenMultiplier, OneTimeShield, InstantHeal,
+    DashDistanceMultiplier
 }
 
 [CreateAssetMenu(menuName = "Arena/Buff", fileName = "Buff_")]
@@ -55,6 +56,8 @@ public class BuffSO : ScriptableObject
                 buffs.knockbackTakenMultiplier *= Mathf.Max(0.1f, floatValue); break;
             case BuffEffectType.OneTimeShield:
                 buffs.oneTimeShield = true; break;
+            case BuffEffectType.DashDistanceMultiplier:
+                buffs.dashDistanceMultiplier *= Mathf.Max(0.1f, floatValue); break;
         }
     }
 }

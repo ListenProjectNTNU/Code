@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-
+using TMPro;
+using System.Linq;
 public class UpgradeMenu : MonoBehaviour
 {
     [Header("Refs")]
@@ -22,6 +23,7 @@ public class UpgradeMenu : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+
     public void ShowThreeRandom()
     {
         gameObject.SetActive(true);
@@ -39,26 +41,69 @@ public class UpgradeMenu : MonoBehaviour
 
         foreach (var buff in picks)
         {
-            var go  = Instantiate(cardPrefab, cardParent);
-            var icon= go.transform.Find("Icon")?.GetComponent<Image>();
-            var t1  = go.transform.Find("Title")?.GetComponent<TMPro.TextMeshProUGUI>();
-            var t2  = go.transform.Find("Desc") ?.GetComponent<TMPro.TextMeshProUGUI>();
-            var btn = go.GetComponentInChildren<Button>();
+            var go   = Instantiate(cardPrefab, cardParent);
 
-            if (icon) icon.sprite = buff.icon;
-            if (t1)   t1.text     = buff.title;
-            if (t2)   t2.text     = buff.description;
+            // 1) 先嘗試用你原本的路徑抓
+            var icon = go.transform.Find("Icon") ?.GetComponent<Image>();
+            var t1   = go.transform.Find("Title")?.GetComponent<TMP_Text>();
+            var t2   = go.transform.Find("Desc") ?.GetComponent<TMP_Text>();
+            var btn  = go.GetComponentInChildren<Button>(true);
 
-            btn.onClick.RemoveAllListeners();
-            btn.onClick.AddListener(() =>
+            // 2) 如果 t1 或 t2 沒抓到，用更保險的全域搜尋（包含隱藏物件）
+            if (!t1 || !t2)
             {
-                Debug.Log($"[UpgradeMenu] Player clicked buff: {buff.title}");
-                buff.Apply(ArenaPlayerController.Instance ? ArenaPlayerController.Instance.gameObject : null);
-                HealPlayer();
-                CloseAndResume();
-            });
+                var tmps = go.GetComponentsInChildren<TMP_Text>(true);
+                foreach (var t in tmps)
+                    Debug.Log($"[Card TMP] found: {t.name}", t);
+
+                if (!t1)
+                    t1 = tmps.FirstOrDefault(x => x.name.Equals("Title"));
+                if (!t2)
+                    t2 = tmps.FirstOrDefault(x => x.name.Equals("Desc"));
+            }
+
+            // 3) 寫入顯示
+            if (icon) icon.sprite = buff.icon;
+
+            if (t1)
+            {
+                t1.text = string.IsNullOrEmpty(buff.title) ? "(No Title)" : buff.title;
+                t1.ForceMeshUpdate(); // 保險：強制刷新
+                Debug.Log($"[UpgradeMenu] Title set to: {t1.text}", t1);
+            }
+            else
+            {
+                Debug.LogWarning("[UpgradeMenu] Title TMP not found on card prefab.", go);
+            }
+
+            if (t2)
+            {
+                t2.text = buff.description ?? "";
+            }
+            else
+            {
+                Debug.LogWarning("[UpgradeMenu] Desc TMP not found on card prefab.", go);
+            }
+
+            // 4) 綁定點擊
+            if (btn)
+            {
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() =>
+                {
+                    Debug.Log($"[UpgradeMenu] Player clicked buff: {buff.title}");
+                    buff.Apply(ArenaPlayerController.Instance ? ArenaPlayerController.Instance.gameObject : null);
+                    HealPlayer();
+                    CloseAndResume();
+                });
+            }
+            else
+            {
+                Debug.LogWarning("[UpgradeMenu] Button not found on card prefab.", go);
+            }
         }
     }
+
 
     private void HealPlayer()
     {

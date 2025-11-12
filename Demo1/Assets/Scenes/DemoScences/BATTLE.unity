@@ -187,8 +187,8 @@ MonoBehaviour:
   - {fileID: 298093630}
   - {fileID: 1311871402}
   enemyPrefabs:
+  - {fileID: 6671779312051646865, guid: b1e26a18e05c8a14e9104ee996acc3e6, type: 3}
   - {fileID: 2918784421876243179, guid: 18f57c06de6e55e4593c96ff5895a7ea, type: 3}
-  - {fileID: 2770050998917371917, guid: 7bf3746e04c591441b0e604d8103547d, type: 3}
   - {fileID: 2770050998917371917, guid: 7bf3746e04c591441b0e604d8103547d, type: 3}
   bossPrefab: {fileID: 1506926163622650895, guid: 8cf56fcff03b04c4bb95048abda66471, type: 3}
   enemiesParent: {fileID: 658613095}
@@ -375,6 +375,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 567723ff1ed7c7e4eae7bd2d74fc4069, type: 2}
   - {fileID: 11400000, guid: e93417b03622f5846a392e931467bd50, type: 2}
   - {fileID: 11400000, guid: 18d49603def4ec84181568868d824a4a, type: 2}
+  - {fileID: 11400000, guid: 3b6c067b7529bc641a60c0ccc69dbe47, type: 2}
+  - {fileID: 11400000, guid: bd6407c2d2463734ab7c28adbf332c35, type: 2}
   healOnChoose: 30
 --- !u!1 &426262262
 GameObject:
@@ -2700,6 +2702,7 @@ MonoBehaviour:
   jumpForceBonus: 0
   regenPerSecond: 0
   knockbackTakenMultiplier: 1
+  dashDistanceMultiplier: 1
   oneTimeShield: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
