@@ -5,20 +5,19 @@ using System.Collections.Generic;
 public class UpgradeMenu : MonoBehaviour
 {
     [Header("Refs")]
-    public ArenaManager arena;       // 拖引用或 FindObjectOfType
-    public GameObject cardPrefab;    // 內含：Image(Icon) + Text(Title) + Text(Desc) + Button
-    public Transform cardParent;     // 擺 3 張卡的容器
+    public ArenaManager arena;
+    public GameObject cardPrefab;
+    public Transform cardParent;
 
     [Header("Pool")]
     public List<BuffSO> allBuffs = new();
 
-    private GameObject _player;
+    [Header("Reward")]
+    [Tooltip("玩家每次選擇增益時回復的血量")]
+    public float healOnChoose = 30f;
 
     void Awake()
     {
-        _player = ArenaPlayerController.Instance ? 
-                  ArenaPlayerController.Instance.gameObject : 
-                  GameObject.FindGameObjectWithTag("Player");
         if (!arena) arena = FindObjectOfType<ArenaManager>(true);
         gameObject.SetActive(false);
     }
@@ -26,10 +25,9 @@ public class UpgradeMenu : MonoBehaviour
     public void ShowThreeRandom()
     {
         gameObject.SetActive(true);
-        // 清空舊卡
+
         foreach (Transform c in cardParent) Destroy(c.gameObject);
 
-        // 取 3 張不重複
         var picks = new List<BuffSO>();
         var pool  = new List<BuffSO>(allBuffs);
         for (int i = 0; i < 3 && pool.Count > 0; i++)
@@ -39,25 +37,40 @@ public class UpgradeMenu : MonoBehaviour
             pool.RemoveAt(idx);
         }
 
-        // 生成卡片
         foreach (var buff in picks)
         {
-            var go = Instantiate(cardPrefab, cardParent);
-            var icon = go.transform.Find("Icon")?.GetComponent<Image>();
-            var t1   = go.transform.Find("Title")?.GetComponent<TMPro.TextMeshProUGUI>();
-            var t2   = go.transform.Find("Desc") ?.GetComponent<TMPro.TextMeshProUGUI>();
-            var btn  = go.GetComponentInChildren<Button>();
+            var go  = Instantiate(cardPrefab, cardParent);
+            var icon= go.transform.Find("Icon")?.GetComponent<Image>();
+            var t1  = go.transform.Find("Title")?.GetComponent<TMPro.TextMeshProUGUI>();
+            var t2  = go.transform.Find("Desc") ?.GetComponent<TMPro.TextMeshProUGUI>();
+            var btn = go.GetComponentInChildren<Button>();
 
             if (icon) icon.sprite = buff.icon;
             if (t1)   t1.text     = buff.title;
             if (t2)   t2.text     = buff.description;
+
             btn.onClick.RemoveAllListeners();
             btn.onClick.AddListener(() =>
             {
-                buff.Apply(_player);
+                Debug.Log($"[UpgradeMenu] Player clicked buff: {buff.title}");
+                buff.Apply(ArenaPlayerController.Instance ? ArenaPlayerController.Instance.gameObject : null);
+                HealPlayer();
                 CloseAndResume();
             });
         }
+    }
+
+    private void HealPlayer()
+    {
+        var player = ArenaPlayerController.Instance;
+        if (player == null || player.isDead) return;
+
+        player.currentHealth = Mathf.Min(player.maxHealth, player.currentHealth + healOnChoose);
+
+        if (player.healthBar != null)
+            player.healthBar.SetHealth(player.currentHealth);
+
+        Debug.Log($"[UpgradeMenu] Heal +{healOnChoose}. HP = {player.currentHealth}/{player.maxHealth}");
     }
 
     private void CloseAndResume()

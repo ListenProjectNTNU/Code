@@ -375,6 +375,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 567723ff1ed7c7e4eae7bd2d74fc4069, type: 2}
   - {fileID: 11400000, guid: e93417b03622f5846a392e931467bd50, type: 2}
   - {fileID: 11400000, guid: 18d49603def4ec84181568868d824a4a, type: 2}
+  healOnChoose: 30
 --- !u!1 &426262262
 GameObject:
   m_ObjectHideFlags: 0
@@ -2659,7 +2660,7 @@ MonoBehaviour:
   hurtForce: 3
   speed: 5
   attackDamage: 20
-  defence: 15
+  defence: 2
   deathMenu: {fileID: 0}
   AnimatorLayerNames:
   - Base Layer

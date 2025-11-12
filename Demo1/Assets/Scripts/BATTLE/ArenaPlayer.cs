@@ -39,7 +39,7 @@ public class ArenaPlayerController : LivingEntity
 
     public int speed = 5;
     public int attackDamage = 20;
-    public int defence = 15;
+    public int defence = 2;
 
     // ★ 有效數值：先用 PlayerBuffs，退而求其次用舊 seg 欄位
     public int curdefence => buffs ? buffs.CurDefence(defence) : defence + defenceseg * 10;
@@ -286,9 +286,11 @@ public class ArenaPlayerController : LivingEntity
         }
 
         float mul = (buffs ? Mathf.Max(0.01f, buffs.damageTakenMultiplier) : 1f);
-        base.TakeDamage(damage * mul);
+        float mitigatedDamage = Mathf.Max(0f, damage - curdefence);
+        float finalDamage = mitigatedDamage * mul;
+        base.TakeDamage(finalDamage);
 
-        if (!isDead)
+        if (!isDead && finalDamage > 0f)
         {
             anim.SetTrigger("hurt");
         }
