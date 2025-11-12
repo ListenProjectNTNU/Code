@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/DemoScences/FirstScene.unity
     guid: 906172ffd1017af4fa72d6a6e4057eff
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DemoScences/SecondScene.unity
     guid: 0939b1bdc0a4f384dbee4d2cc29fac70
   - enabled: 1
@@ -23,13 +23,13 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/DemoScences/ReFirstScene.unity
     guid: 1b5d27d0d14c4c042ad667981321facb
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DemoScences/BATTLE.unity
     guid: 6d3594ceb42f65b41bf37b9b11470c8c
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DemoScences/MainMenu.unity
     guid: 73cf02b9debd83c41830d2ff688fc23e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DemoScences/FourthScene.unity
     guid: f82de7d9968fab149abda48a8beb7fea
   m_configObjects:
