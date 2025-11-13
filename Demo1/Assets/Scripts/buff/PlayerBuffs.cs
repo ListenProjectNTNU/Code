@@ -22,6 +22,17 @@ public class PlayerBuffs : MonoBehaviour
     // ── 一次性護盾 ──
     [HideInInspector] public bool oneTimeShield = false;
 
+    // 👉 新增：紀錄玩家已取得的所有 Buff
+    [Header("Runtime Buff List")]
+    public List<BuffSO> acquiredBuffs = new();
+
+    // 統一的註冊入口（之後面板會來讀這份清單）
+    public void RegisterBuff(BuffSO buff)
+    {
+        if (buff == null) return;
+        acquiredBuffs.Add(buff);
+    }
+    
     // ── 便利方法：把 base 值轉有效值（給控制器讀）──
     public int CurAttack   (int baseAttack)  => baseAttack  + attackSeg  * 10;
     public int CurDefence  (int baseDefence) => baseDefence + defenceSeg * 10;

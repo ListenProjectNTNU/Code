@@ -16,5 +16,5 @@ MonoBehaviour:
   description: +10 % speed
   icon: {fileID: 0}
   effect: 4
-  intValue: 0
-  floatValue: 20
+  intValue: 10
+  floatValue: 0

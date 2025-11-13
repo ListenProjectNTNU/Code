@@ -101,7 +101,7 @@ public class ArenaPlayerController : LivingEntity
         if (tag != "Player") tag = "Player";
 
         // 基本元件
-        rb   = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
 
@@ -111,7 +111,7 @@ public class ArenaPlayerController : LivingEntity
         buffs = GetComponent<PlayerBuffs>();
         if (!buffs) buffs = gameObject.AddComponent<PlayerBuffs>();
     }
-
+    
     protected override void Start()
     {
         base.Start();

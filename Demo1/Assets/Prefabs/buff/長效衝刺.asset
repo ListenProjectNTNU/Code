@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "\u9577\u6548\u885D\u523A"
   m_EditorClassIdentifier: 
   title: 
-  description: "\u885D\u523A\u6642\u9593 +0.5 \u79D2"
+  description: "Dash Time +0.5 \u79D2"
   icon: {fileID: 0}
   effect: 6
   intValue: 0

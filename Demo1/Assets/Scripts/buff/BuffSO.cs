@@ -43,21 +43,35 @@ public class BuffSO : ScriptableObject
             case BuffEffectType.DamageTakenMultiplier:
                 buffs.damageTakenMultiplier *= Mathf.Max(0.01f, floatValue); break;
             case BuffEffectType.MoveSpeedMultiplier:
-                buffs.moveSpeedMultiplier   += floatValue; break;
+                buffs.moveSpeedMultiplier += floatValue; break;
             case BuffEffectType.DashCooldownMultiplier:
-                buffs.dashCooldownMultiplier*= Mathf.Max(0.2f, floatValue); break;
+                buffs.dashCooldownMultiplier *= Mathf.Max(0.2f, floatValue); break;
             case BuffEffectType.DashDurationBonusSeconds:
-                buffs.dashDurationBonus     += Mathf.Max(0f, floatValue); break;
+                buffs.dashDurationBonus += Mathf.Max(0f, floatValue); break;
             case BuffEffectType.JumpForceBonus:
-                buffs.jumpForceBonus        += floatValue; break;
+                buffs.jumpForceBonus += floatValue; break;
             case BuffEffectType.RegenPerSecondAdd:
-                buffs.regenPerSecond        += Mathf.Max(0f, floatValue); break;
+                buffs.regenPerSecond += Mathf.Max(0f, floatValue); break;
             case BuffEffectType.KnockbackTakenMultiplier:
                 buffs.knockbackTakenMultiplier *= Mathf.Max(0.1f, floatValue); break;
             case BuffEffectType.OneTimeShield:
                 buffs.oneTimeShield = true; break;
             case BuffEffectType.DashDistanceMultiplier:
                 buffs.dashDistanceMultiplier *= Mathf.Max(0.1f, floatValue); break;
+            case BuffEffectType.InstantHeal:
+            {
+                var player = ArenaPlayerController.Instance;
+                if (player == null || player.isDead) break;
+                // intValue   → 固定回血量
+                float fixedHeal   = Mathf.Max(0, intValue);
+                player.currentHealth = Mathf.Min(player.maxHealth, player.currentHealth + fixedHeal);
+                if (player.healthBar != null)
+                    player.healthBar.SetHealth(player.currentHealth);
+
+                Debug.Log($"[BuffSO] InstantHeal +{fixedHeal}. HP = {player.currentHealth}/{player.maxHealth}");
+                break;
+}
         }
+        buffs.RegisterBuff(this);
     }
 }

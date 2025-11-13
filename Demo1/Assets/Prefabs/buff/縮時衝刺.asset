@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "\u7E2E\u6642\u885D\u523A"
   m_EditorClassIdentifier: 
   title: 
-  description: "\u885D\u523A\u51B7\u537B\u7E2E\u77ED 20%"
+  description: Dash Cooldown 20%
   icon: {fileID: 0}
   effect: 5
   intValue: 0

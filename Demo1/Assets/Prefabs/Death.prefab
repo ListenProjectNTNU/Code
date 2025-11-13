@@ -247,7 +247,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.008438751, y: -0.16492376}
+  m_Offset: {x: 0.00978747, y: -0.1811066}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.75, y: 0.5}
@@ -258,7 +258,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.39905336, y: 0.60015255}
+  m_Size: {x: 0.38017344, y: 0.5677869}
   m_EdgeRadius: 0
 --- !u!114 &4079857644917283874
 MonoBehaviour:
@@ -393,7 +393,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 246202029360719859}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: leftpoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -424,7 +424,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 992546638977121436}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: rightpoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -456,7 +456,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6939602716729945600}
   - component: {fileID: 6311946143053089397}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: special_point
   m_TagString: Untagged
   m_Icon: {fileID: 0}

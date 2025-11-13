@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "\u9435\u58C1\u9632\u79A6"
   m_EditorClassIdentifier: 
   title: 
-  description: "\u627F\u53D7\u50B7\u5BB3 \xD70.8"
+  description: "Damage Taken \xD70.8"
   icon: {fileID: 0}
   effect: 3
   intValue: 0

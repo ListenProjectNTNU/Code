@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: jump
   m_EditorClassIdentifier: 
   title: 
-  description: "\u8DF3\u8E8D\u529B +1.0"
+  description: Jump Power +1.0
   icon: {fileID: 0}
   effect: 7
   intValue: 0

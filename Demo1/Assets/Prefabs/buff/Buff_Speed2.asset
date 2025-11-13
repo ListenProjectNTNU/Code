@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Buff_Speed2
   m_EditorClassIdentifier: 
   title: 
-  description: "\u79FB\u52D5\u901F\u5EA6 +15%"
+  description: move speed +15%
   icon: {fileID: 0}
   effect: 4
   intValue: 0
