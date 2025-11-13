@@ -16,20 +16,26 @@ public class UpgradeMenu : MonoBehaviour
     [Header("Reward")]
     [Tooltip("玩家每次選擇增益時回復的血量")]
     public float healOnChoose = 30f;
+    private GameObject _player;
 
     void Awake()
     {
+        _player = ArenaPlayerController.Instance ?
+                  ArenaPlayerController.Instance.gameObject :
+                  GameObject.FindGameObjectWithTag("Player");
         if (!arena) arena = FindObjectOfType<ArenaManager>(true);
         gameObject.SetActive(false);
     }
-
 
     public void ShowThreeRandom()
     {
         gameObject.SetActive(true);
 
-        foreach (Transform c in cardParent) Destroy(c.gameObject);
+        // 清空舊卡
+        foreach (Transform c in cardParent)
+            Destroy(c.gameObject);
 
+        // 取 3 張不重複
         var picks = new List<BuffSO>();
         var pool  = new List<BuffSO>(allBuffs);
         for (int i = 0; i < 3 && pool.Count > 0; i++)
@@ -39,36 +45,40 @@ public class UpgradeMenu : MonoBehaviour
             pool.RemoveAt(idx);
         }
 
+        // 產卡
         foreach (var buff in picks)
         {
-            var go   = Instantiate(cardPrefab, cardParent);
+            var go = Instantiate(cardPrefab, cardParent);
 
-            // 1) 先嘗試用你原本的路徑抓
-            var icon = go.transform.Find("Icon") ?.GetComponent<Image>();
-            var t1   = go.transform.Find("Title")?.GetComponent<TMP_Text>();
-            var t2   = go.transform.Find("Desc") ?.GetComponent<TMP_Text>();
+            // 先抓 Icon、Button
+            var icon = go.transform.Find("Icon")?.GetComponent<Image>();
             var btn  = go.GetComponentInChildren<Button>(true);
 
-            // 2) 如果 t1 或 t2 沒抓到，用更保險的全域搜尋（包含隱藏物件）
-            if (!t1 || !t2)
-            {
-                var tmps = go.GetComponentsInChildren<TMP_Text>(true);
-                foreach (var t in tmps)
-                    Debug.Log($"[Card TMP] found: {t.name}", t);
+            // 用名稱搜尋 Title / Desc（容錯：Trim + StartsWith）
+            TMP_Text t1 = null; // Title
+            TMP_Text t2 = null; // Desc
 
-                if (!t1)
-                    t1 = tmps.FirstOrDefault(x => x.name.Equals("Title"));
-                if (!t2)
-                    t2 = tmps.FirstOrDefault(x => x.name.Equals("Desc"));
+            var tmps = go.GetComponentsInChildren<TMP_Text>(true);
+            foreach (var t in tmps)
+            {
+                // Debug 看看實際名字
+                Debug.Log($"[Card TMP] found: '{t.name}'", t);
+
+                var n = t.name.Trim(); // 把前後空白剪掉
+
+                if (t1 == null && (n == "Title" || n.StartsWith("Title")))
+                    t1 = t;
+                else if (t2 == null && (n == "Desc" || n.StartsWith("Desc")))
+                    t2 = t;
             }
 
-            // 3) 寫入顯示
+            // 寫入顯示
             if (icon) icon.sprite = buff.icon;
 
             if (t1)
             {
                 t1.text = string.IsNullOrEmpty(buff.title) ? "(No Title)" : buff.title;
-                t1.ForceMeshUpdate(); // 保險：強制刷新
+                t1.ForceMeshUpdate();
                 Debug.Log($"[UpgradeMenu] Title set to: {t1.text}", t1);
             }
             else
@@ -85,7 +95,7 @@ public class UpgradeMenu : MonoBehaviour
                 Debug.LogWarning("[UpgradeMenu] Desc TMP not found on card prefab.", go);
             }
 
-            // 4) 綁定點擊
+            // 綁定點擊
             if (btn)
             {
                 btn.onClick.RemoveAllListeners();
