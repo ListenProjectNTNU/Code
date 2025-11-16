@@ -47,3 +47,8 @@ MonoBehaviour:
   loopingBG: {fileID: 0}
   senpai: {fileID: 0}
   player: {fileID: 0}
+  animCanva: {fileID: 0}
+  globalVolume: {fileID: 0}
+  audioSource: {fileID: 0}
+  headphoneClip: {fileID: 0}
+  inkJSON: {fileID: 0}

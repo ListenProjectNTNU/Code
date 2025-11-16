@@ -22,6 +22,8 @@ public class Scene1Controller : MonoBehaviour, ISceneController
     [Header("Ink JSON（起始對話檔）")]
     public TextAsset inkJSON;
 
+    
+
     void Start()
     {
         Debug.Log("Scene1Controller 啟動，玩家狀態：" + (player != null ? player.activeInHierarchy.ToString() : "player為null"));

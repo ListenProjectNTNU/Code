@@ -99,6 +99,8 @@ public class Scene2Controller : MonoBehaviour, ISceneController
             dialogueManager.inkJSON = inkJSON;
             dialogueManager.EnterDialogueModeFromKnot(knotBattleBefore);
         }
+
+        
     }
 
     void OnEnable()

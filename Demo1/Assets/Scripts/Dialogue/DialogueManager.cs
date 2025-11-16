@@ -56,6 +56,7 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogError("❌ Font Not Found in Build!");
         }
+
     }
 
     public static DialogueManager GetInstance() => instance;
@@ -77,15 +78,6 @@ public class DialogueManager : MonoBehaviour
                 choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
             index++;
         }
-
-        Debug.Log($"PlayerController: {(playerController ? playerController.name : "NULL")}");
-        Debug.Log($"DialoguePanel: {(dialoguePanel ? dialoguePanel.name : "NULL")}");
-        Debug.Log($"PlayerController: {(dialogueText ? dialogueText.name : "NULL")}");
-        Debug.Log($"PlayerController: {(displayNameText ? displayNameText.name : "NULL")}");
-        Debug.Log($"InkJSON: {(inkJSON ? inkJSON.name : "NULL")}");
-        Debug.Log($"dialogueText: {dialogueText} | font: {dialogueText.font}");
-        Debug.Log($"displayNameText: {displayNameText} | font: {displayNameText.font}");
-
     }
 
     private void Update()
@@ -99,6 +91,13 @@ public class DialogueManager : MonoBehaviour
     // 從 JSON 進入對話
     public void EnterDialogueMode(TextAsset inkJSON)
     {
+        StartCoroutine(EnterDialogueModeDelayed(inkJSON));
+    }
+    private IEnumerator EnterDialogueModeDelayed(TextAsset inkJSON)
+    {
+        // 等待 1 frame，確保 Canvas、TMP、Animator 全部初始化完畢
+        yield return null;
+
         // 可能在切場前後，先判空
         EnsurePlayerController();
         if (playerController != null) playerController.enabled = false;
@@ -106,7 +105,7 @@ public class DialogueManager : MonoBehaviour
         if (inkJSON == null)
         {
             Debug.LogError("❌ Ink JSON 未指定");
-            return;
+            yield break;
         }
 
         if (player != null)
@@ -137,11 +136,17 @@ public class DialogueManager : MonoBehaviour
     // 從指定 knot 進入對話
     public void EnterDialogueModeFromKnot(string knotName)
     {
+        StartCoroutine(EnterDialogueModeFromKnotDelayed(knotName));
+    }
+    private IEnumerator EnterDialogueModeFromKnotDelayed(string knotName)
+    {
+        yield return null;
+        
         Debug.Log("Enter Dialogue Mode From Knot：" + knotName);
         if (inkJSON == null)
         {
             Debug.LogError("❌ Ink JSON 未指定");
-            return;
+            yield break;
         }
 
         EnsurePlayerController();
@@ -217,6 +222,9 @@ public class DialogueManager : MonoBehaviour
         // 先顯示選項（如果有）
         if (currentStory.currentChoices.Count > 0)
         {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
             DisplayChoices();
             return;
         }
@@ -313,6 +321,8 @@ public class DialogueManager : MonoBehaviour
         continueStory();
         if (globalVolumeController != null)
             globalVolumeController.SetBlur();
+        Cursor.lockState = CursorLockMode.Locked; // 或你的遊戲原本設定
+        Cursor.visible = false;
     }
 
     // —— 小工具：確保 playerController 可用（被銷毀就重新抓）——
