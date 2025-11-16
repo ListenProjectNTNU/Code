@@ -98,8 +98,18 @@ public class EnemyFlyerShooterArena : LivingEntity
 
         if (player == null)
         {
-            var pc = FindObjectOfType<PlayerController>();
-            if (pc) player = pc.transform;
+            var apc = FindObjectOfType<ArenaPlayerController>();
+            if (apc) player = apc.transform;
+            else
+            {
+                var pc = FindObjectOfType<PlayerController>();
+                if (pc) player = pc.transform;
+                else
+                {
+                    var go = GameObject.FindGameObjectWithTag("Player");
+                    if (go) player = go.transform;
+                }
+            }
         }
 
         // 巡邏邊界

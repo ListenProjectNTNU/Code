@@ -51,7 +51,6 @@ public class LivingEntity : MonoBehaviour
         }
     }
 
-
     protected virtual void Die()
     {
         isDead = true;
