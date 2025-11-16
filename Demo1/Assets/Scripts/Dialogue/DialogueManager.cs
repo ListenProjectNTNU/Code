@@ -41,6 +41,10 @@ public class DialogueManager : MonoBehaviour
 
     private GlobalVolumeController globalVolumeController;
 
+    //[Header("數值條")]
+    private GameObject healthBar;
+
+
     private void Awake()
     {
         if (instance != null)
@@ -98,6 +102,12 @@ public class DialogueManager : MonoBehaviour
         // 等待 1 frame，確保 Canvas、TMP、Animator 全部初始化完畢
         yield return null;
 
+        EnsureHealthBar();
+        if (healthBar != null)
+        {
+            healthBar.SetActive(false);
+        }
+
         // 可能在切場前後，先判空
         EnsurePlayerController();
         if (playerController != null) playerController.enabled = false;
@@ -141,7 +151,13 @@ public class DialogueManager : MonoBehaviour
     private IEnumerator EnterDialogueModeFromKnotDelayed(string knotName)
     {
         yield return null;
-        
+
+        EnsureHealthBar();
+        if (healthBar != null)
+        {
+            healthBar.SetActive(false);
+        }
+            
         Debug.Log("Enter Dialogue Mode From Knot：" + knotName);
         if (inkJSON == null)
         {
@@ -179,6 +195,32 @@ public class DialogueManager : MonoBehaviour
         continueStory();
     }
 
+    private void EnsureHealthBar()
+    {
+        if (healthBar != null) return;
+
+        // 先找 DDOL 裡的血條（優先）
+        var allCanvases = FindObjectsOfType<Canvas>(true);
+        foreach (var c in allCanvases)
+        {
+            if (c.gameObject.scene.name == "DontDestroyOnLoad")
+            {
+                Transform hb = c.transform.Find("playerUI");
+                if (hb != null)
+                {
+                    healthBar = hb.gameObject;
+                    return;
+                }
+            }
+        }
+
+        // 如果在 DDOL 找不到，就找目前場景內的
+        var hbInScene = GameObject.Find("playerUI");
+        if (hbInScene)
+            healthBar = hbInScene;
+    }
+
+
     private void UpdateInkVariables()
     {
         var inkUpdater = FindObjectOfType<InkVariableUpdater>();
@@ -197,6 +239,12 @@ public class DialogueManager : MonoBehaviour
     {
         Debug.Log("ExitDialogueMode");
         dialogueIsPlaying = false;
+
+        EnsureHealthBar();
+        if (healthBar != null)
+        {
+            healthBar.SetActive(true);
+        }
 
         if (dialoguePanel) dialoguePanel.SetActive(false);
         if (dialogueText) dialogueText.text = "";
