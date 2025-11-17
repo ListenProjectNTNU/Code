@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbb57a69514c88d4bae1dc639de4a58d, type: 3}
   m_Name: Buff_Defence
   m_EditorClassIdentifier: 
-  title: Def Buff
-  description: +10 def
+  title: "\u9632\u79A6\u8A13\u7DF4"
+  description: "\u9632\u79A6\u529B + 10"
   icon: {fileID: 0}
   effect: 1
   intValue: 1

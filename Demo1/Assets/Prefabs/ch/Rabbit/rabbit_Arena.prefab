@@ -157,8 +157,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 128.6656, y: 27.7}
-  m_SizeDelta: {x: 257.33118, y: 39.7865}
+  m_AnchoredPosition: {x: 339.0166, y: 68.27469}
+  m_SizeDelta: {x: 914.6775, y: 110.7175}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5875692054351942238
 CanvasRenderer:
@@ -232,8 +232,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 128.6656, y: 27.7}
-  m_SizeDelta: {x: 257.33118, y: 39.7865}
+  m_AnchoredPosition: {x: 339.0166, y: 68.27469}
+  m_SizeDelta: {x: 914.6775, y: 110.7175}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2235429154062636827
 CanvasRenderer:
@@ -284,10 +284,12 @@ GameObject:
   - component: {fileID: 6026982861198479447}
   - component: {fileID: 688691059308515719}
   - component: {fileID: 7810144776706345080}
+  - component: {fileID: 4058189279738395960}
   - component: {fileID: 9139467024135535162}
   - component: {fileID: 429871080984878579}
   - component: {fileID: 2923893116272935182}
   - component: {fileID: 4781995476166064621}
+  - component: {fileID: 4225302910232880619}
   m_Layer: 8
   m_Name: rabbit_Arena
   m_TagString: Player
@@ -386,6 +388,50 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4058189279738395960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376125773283568411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98b6f6969e43455468c85b6c818e3ec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 0
+  isDead: 0
+  healthBar: {fileID: 2739089054650263086}
+  anim: {fileID: 0}
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  attackseg: 0
+  defenceseg: 0
+  speedseg: 0
+  playerID: player
+  ground:
+    serializedVersion: 2
+    m_Bits: 64
+  jumpForce: 7
+  hurtForce: 3
+  speed: 5
+  attackDamage: 20
+  defence: 2
+  deathMenu: {fileID: 0}
+  AnimatorLayerNames:
+  - Base Layer
+  activeLayerName: Base Layer
+  arenaMode: 1
+  dashKey: 304
+  dashSpeed: 25
+  dashDuration: 0.18
+  dashCooldown: 0.9
+  playerPhysicsLayer: Player
+  harmPhysicsLayers:
+  - Enemy
 --- !u!50 &9139467024135535162
 Rigidbody2D:
   serializedVersion: 4
@@ -445,7 +491,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -1.4742069, y: 2.9679384}
+  m_Offset: {x: -2.7107372, y: 1.7314072}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -456,7 +502,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 20.18216, y: 61.564125}
+  m_Size: {x: 16.567688, y: 64.037186}
   m_EdgeRadius: 0
 --- !u!114 &2923893116272935182
 MonoBehaviour:
@@ -485,7 +531,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1376125773283568411}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 39ee6233223a29a49b00558c79d8d22f, type: 3}
   m_Name: 
@@ -494,6 +540,31 @@ MonoBehaviour:
   currentHealth: 0
   isDead: 0
   healthBar: {fileID: 2739089054650263086}
+--- !u!114 &4225302910232880619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376125773283568411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a27b0aeabfa2084ea3b9f035a13c7b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackSeg: 0
+  defenceSeg: 0
+  speedSeg: 0
+  damageTakenMultiplier: 1
+  moveSpeedMultiplier: 1
+  dashCooldownMultiplier: 1
+  dashDurationBonus: 0
+  jumpForceBonus: 0
+  regenPerSecond: 0
+  knockbackTakenMultiplier: 1
+  dashDistanceMultiplier: 1
+  oneTimeShield: 0
+  acquiredBuffs: []
 --- !u!1 &2461298629769137879
 GameObject:
   m_ObjectHideFlags: 0
@@ -621,7 +692,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: -1609922355
   m_SortingOrder: 0
@@ -718,8 +789,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 128.6656, y: 27.7}
-  m_SizeDelta: {x: 257.33118, y: 39.7865}
+  m_AnchoredPosition: {x: 339.0166, y: 68.27469}
+  m_SizeDelta: {x: 914.6775, y: 110.7175}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6609278267648788767
 CanvasRenderer:
@@ -793,8 +864,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 128.66559, y: 13.725037}
-  m_SizeDelta: {x: 257.33118, y: 27.450104}
+  m_AnchoredPosition: {x: 339.0166, y: 29.385284}
+  m_SizeDelta: {x: 914.6775, y: 76.3879}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &662883884055599725
 CanvasRenderer:
@@ -868,8 +939,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 128.66559, y: 13.725037}
-  m_SizeDelta: {x: 257.33118, y: 27.450104}
+  m_AnchoredPosition: {x: 339.0166, y: 29.385284}
+  m_SizeDelta: {x: 914.6775, y: 76.3879}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &244280253599356977
 CanvasRenderer:
@@ -943,8 +1014,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 128.66559, y: 13.725037}
-  m_SizeDelta: {x: 257.33118, y: 27.450104}
+  m_AnchoredPosition: {x: 339.0166, y: 29.385284}
+  m_SizeDelta: {x: 914.6775, y: 76.3879}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6072256959508901273
 CanvasRenderer:

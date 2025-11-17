@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbb57a69514c88d4bae1dc639de4a58d, type: 3}
   m_Name: Buff_attack
   m_EditorClassIdentifier: 
-  title: Attack Buff
-  description: +10 atk
+  title: "\u653B\u64CA\u8A13\u7DF4"
+  description: "\u653B\u64CA\u529B + 10"
   icon: {fileID: 0}
   effect: 0
   intValue: 1
