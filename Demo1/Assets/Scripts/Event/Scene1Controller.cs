@@ -19,6 +19,11 @@ public class Scene1Controller : MonoBehaviour, ISceneController
     public AudioSource audioSource; // 指定 AudioSource
     public AudioClip headphoneClip; // 🎧 耳機音效 (請在 Inspector 指定)
 
+    [Header("Ink JSON（起始對話檔）")]
+    public TextAsset inkJSON;
+
+    
+
     void Start()
     {
         Debug.Log("Scene1Controller 啟動，玩家狀態：" + (player != null ? player.activeInHierarchy.ToString() : "player為null"));
@@ -29,6 +34,23 @@ public class Scene1Controller : MonoBehaviour, ISceneController
         {
             Debug.Log("成功存取 Global Volume。");
         }
+
+        //自動開啟對話
+        if (DialogueManager.GetInstance() == null)
+        {
+            Debug.LogError("❌ DialogueManager 尚未在場景中建立！");
+            return;
+        }
+
+        if (inkJSON == null)
+        {
+            Debug.LogError("❌ 尚未指定 Ink JSON 檔案！");
+            return;
+        }
+
+        Debug.Log("🎬 遊戲開始，自動進入對話");
+        DialogueManager.GetInstance().EnterDialogueMode(inkJSON);
+        
     }
 
 
