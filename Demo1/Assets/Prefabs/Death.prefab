@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb0e4d7a881eef44813123ed31b9db6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 20
   currentHealth: 0
   isDead: 0
   healthBar: {fileID: 896722592436501781}
@@ -309,6 +309,13 @@ MonoBehaviour:
   specialMaxDistance: 10
   lockOnDuringCast: 1
   specialPostCastDelay: 1
+  extraHpPerWave: 20
+  extraDamagePerWave: 2
+  extraSpeedPerWave: 0.1
+  harderFromWave: 6
+  hardHpMultiplier: 1.5
+  hardDamageMultiplier: 1.3
+  hardSpeedMultiplier: 1.15
 --- !u!1 &2971940820430247240
 GameObject:
   m_ObjectHideFlags: 0
