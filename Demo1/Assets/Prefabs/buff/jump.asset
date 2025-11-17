@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbb57a69514c88d4bae1dc639de4a58d, type: 3}
   m_Name: jump
   m_EditorClassIdentifier: 
-  title: Jump Buff
-  description: Jump Power +1.0
+  title: "\u5411\u4E0A\u98DB\u5347"
+  description: "\u8DF3\u8E8D\u529B + 10"
   icon: {fileID: 0}
   effect: 7
   intValue: 0
