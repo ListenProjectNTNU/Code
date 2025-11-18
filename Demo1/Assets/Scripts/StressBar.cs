@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 壓力值條：從 0 往上加到 maxStress。
@@ -27,9 +28,27 @@ public class StressBar : MonoBehaviour, IDataPersistence
 
     void Start()
     {
+        ApplySceneDefaults();
         // 沒有存檔就用 0 起
         currentStress = Mathf.Clamp(currentStress, 0, maxStress);
         RefreshUI(immediate:true);
+    }
+    // 寫死的壓力值
+    void ApplySceneDefaults()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+        switch (sceneName)
+        {
+            case "SecondScene":
+                currentStress = 100f;
+                break;
+            case "ThirdScene":
+                currentStress = 70f;
+                break;
+            case "FourthScene":
+                currentStress = 30f;
+                break;
+        }
     }
 
     /* ─────────────────── Public API ─────────────────── */
