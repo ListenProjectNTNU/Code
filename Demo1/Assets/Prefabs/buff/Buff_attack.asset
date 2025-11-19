@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   title: "\u653B\u64CA\u8A13\u7DF4"
   description: "\u653B\u64CA\u529B + 10"
-  icon: {fileID: 0}
+  icon: {fileID: 396080119, guid: 9c063b37bd6aef440a1a56824a4a40f2, type: 3}
   effect: 0
   intValue: 1
   floatValue: 0
