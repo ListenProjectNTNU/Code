@@ -9,7 +9,7 @@ public class UpgradeMenu : MonoBehaviour
     public ArenaManager arena;
     public GameObject cardPrefab;
     public Transform cardParent;
-
+    public ArenaStatusPanel statusPanel;
     [Header("Pool")]
     public List<BuffSO> allBuffs = new();
 
@@ -24,6 +24,11 @@ public class UpgradeMenu : MonoBehaviour
                   ArenaPlayerController.Instance.gameObject :
                   GameObject.FindGameObjectWithTag("Player");
         if (!arena) arena = FindObjectOfType<ArenaManager>(true);
+
+        // 🔥 如果你懶得手動拖，可以加這行自動找
+        if (!statusPanel)
+            statusPanel = FindObjectOfType<ArenaStatusPanel>(true);
+
         gameObject.SetActive(false);
     }
 
@@ -102,8 +107,21 @@ public class UpgradeMenu : MonoBehaviour
                 btn.onClick.AddListener(() =>
                 {
                     Debug.Log($"[UpgradeMenu] Player clicked buff: {buff.title}");
+
                     buff.Apply(ArenaPlayerController.Instance ? ArenaPlayerController.Instance.gameObject : null);
                     HealPlayer();
+
+                    // 🔥🔥🔥 讓狀態面板更新（重點補在這裡）
+                    if (statusPanel != null)
+                    {
+                        statusPanel.RefreshAll();
+                        Debug.Log("[UpgradeMenu] StatusPanel refreshed.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[UpgradeMenu] statusPanel is NULL, cannot refresh.");
+                    }
+
                     CloseAndResume();
                 });
             }

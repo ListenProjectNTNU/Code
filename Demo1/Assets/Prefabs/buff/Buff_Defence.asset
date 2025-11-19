@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Buff_Defence
   m_EditorClassIdentifier: 
   title: "\u9632\u79A6\u8A13\u7DF4"
-  description: "\u9632\u79A6\u529B + 10"
+  description: "\u9632\u79A6\u529B + 2"
   icon: {fileID: 0}
   effect: 1
   intValue: 1
