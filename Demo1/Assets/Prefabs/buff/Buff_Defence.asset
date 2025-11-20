@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Buff_Defence
   m_EditorClassIdentifier: 
   title: "\u9632\u79A6\u8A13\u7DF4"
-  description: "\u9632\u79A6\u529B + 10"
-  icon: {fileID: 0}
+  description: "\u9632\u79A6\u529B + 2"
+  icon: {fileID: 369612070, guid: 9c063b37bd6aef440a1a56824a4a40f2, type: 3}
   effect: 1
   intValue: 1
   floatValue: 0
