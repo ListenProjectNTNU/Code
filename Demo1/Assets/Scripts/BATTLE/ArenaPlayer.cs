@@ -81,6 +81,15 @@ public class ArenaPlayerController : LivingEntity
     private PlayerBuffs buffs;
 
     // ─────────────────────────────────────────────────────────
+    // 新增：跌落過低判定
+    // ─────────────────────────────────────────────────────────
+    [Header("Fall / Out-of-bounds")]
+    [Tooltip("若玩家 Y 軸低於此值，會直接觸發死亡。")]
+    [SerializeField] private float fallDeathY = -20f;
+    // 防止在同一段時間內重複處理跌落事件
+    private bool _fallenHandled = false;
+
+    // ─────────────────────────────────────────────────────────
     // Unity lifecycle
     // ─────────────────────────────────────────────────────────
     private void Awake()
@@ -186,6 +195,19 @@ public class ArenaPlayerController : LivingEntity
             return;
         }
 
+        // --- 跌落過低自動死亡檢查 ---
+        if (!_fallenHandled && transform.position.y < fallDeathY)
+        {
+            _fallenHandled = true;
+
+            // 直接觸發死亡（跳過 dash 無敵或其他短路）
+            Die();
+
+            // 如果你想要先播放 hurt 再死，可以改成呼叫 TakeDamage 或在這裡做額外處理
+            // 例如：anim.SetTrigger("hurt"); StartCoroutine(DelayedDie(0.5f));
+            return;
+        }
+
         // Dash 輸入
         if (Input.GetKeyDown(dashKey))
             TryDash();
@@ -226,6 +248,9 @@ public class ArenaPlayerController : LivingEntity
         if (isDead) return;
         isDead = true;
 
+        // 設定跌落處理旗標，避免重複
+        _fallenHandled = true;
+
         anim.SetTrigger("die");
         rb.velocity = Vector2.zero;
         this.enabled = false;
@@ -265,6 +290,9 @@ public class ArenaPlayerController : LivingEntity
         this.enabled = true;
 
         if (deathMenu) deathMenu.SetActive(false);
+
+        // 復活時重置跌落旗標
+        _fallenHandled = false;
 
         if (DataPersistenceManager.instance != null)
             DataPersistenceManager.instance.LoadSceneAndUpdate(SceneManager.GetActiveScene().name);
