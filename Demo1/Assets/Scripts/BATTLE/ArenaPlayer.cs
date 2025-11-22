@@ -71,6 +71,9 @@ public class ArenaPlayerController : LivingEntity
     [SerializeField] private string playerPhysicsLayer = "Player";
     [SerializeField] private string[] harmPhysicsLayers = new string[] { "Enemy" };
 
+    [Header("Effects")]
+    public ParticleSystem healEffect;
+
     private bool isDashing = false;
     private float lastDashTime = -999f;
     private int _playerLayer;
@@ -298,6 +301,29 @@ public class ArenaPlayerController : LivingEntity
             DataPersistenceManager.instance.LoadSceneAndUpdate(SceneManager.GetActiveScene().name);
         else
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void Heal(float amount)
+    {
+        if (isDead) return;
+
+        // 1. 計算血量 (防止溢出)
+        // 注意：這裡假設 LivingEntity 有 maxHealth 和 currentHealth
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+
+        // 2. 更新血條 UI
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
+
+        // 3. ★ 播放治癒特效
+        if (healEffect != null)
+        {
+            healEffect.Play();
+        }
+
+        Debug.Log($"[Player] Healed {amount}. HP: {currentHealth}/{maxHealth}");
     }
 
     // ★ 受傷：一次性護盾 + 減傷乘數

@@ -64,7 +64,7 @@ public class UpgradeMenu : MonoBehaviour
         {
             if (!buff) continue;
 
-            Debug.Log($"[UpgradeMenu] ===== Spawn card for buff: {buff.name}, icon = {buff.icon}");
+            //Debug.Log($"[UpgradeMenu] ===== Spawn card for buff: {buff.name}, icon = {buff.icon}");
 
             var go = Instantiate(cardPrefab, cardParent);
 
@@ -73,12 +73,12 @@ public class UpgradeMenu : MonoBehaviour
             var images = go.GetComponentsInChildren<Image>(true);
             foreach (var img in images)
             {
-                Debug.Log($"[UpgradeMenu] Image found on card: {img.name}", img);
+                //Debug.Log($"[UpgradeMenu] Image found on card: {img.name}", img);
                 var n = img.name.Trim();
                 if (n == "Icon" || n.StartsWith("Icon"))
                 {
                     icon = img;
-                    Debug.Log("[UpgradeMenu] >>> Icon Image chosen: " + img.name, img);
+                    //Debug.Log("[UpgradeMenu] >>> Icon Image chosen: " + img.name, img);
                     break;
                 }
             }
@@ -90,7 +90,7 @@ public class UpgradeMenu : MonoBehaviour
             var tmps = go.GetComponentsInChildren<TMP_Text>(true);
             foreach (var t in tmps)
             {
-                Debug.Log($"[Card TMP] found: '{t.name}'", t);
+                //Debug.Log($"[Card TMP] found: '{t.name}'", t);
 
                 var n = t.name.Trim();
 
@@ -103,15 +103,15 @@ public class UpgradeMenu : MonoBehaviour
             // 3) 填 Icon
             if (icon)
             {
-                Debug.Log($"[UpgradeMenu] Icon BEFORE set: sprite = {icon.sprite}", icon);
+                //Debug.Log($"[UpgradeMenu] Icon BEFORE set: sprite = {icon.sprite}", icon);
                 icon.sprite = buff.icon;
                 icon.preserveAspect = true;
                 icon.enabled = (buff.icon != null);
-                Debug.Log($"[UpgradeMenu] Icon AFTER set: sprite = {icon.sprite}", icon);
+                //Debug.Log($"[UpgradeMenu] Icon AFTER set: sprite = {icon.sprite}", icon);
             }
             else
             {
-                Debug.LogWarning("[UpgradeMenu] Icon Image not found on card prefab.", go);
+                //Debug.LogWarning("[UpgradeMenu] Icon Image not found on card prefab.", go);
             }
 
             // 4) 填文字
@@ -119,11 +119,11 @@ public class UpgradeMenu : MonoBehaviour
             {
                 t1.text = string.IsNullOrEmpty(buff.title) ? "(No Title)" : buff.title;
                 t1.ForceMeshUpdate();
-                Debug.Log($"[UpgradeMenu] Title set to: {t1.text}", t1);
+                //Debug.Log($"[UpgradeMenu] Title set to: {t1.text}", t1);
             }
             else
             {
-                Debug.LogWarning("[UpgradeMenu] Title TMP not found on card prefab.", go);
+                //Debug.LogWarning("[UpgradeMenu] Title TMP not found on card prefab.", go);
             }
 
             if (t2)
@@ -132,7 +132,7 @@ public class UpgradeMenu : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("[UpgradeMenu] Desc TMP not found on card prefab.", go);
+                //Debug.LogWarning("[UpgradeMenu] Desc TMP not found on card prefab.", go);
             }
 
             // 5) 綁定點擊事件
@@ -142,7 +142,7 @@ public class UpgradeMenu : MonoBehaviour
                 btn.onClick.RemoveAllListeners();
                 btn.onClick.AddListener(() =>
                 {
-                    Debug.Log($"[UpgradeMenu] Player clicked buff: {buff.title}", buff);
+                    //Debug.Log($"[UpgradeMenu] Player clicked buff: {buff.title}", buff);
 
                     buff.Apply(ArenaPlayerController.Instance
                                ? ArenaPlayerController.Instance.gameObject
@@ -157,7 +157,7 @@ public class UpgradeMenu : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogWarning("[UpgradeMenu] statusPanel is NULL, cannot refresh.");
+                        //Debug.LogWarning("[UpgradeMenu] statusPanel is NULL, cannot refresh.");
                     }
 
                     CloseAndResume();
@@ -165,7 +165,7 @@ public class UpgradeMenu : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("[UpgradeMenu] Button not found on card prefab.", go);
+                //Debug.LogWarning("[UpgradeMenu] Button not found on card prefab.", go);
             }
         }
     }
@@ -173,15 +173,12 @@ public class UpgradeMenu : MonoBehaviour
     private void HealPlayer()
     {
         var player = ArenaPlayerController.Instance;
-        if (player == null || player.isDead) return;
-
-        player.currentHealth = Mathf.Min(player.maxHealth,
-                                         player.currentHealth + healOnChoose);
-
-        if (player.healthBar != null)
-            player.healthBar.SetHealth(player.currentHealth);
-
-        Debug.Log($"[UpgradeMenu] Heal +{healOnChoose}. HP = {player.currentHealth}/{player.maxHealth}");
+        
+        if (player != null)
+        {
+            // 把所有髒活累活都交給玩家腳本處理
+            player.Heal(healOnChoose);
+        }
     }
 
     private void CloseAndResume()
