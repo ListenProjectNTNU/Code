@@ -249,32 +249,56 @@ public class PlayerController : LivingEntity, IDataPersistence
     {
         if (arenaMode)
         {
-            // 競技場不提供原地復活；若需要可讓 ArenaManager 控制重開
+            // 競技場另外處理（有需要再接 ArenaManager）
             var arena = FindObjectOfType<ArenaManager>();
             if (arena != null) arena.Restart();
             return;
         }
-        
+
         if (anim == null) anim = GetComponent<Animator>();
+        if (rb   == null) rb   = GetComponent<Rigidbody2D>();
+        if (coll == null) coll = GetComponent<Collider2D>();
 
-        Debug.Log("RevivePlayer() 被執行！");
+        Debug.Log("RevivePlayer() 被執行！（原地滿血復活）");
 
-        healthBar.SetHealth(healthBar.maxHP);
-        transform.position = Vector3.zero;
-        state = State.idle;
-        anim.SetInteger("state", (int)state);
+        // ① 本體狀態：確實標記為活著
+        isDead = false;
+        state  = State.idle;
+
+        // ② 重設 LivingEntity 內部血量（這裡假設 LivingEntity 有 currentHealth / maxHealth）
+        // 如果你的欄位名稱不同，把下面兩行改成你自己的變數名稱即可
+        currentHealth = maxHealth;                   // ← LivingEntity 裡的血量變數
+        if (healthBar != null)
+            healthBar.SetHealth(maxHealth);          // UI 血條一起回滿
+
+        // ③ 停止移動，避免殘留速度
         rb.velocity = Vector2.zero;
 
+        // ④ 強制切回站立動畫
+        anim.ResetTrigger("die");                    // 把 die trigger 清掉
+        anim.SetInteger("state", (int)State.idle);   // 你的 FSM 整數狀態
+        anim.Play("Idle", 0, 0f);                    // Idle clip 名稱如果不是 Idle 就改成你的
+
+        // ⑤ 開啟控制
         this.enabled = true;
 
-        if (deathMenu) deathMenu.SetActive(false);
+        // ⑥ 關掉死亡選單
+        if (deathMenu != null)
+            deathMenu.SetActive(false);
 
-        // 若你有資料管理器要同步 UI/狀態，可用現成流程
-        if (DataPersistenceManager.instance != null)
-            DataPersistenceManager.instance.LoadSceneAndUpdate(SceneManager.GetActiveScene().name);
-        else
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        // ⑦ 給一小段無敵時間，避免剛站起來馬上又被 Boss 貼臉處決
+        StartCoroutine(Co_ReviveIFrames());
     }
+        
+    private IEnumerator Co_ReviveIFrames()
+    {
+        // 利用你 Dash 已經有的 iFrame 系統
+        ToggleIFrames(true);
+        yield return new WaitForSeconds(1.0f);   // 1 秒無敵，長短自己調
+        ToggleIFrames(false);
+    }
+
+
 
     private void ResetPlayerPosition()
     {

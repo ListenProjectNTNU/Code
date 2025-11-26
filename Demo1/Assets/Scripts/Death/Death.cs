@@ -67,6 +67,16 @@ public class Death : LivingEntity
     public float specialPostCastDelay = 1.0f;   // Cast 動畫結束後，等待幾秒才生成手臂
     private SpecialPointFollower spFollower;   // special_point 的跟隨器
 
+    [Header("Arena Scaling")]
+    public float extraHpPerWave = 20f;         // 每波 +20 HP
+    public float extraDamagePerWave = 2f;      // 每波 +2 傷害
+    public float extraSpeedPerWave = 0.1f;     // 每波 +0.1 移動速度
+
+    public int harderFromWave = 6;             // 第 6 波開始進入困難模式
+    public float hardHpMultiplier = 1.5f;      // 血量 ×1.5
+    public float hardDamageMultiplier = 1.3f;  // 傷害 ×1.3
+    public float hardSpeedMultiplier = 1.15f;  // 速度 ×1.15
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -148,6 +158,42 @@ public class Death : LivingEntity
             Patrol();
         }
     }
+
+        /// <summary>
+        /// 由 ArenaManager 生成時呼叫，根據 wave 調整數值。
+        /// </summary>
+    public void OnArenaScale(int wave)
+    {
+        // ---------- 1) 基礎血量成長 ----------
+        float newHp = maxHealth + (wave - 1) * extraHpPerWave;
+
+        // ---------- 2) 基礎傷害成長 ----------
+        float newDmg = meleeDamage + (wave - 1) * extraDamagePerWave;
+
+        // ---------- 3) 移動速度成長 ----------
+        float newPatrolSpeed = patrolSpeed + (wave - 1) * extraSpeedPerWave;
+        float newChaseSpeed  = chaseSpeed  + (wave - 1) * extraSpeedPerWave;
+
+        // ---------- 4) 進入困難模式（第 6 波起） ----------
+        if (wave >= harderFromWave)
+        {
+            newHp          = Mathf.RoundToInt(newHp * hardHpMultiplier);
+            newDmg         = Mathf.RoundToInt(newDmg * hardDamageMultiplier);
+            newPatrolSpeed = newPatrolSpeed * hardSpeedMultiplier;
+            newChaseSpeed  = newChaseSpeed  * hardSpeedMultiplier;
+        }
+
+        // ---------- 5) 回寫到怪物 ----------
+        maxHealth = newHp;
+        currentHealth = maxHealth;      // 新生成怪 → 滿血
+        meleeDamage = Mathf.RoundToInt(newDmg);
+        patrolSpeed = newPatrolSpeed;
+        chaseSpeed  = newChaseSpeed;
+
+        // 如果想讓特殊攻擊跟著加強，也可以寫：
+        // specialDamage = meleeDamage;
+    }
+
 
 
     // ───────────────────────── Movement / Facing ─────────────────────────

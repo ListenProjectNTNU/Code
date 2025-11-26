@@ -55,19 +55,29 @@ public class ArenaStatusPanel : MonoBehaviour
 
     private void RefreshBuffList()
     {
-        if (!buffListParent || buffs == null) return;
+        if (!buffListParent || buffs == null)
+        {
+            Debug.LogWarning("[StatusPanel] buffListParent or buffs is null, skip RefreshBuffList.");
+            return;
+        }
 
         // 清空舊的
         foreach (Transform c in buffListParent)
             Destroy(c.gameObject);
 
-        // 逐一生成已取得 Buff 的小圖示
+        // 🔥 防呆：Prefab 沒設定或被摧毀
+        if (!buffEntryPrefab)
+        {
+            Debug.LogWarning("[StatusPanel] buffEntryPrefab is null or destroyed, cannot spawn buff entries.");
+            return;
+        }
+
         foreach (var b in buffs.acquiredBuffs)
         {
             if (!b) continue;
 
             var go = Instantiate(buffEntryPrefab, buffListParent);
-            var icon = go.transform.Find("Icon") ?.GetComponent<Image>();
+            var icon  = go.transform.Find("Icon") ?.GetComponent<Image>();
             var title = go.transform.Find("Title")?.GetComponent<TMP_Text>();
 
             if (icon)  icon.sprite = b.icon;

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbb57a69514c88d4bae1dc639de4a58d, type: 3}
+  m_Name: jump
+  m_EditorClassIdentifier: 
+  title: "\u5411\u4E0A\u98DB\u5347"
+  description: "\u8DF3\u8E8D\u529B + 10"
+  icon: {fileID: -273275599, guid: 9c063b37bd6aef440a1a56824a4a40f2, type: 3}
+  effect: 7
+  intValue: 0
+  floatValue: 1.5
