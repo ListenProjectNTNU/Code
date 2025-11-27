@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 
 public class DialogueTrigger : MonoBehaviour
-{
+{//
     [Header("Visual Cue")]
     public GameObject visualCue;
     [Header("Ink JSON")]

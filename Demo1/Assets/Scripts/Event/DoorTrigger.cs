@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public class DoorTrigger : MonoBehaviour
-{
+{//
     // 🔹原功能：敵人清空後才可進入門
     [Header("戰鬥門用呼叫LevelLoader")]
     public UnityEvent onEnemiesEnd;

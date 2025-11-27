@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Scene4Controller : MonoBehaviour, ISceneController
 
-{
+{//
     [Header("Ink JSON（起始對話檔）")]
     public TextAsset inkJSON;
 

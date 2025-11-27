@@ -5,7 +5,7 @@ public class AutoStartDialogue : MonoBehaviour
 {
     [Header("Ink JSON（起始對話檔）")]
     public TextAsset inkJSON;
-
+//
     private void Start()
     {
         // 若是競技場場景，直接略過

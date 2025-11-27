@@ -3,7 +3,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal; 
 using UnityEngine.Rendering.PostProcessing;
 public class Scene1Controller : MonoBehaviour, ISceneController
-{
+{//
     public LoopingBackground loopingBG;
     public GameObject senpai; // 學姊物件
     public GameObject player; // 主角物件

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Scene3Controller : MonoBehaviour, ISceneController
-{
+{//
     [Header("Scene References")]
     public BossController boss;
     public Transform player;

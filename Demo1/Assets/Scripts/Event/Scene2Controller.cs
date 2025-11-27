@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Scene2Controller : MonoBehaviour, ISceneController
-{
+{//
     public Transform monster;
     public PlayerController pc;       // ← 玩家 PlayerController
     public string animatorLayerName = "Base Layer";  // 欲啟用的 Animator Layer

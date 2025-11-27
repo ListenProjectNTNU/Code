@@ -8,7 +8,7 @@ using UnityEngine.Events;
 //using Microsoft.Unity.VisualStudio.Editor;
 
 public class DialogueManager : MonoBehaviour
-{
+{//
     private PlayerController playerController;
 
     [Header("Dialogue UI")]
