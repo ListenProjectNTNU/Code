@@ -3,33 +3,33 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    // 單例（兩個別名都給，I / instance 都可用）
     public static GameManager I { get; private set; }
     public static GameManager instance { get; private set; }
 
     [Header("Player")]
-    public GameObject player;           // 場上那隻玩家（若做常駐，記得也 DontDestroyOnLoad）
-    public GameObject playerPrefab;     // 若要在新場景生成玩家，可指定 prefab（可選）
+    public GameObject player;
+    public GameObject playerPrefab;
 
     [Header("Scene Spawn")]
-    public string NextSpawnId = "default"; // 轉場時記住要落地的 spawnId
+    public string NextSpawnId = "default";
 
     void Awake()
     {
-        // 單例去重
-        if (I != null && I != this) { Destroy(gameObject); return; }
+        if (I != null && I != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         I = this;
+        instance = this;
 
-        // 必須是根物件：若有父物件，先脫離
         if (transform.parent != null) transform.SetParent(null);
+        DontDestroyOnLoad(gameObject);
 
-        DontDestroyOnLoad(gameObject);  // 這時才會被搬到 "DontDestroyOnLoad" 區域
+        Debug.Log("🌟 GameManager Awake，單例建立完成");
     }
 
-    /// <summary>
-    /// 給 ScenePortal 用的轉場方法：記住下一個 spawnId，然後載入場景
-    /// </summary>
     public void GoToScene(string sceneName, string spawnId)
     {
         NextSpawnId = string.IsNullOrEmpty(spawnId) ? "default" : spawnId;
@@ -38,14 +38,32 @@ public class GameManager : MonoBehaviour
 
     public void RevivePlayer()
     {
-        Debug.Log("Reviving player...");
-        if (!player) { Debug.LogWarning("GameManager.player 未指定"); return; }
+        Debug.Log("GameManager.RevivePlayer() 被呼叫");
 
-        player.SetActive(true);
-        var playerController = player.GetComponent<PlayerController>();
-        if (playerController != null)
+        if (player == null)
         {
-            playerController.RevivePlayer();
+            player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null)
+            {
+                Debug.LogWarning("GameManager：場景中找不到 Player");
+                return;
+            }
         }
+
+        var pc = player.GetComponent<PlayerController>();
+        if (pc == null)
+        {
+            Debug.LogWarning("GameManager：Player 上沒有 PlayerController");
+            return;
+        }
+
+        pc.RevivePlayer();
+    }
+
+    public void RestartCurrentScene()
+    {
+        var scene = SceneManager.GetActiveScene();
+        Debug.Log("Restart scene: " + scene.name);
+        SceneManager.LoadScene(scene.name);
     }
 }

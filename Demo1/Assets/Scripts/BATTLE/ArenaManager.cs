@@ -160,8 +160,16 @@ public class ArenaManager : MonoBehaviour
 
     private int GetEnemyCountForWave(int currentWave)
     {
-        // 簡單線性成長：基礎 + (波數-1)*增量
-        return Mathf.Max(1, baseEnemyCount + (currentWave - 1) * enemyCountPerWave);
+        // 基礎線性成長
+        int count = Mathf.Max(1, baseEnemyCount + (currentWave - 1) * enemyCountPerWave);
+
+        // 第 6 波（含）之後難度跳一階：一次多出 2 倍怪
+        if (currentWave >= 6)
+        {
+            count *= 2;
+        }
+
+        return count;
     }
 
     private void SpawnEnemies(int count)
@@ -239,14 +247,14 @@ public class ArenaManager : MonoBehaviour
     public void OnWaveCleared()
     {
         // 這裡用 wave（已開啟的波數）判定更直觀：第 3、6、9 ... 波清空後升級
-        if (upgradeMenu != null && wave > 0 && wave % 3 == 1)
+        if (upgradeMenu != null && wave > 0 && wave % 3 == 0)
         {
             PauseGame();
             upgradeMenu.ShowThreeRandom();
         }
     }
 
-        public void PauseGame()
+    public void PauseGame()
     {
         Time.timeScale = 0f;            // 暫停
         AudioListener.pause = true;     // 可選：暫停音效

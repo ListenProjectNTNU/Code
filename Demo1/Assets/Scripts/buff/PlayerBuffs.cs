@@ -35,7 +35,7 @@ public class PlayerBuffs : MonoBehaviour
     
     // ── 便利方法：把 base 值轉有效值（給控制器讀）──
     public int CurAttack   (int baseAttack)  => baseAttack  + attackSeg  * 10;
-    public int CurDefence  (int baseDefence) => baseDefence + defenceSeg * 10;
+    public int CurDefence  (int baseDefence) => baseDefence + defenceSeg * 2;
     public int CurSpeed    (int baseSpeed)   => baseSpeed   + speedSeg   * 20;
 
     // ── 時效型 Buff（可選擇使用；用 unscaled 計時）──

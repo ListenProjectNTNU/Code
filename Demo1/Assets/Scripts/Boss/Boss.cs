@@ -52,6 +52,10 @@ public class BossController : LivingEntity
     //public bool disableColliderOnDeath = true;
     public float destroyDelay = 5f; // 動畫結束後銷毀時間
 
+    [Header("特效參考")]
+    public ParticleSystem hitEffect;
+    public ParticleSystem chargeEffect; 
+
     private bool isDying = false;
 
     // runtime
@@ -179,6 +183,11 @@ public class BossController : LivingEntity
         col.enabled = false;
         transform.position = tp;
         col.enabled = colWasEnabled;
+
+        if (chargeEffect != null)
+        {
+            chargeEffect.Play();
+        }
 
         // 4) Telegraph：鎖死位置，給玩家反應時間
         telegraphAnchor = transform.position;
@@ -340,6 +349,11 @@ public class BossController : LivingEntity
     {
         if (isDead) return;
 
+        if (hitEffect != null)
+        {
+            hitEffect.Play();
+        }
+
         base.TakeDamage(damage);
 
         if (!isDead && !isHurting)
@@ -431,7 +445,6 @@ public class BossController : LivingEntity
     IEnumerator WaitForLanding()
     {
         landed = false;
-
         float start   = Time.time;
         float timeout = 1.8f;
         int nearZeroFrames = 0;
